@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/linearLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+    <!--<TextView-->
+        <!--android:id="@+id/textView2"-->
+        <!--android:layout_width="0dp"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_marginStart="5dp"-->
+        <!--android:padding="5dp"-->
+        <!--android:text="SKU Category:"-->
+        <!--app:layout_constraintBaseline_toBaselineOf="@+id/txtView_skuName"-->
+        <!--app:layout_constraintEnd_toStartOf="@+id/txtView_skuName"-->
+        <!--app:layout_constraintStart_toStartOf="parent" />-->
+
+    <!--<TextView-->
+        <!--android:id="@+id/txtView_skuName"-->
+        <!--android:layout_width="0dp"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_marginEnd="4dp"-->
+        <!--android:layout_marginTop="5dp"-->
+        <!--android:padding="5dp"-->
+        <!--android:text="names"-->
+        <!--app:layout_constraintEnd_toEndOf="parent"-->
+        <!--app:layout_constraintStart_toEndOf="@+id/textView2"-->
+        <!--app:layout_constraintTop_toTopOf="parent" />-->
+
+
+    <!--<TextView-->
+        <!--android:id="@+id/textView3"-->
+        <!--android:layout_width="0dp"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_marginStart="5dp"-->
+        <!--android:padding="5dp"-->
+        <!--android:text="SKU Category:"-->
+        <!--app:layout_constraintBaseline_toBaselineOf="@+id/txtView_target"-->
+        <!--app:layout_constraintEnd_toStartOf="@+id/txtView_target"-->
+        <!--app:layout_constraintStart_toStartOf="parent" />-->
+
+    <!--<TextView-->
+        <!--android:id="@+id/txtView_target"-->
+        <!--android:layout_width="0dp"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_marginEnd="4dp"-->
+        <!--android:layout_marginTop="10dp"-->
+        <!--android:padding="5dp"-->
+        <!--android:text="names"-->
+        <!--app:layout_constraintEnd_toEndOf="parent"-->
+        <!--app:layout_constraintStart_toEndOf="@+id/textView3"-->
+        <!--app:layout_constraintTop_toBottomOf="@+id/textView2" />-->
+
+
+    <!--<TextView-->
+        <!--android:id="@+id/textView4"-->
+        <!--android:layout_width="0dp"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_marginStart="5dp"-->
+        <!--android:padding="5dp"-->
+        <!--android:text="SKU Category:"-->
+        <!--app:layout_constraintBaseline_toBaselineOf="@+id/txtView_achievedNumber"-->
+        <!--app:layout_constraintEnd_toStartOf="@+id/txtView_achievedNumber"-->
+        <!--app:layout_constraintStart_toStartOf="parent" />-->
+
+    <!--<TextView-->
+        <!--android:id="@+id/txtView_achievedNumber"-->
+        <!--android:layout_width="0dp"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_marginEnd="4dp"-->
+        <!--android:layout_marginTop="9dp"-->
+        <!--android:padding="5dp"-->
+        <!--android:text="names"-->
+        <!--app:layout_constraintEnd_toEndOf="parent"-->
+        <!--app:layout_constraintStart_toEndOf="@+id/textView4"-->
+        <!--app:layout_constraintTop_toBottomOf="@+id/textView3" />-->
+
+
+    <!--<TextView-->
+        <!--android:id="@+id/textView5"-->
+        <!--android:layout_width="0dp"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_marginStart="5dp"-->
+        <!--android:padding="5dp"-->
+        <!--android:text="SKU Category:"-->
+        <!--app:layout_constraintBaseline_toBaselineOf="@+id/txtView_achievedPercentage"-->
+        <!--app:layout_constraintEnd_toStartOf="@+id/txtView_achievedPercentage"-->
+        <!--app:layout_constraintStart_toStartOf="parent" />-->
+
+    <!--<TextView-->
+        <!--android:id="@+id/txtView_achievedPercentage"-->
+        <!--android:layout_width="0dp"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_marginEnd="4dp"-->
+        <!--android:layout_marginTop="10dp"-->
+        <!--android:padding="5dp"-->
+        <!--android:text="names"-->
+        <!--app:layout_constraintEnd_toEndOf="parent"-->
+        <!--app:layout_constraintStart_toEndOf="@+id/textView5"-->
+        <!--app:layout_constraintTop_toBottomOf="@+id/textView4" />-->
+
+
+</android.support.constraint.ConstraintLayout>
