@@ -453,7 +453,7 @@ public class SalesActivity extends BaseActivity implements AdapterView.OnItemSel
         spinner_cBrand.setSelection(spinner_cBrand.getSelectedItemPosition());
         spinner_pBrand.setSelection(spinner_pBrand.getSelectedItemPosition());
 
-//        edtText_name.setText("");
+        edtText_name.setText("");
 
 
         salesAndNoSales = realmCRUD.getSaleAndNoSales();
@@ -472,16 +472,19 @@ public class SalesActivity extends BaseActivity implements AdapterView.OnItemSel
     @Override
     protected void onStart() {
         super.onStart();
+        edtText_name.setText("");
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+//        edtText_name.setText("");
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+//        edtText_name.setText("");
     }
 
 
