@@ -45,7 +45,6 @@ import com.example.arsalansiddiq.beem.utils.SyncDataToServerClass;
 
 import java.io.File;
 
-import io.realm.Realm;
 import retrofit2.Response;
 
 
@@ -389,7 +388,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
                 case R.id.fab_menu_endDay:
 
                     SharedPreferences preferences = this.getSharedPreferences(Constants.ATTENDANCE_STATUS, MODE_PRIVATE);
-                    int endDayStatus = preferences.getInt(Constants.KEY_ATTENDANCE_STATUS, 0);
+//                    int endDayStatus = preferences.getInt(Constants.KEY_ATTENDANCE_STATUS, 0);
 
                     if (salesAndNoSales.getTotal_nosales() > 0) {
                         Toast.makeText(this, "please sync data before end day", Toast.LENGTH_SHORT).show();
