@@ -138,13 +138,13 @@ public class OrderActivity extends BaseActivity implements LocationListener, Rad
 
                 if (position == 2) {
 //                    getSalesId();
-                    sale_id = 1;
+//                    sale_id = 1;
                     linearLayout_bottom.setVisibility(View.VISIBLE);
                 } else if (position == 1){
-                    sale_id = 0;
+//                    sale_id = 0;
                     linearLayout_bottom.setVisibility(View.GONE);
                 } else {
-                    sale_id = null;
+//                    sale_id = null;
                 }
 
             }
@@ -173,12 +173,9 @@ public class OrderActivity extends BaseActivity implements LocationListener, Rad
             Toast.makeText(this, "Please select sale status", Toast.LENGTH_SHORT).show();
         } else {
             if (spinner_saleStatus.getSelectedItemPosition() == 1) {
-                getSalesId();
+//                getSalesId();
                 Toast.makeText(this, "Order Saved Offline", Toast.LENGTH_SHORT).show();
                 finish();
-//                intent = new Intent(OrderActivity.this, SalesActivity.class);
-//                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//                startActivity(intent);
             } else {
                 getLocation();
                 getSelectedItemAndPrice();
@@ -191,8 +188,6 @@ public class OrderActivity extends BaseActivity implements LocationListener, Rad
     void sendOrder(final int sales_id) {
 
         Log.i("dates", appUtils.getDate());
-
-//        HolderListModel holderListModel = bu;
 
         final boolean isConnected;
 
@@ -241,13 +236,9 @@ public class OrderActivity extends BaseActivity implements LocationListener, Rad
                                 final BeemPreferences beemPreferences = new BeemPreferences(OrderActivity.this);
                                 beemPreferences.initialize_and_createPreferences_forStatus(loginResponse.getStatus());
 
-//                                SalesStatus salesStatus = new SalesStatus();
-//
-//                                salesStatus.setTotal_sales(1);
-
                                 //Offline Checking
-                                realmCRUD.insertOrderDetails(holderListModel, appUtils.getDate(), 0, 0, 0, 0);
-//                                realmCRUD.insertOrderDetails(holderListModel, appUtils.getDate(), sales_id, Integer.parseInt(loginResponse.getOrder_id()), loginResponse.getStatus(), 1);
+//                                realmCRUD.insertOrderDetails(holderListModel, appUtils.getDate(), 0, 0, 0, 0);
+                                realmCRUD.insertOrderDetails(holderListModel, appUtils.getDate(), sales_id, Integer.parseInt(loginResponse.getOrder_id()), loginResponse.getStatus(), 1);
 
                             }
 
@@ -255,8 +246,8 @@ public class OrderActivity extends BaseActivity implements LocationListener, Rad
                             public void failed(String error) {
 
                                 //Offline Checking
-                                realmCRUD.insertOrderDetails(holderListModel, appUtils.getDate(), 0, 0, 0, 0);
-//                                realmCRUD.insertOrderDetails(holderListModel, appUtils.getDate(), sales_id, 0, 0, 0);
+//                                realmCRUD.insertOrderDetails(holderListModel, appUtils.getDate(), 0, 0, 0, 0);
+                                realmCRUD.insertOrderDetails(holderListModel, appUtils.getDate(), sales_id, 0, 0, 0);
                             }
                         });
 
@@ -345,47 +336,8 @@ public class OrderActivity extends BaseActivity implements LocationListener, Rad
 //                    realmCRUD.getUserBrandsSKUCategory(loginResponse.getUserId()));
             listView_order.setAdapter(adapter);
         } else {
-//            Toast.makeText(this, "please check your internet connection", Toast.LENGTH_SHORT).show();
             frameLayout_noProducts.setVisibility(View.VISIBLE);
         }
-
-//        NetworkUtils networkUtils = new NetworkUtils(OrderActivity.this);
-//
-//        if (networkUtils.isNetworkConnected()) {
-//
-//            progressShow();
-//
-//            networkUtils.getBrandsofUser(cBrand, new SKUCategoryInterface() {
-//                @Override
-//                public void success(Response<SalesObjectResponse> response) {
-//                    Log.i(LOG_TAG, "getBrandItems Status" + response.body().getStatus());
-//                    if (response.body().getStatus() == 1) {
-//
-//                        progressHide();
-
-//                        salesSKUArrayResponseArrayList = response.body().getSku();
-//                        CustomListAdapter adapter = new CustomListAdapter(OrderActivity.this, 0, salesSKUArrayResponseArrayList);
-//                        listView_order.setAdapter(adapter);
-//
-//                    } else {
-//                        Toast.makeText(OrderActivity.this, "Something Went Wrong", Toast.LENGTH_SHORT).show();
-//                    }
-//                }
-
-//                @Override
-//                public void failed(String error) {
-//                    Log.i("SKU", error);
-//
-//                    progressHide();
-//                    Toast.makeText(OrderActivity.this, error, Toast.LENGTH_SHORT).show();
-//                    listView_order.setVisibility(View.GONE);
-//
-//                    frameLayout_noProducts.setVisibility(View.VISIBLE);
-//                }
-//            });
-//        } else {
-
-//        }
 
     }
 

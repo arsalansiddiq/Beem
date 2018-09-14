@@ -84,6 +84,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
         realmCRUD = new RealmCRUD(this);
 
+
         loginResponseRealm = realmCRUD.getLoginInformationDetails();
 
         appUtils = new AppUtils(this);
@@ -325,14 +326,15 @@ public class NavigationDrawerActivity extends AppCompatActivity
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
+
+        SalesAndNoSales salesAndNoSales = realmCRUD.getSaleAndNoSales();
+
         // Handle navigation view item clicks here.
         int id = item.getItemId();
-        SalesAndNoSales salesAndNoSales = realmCRUD.getSaleAndNoSales();
 
         if (id == R.id.nav_notifications) {
             // Handle the camera action
         } else if (id == R.id.nav_sync) {
-
 
             if (salesAndNoSales != null) {
                 if (salesAndNoSales.getTotal_nosales() > 0) {
@@ -372,6 +374,9 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
     @Override
     public void onClick(View v) {
+
+        SalesAndNoSales salesAndNoSales = realmCRUD.getSaleAndNoSales();
+
         switch (v.getId()) {
             case R.id.fab_menu_attandance:
 
@@ -383,9 +388,17 @@ public class NavigationDrawerActivity extends AppCompatActivity
                 break;
                 case R.id.fab_menu_endDay:
 
-                    meetingStatus = 0;
+                    SharedPreferences preferences = this.getSharedPreferences(Constants.ATTENDANCE_STATUS, MODE_PRIVATE);
+                    int endDayStatus = preferences.getInt(Constants.KEY_ATTENDANCE_STATUS, 0);
 
-                    getLocation();
+                    if (salesAndNoSales.getTotal_nosales() > 0) {
+                        Toast.makeText(this, "please sync data before end day", Toast.LENGTH_SHORT).show();
+                    } else {
+                        meetingStatus = 0;
+                        getLocation();
+
+                    }
+
 //                    dispatchTakePictureIntent();
 
                     break;
