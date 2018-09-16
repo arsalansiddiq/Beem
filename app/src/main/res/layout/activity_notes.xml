@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:layout_margin="8dp"
+    tools:context="com.example.arsalansiddiq.beem.activities.NotesActivity">
+
+    <EditText
+        android:id="@+id/edtText_title"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:textSize="20sp"
+        android:hint="@string/title"/>
+
+    <EditText
+        android:id="@+id/edtText_description"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:textSize="20sp"
+        android:lines="4"
+        android:inputType="textMultiLine"
+        android:hint="@string/description"/>
+
+    <Button
+        android:id="@+id/btn_addNotes"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:text="ADD"
+        android:layout_marginTop="10dp"/>
+
+</LinearLayout>

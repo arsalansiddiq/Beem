@@ -18,8 +18,8 @@
         android:supportsRtl="true">
         <activity
             android:name=".activities.LoginActivity"
-            android:theme="@style/AppTheme.NoActionBar1"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar1">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -31,12 +31,12 @@
         <activity
             android:name=".activities.NavigationDrawerActivity"
             android:label="@string/title_activity_navigation_drawer"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".activities.SalesActivity"
-            android:theme="@style/AppTheme"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme" />
 
         <!-- <activity -->
         <!-- android:theme="@style/AppTheme" -->
@@ -45,21 +45,31 @@
 
         <activity
             android:name=".activities.OrderActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme"
-            android:windowSoftInputMode="adjustPan"
-            android:screenOrientation="portrait"/>
+            android:windowSoftInputMode="adjustPan" />
         <!-- <activity -->
         <!-- android:name=".BasicActibity" -->
         <!-- android:label="@string/title_activity_basic_actibity" -->
         <!-- android:theme="@style/AppTheme.NoActionBar"></activity> -->
         <activity
             android:name=".activities.TargetsAndAchievementsActivity"
-            android:theme="@style/AppTheme.NoActionBar2"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar2" />
 
-        <activity android:name=".activities.Replica"
-            android:theme="@style/AppTheme.NoActionBar1"
-            android:screenOrientation="portrait"></activity>
+        <activity
+            android:name=".activities.Replica"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar1" />
+
+        <activity
+            android:name=".activities.NotesActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme" />
+
+        <activity android:name=".activities.AddShopsActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme"></activity>
     </application>
 
 </manifest>

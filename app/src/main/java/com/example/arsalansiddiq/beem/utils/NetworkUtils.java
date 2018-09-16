@@ -269,5 +269,53 @@ public class NetworkUtils {
         });
     }
 
+    public void attandanceSUP(int userId, String name, String startTime,
+                             float latitude, float longitude, int status, final AttandanceInterface attandanceInterface) {
+
+        progressDialog.show();
+        networkRequestInterfaces.attandanceSUP(userId, name, startTime, latitude,
+                longitude, status).enqueue(new Callback<AttandanceResponse>() {
+            @Override
+            public void onResponse(Call<AttandanceResponse> call, Response<AttandanceResponse> response) {
+                progressDialog.cancel();
+                if (response.isSuccessful()) {
+                    attandanceInterface.success(response);
+                } else {
+                    attandanceInterface.failed("invalid credentials");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<AttandanceResponse> call, Throwable t) {
+                Log.i(LOG_TAG, t.getLocalizedMessage().toString());
+                attandanceInterface.failed(t.getLocalizedMessage().toString());
+                progressDialog.cancel();
+            }
+        });
+    }
+
+    public void endAttandenceSUP(int meetingId, String endTime, float eLatitude, float eLongitude,
+                                int status, final EndAttendanceInterface endAttendanceInterface) {
+
+        progressDialog.show();
+        networkRequestInterfaces.endAttandanceSUP(meetingId, endTime, eLatitude, eLongitude, status).enqueue(new Callback<AttandanceResponse>() {
+            @Override
+            public void onResponse(Call<AttandanceResponse> call, Response<AttandanceResponse> response) {
+                progressDialog.cancel();
+                if (response.isSuccessful()) {
+                    endAttendanceInterface.success(response);
+                } else {
+                    endAttendanceInterface.failed("invalid credentials");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<AttandanceResponse> call, Throwable t) {
+                Log.i(LOG_TAG, t.getLocalizedMessage().toString());
+                endAttendanceInterface.failed(t.getLocalizedMessage().toString());
+                progressDialog.cancel();
+            }
+        });
+    }
 
 }

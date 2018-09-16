@@ -23,6 +23,12 @@ public class Constants {
     public static final String USER_BRAND = "userBrand";
     public static final String KEY_USER_BRAND = "keyUserBrand";
 
+    public static final String LOGIN_USER_DESIGNATION = "userBrand";
+    public static final String KEY_LOGIN_USER_DESIGNATION = "keyUserBrand";
+
+    public static final String SUPERVISOR_MEETING_STATUS = "meeting";
+    public static final String KEY_SUPERVISOR_MEETING_STATUS = "keyMeeting";
+
     public static final int STATUS_ON = 1;
     public static final int STATUS_OFF = 0;
 

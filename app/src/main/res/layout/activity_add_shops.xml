@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="8dp"
+    android:orientation="vertical"
+    tools:context="com.example.arsalansiddiq.beem.activities.AddShopsActivity">
+
+    <EditText
+        android:id="@+id/edtText_shopName"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:hint="@string/shop_name"
+        android:textSize="20sp"/>
+
+    <EditText
+        android:id="@+id/edtText_owner"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:hint="@string/owner"
+        android:textSize="20sp"/>
+
+    <EditText
+        android:id="@+id/edtText_contactPerson"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:hint="@string/contact_person"
+        android:textSize="20sp"/>
+
+    <EditText
+        android:id="@+id/edtText_shopContactNumber"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:hint="@string/shop_contact_number"
+        android:textSize="20sp"/>
+
+    <Button
+        android:id="@+id/btn_addShop"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:text="SUBMIT"
+        android:layout_marginTop="10dp"
+        android:textSize="18sp"/>
+
+</LinearLayout>

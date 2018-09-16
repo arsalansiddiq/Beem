@@ -12,6 +12,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -59,7 +60,7 @@ public class OrderActivity extends BaseActivity implements LocationListener, Rad
     private NetworkUtils networkUtils = null;
     private String cusName, contact; String email; String gender; String age; String cBrand = null;
     private String pBrand = null;
-    private Integer sale_id = 0;
+    private Integer sale_id = 0, saleStatus = null;
     private LocationManager locationManager = null;
     private float latitude, longitude;
     private BeemDatabase beemDatabase = null;
@@ -137,13 +138,16 @@ public class OrderActivity extends BaseActivity implements LocationListener, Rad
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
                 if (position == 2) {
+                    saleStatus = 1;
 //                    getSalesId();
 //                    sale_id = 1;
                     linearLayout_bottom.setVisibility(View.VISIBLE);
                 } else if (position == 1){
+                    saleStatus = 0;
 //                    sale_id = 0;
                     linearLayout_bottom.setVisibility(View.GONE);
                 } else {
+                    saleStatus = null;
 //                    sale_id = null;
                 }
 
@@ -159,7 +163,7 @@ public class OrderActivity extends BaseActivity implements LocationListener, Rad
 
         if (spinner_saleStatus.getSelectedItemPosition() == 2) {
             linearLayout_bottom.setVisibility(View.VISIBLE);
-            getSalesId();
+//            getSalesId();
             getBrandItems();
         }
 
@@ -173,11 +177,11 @@ public class OrderActivity extends BaseActivity implements LocationListener, Rad
             Toast.makeText(this, "Please select sale status", Toast.LENGTH_SHORT).show();
         } else {
             if (spinner_saleStatus.getSelectedItemPosition() == 1) {
-//                getSalesId();
-                Toast.makeText(this, "Order Saved Offline", Toast.LENGTH_SHORT).show();
+                getSalesId(saleStatus);
                 finish();
             } else {
                 getLocation();
+//                getSalesId(saleStatus);
                 getSelectedItemAndPrice();
             }
         }
@@ -374,19 +378,48 @@ public class OrderActivity extends BaseActivity implements LocationListener, Rad
                 String looseText = edtText_loose.getText().toString();
                 String cartonText = edtText_carton.getText().toString();
 
-                if (looseText.equals("")  &&
-                        cartonText.equals("")) {
+
+                //Changes requested by humza Friday 15-9-2018
+                //Start
+                int totalItem = 0, totalAmount = 0;
+
+                if (looseText.equals("") &&
+                        cartonText.equals("") ) {
+
                 } else if (looseText.length() > 0 &&
                         cartonText.length() > 0){
-                    doubleQuantity += 1;
+
+                    looseItem = Integer.parseInt(looseText);
+                    cartonItem = Integer.parseInt(cartonText);
+
                     checkSelectionExist++;
                 } else if (looseText.length() > 0 &&
-                        cartonText.equals("")){
+                        TextUtils.isEmpty(cartonText)){
+
                     looseItem = Integer.parseInt(looseText);
-                } else if (looseText.equals("") &&
+                    cartonItem = 0;
+
+                } else if (TextUtils.isEmpty(looseText) &&
                         cartonText.length() > 0){
+                    looseItem = 0;
                     cartonItem = Integer.parseInt(cartonText);
+
                 }
+                //End
+
+//                if (looseText.equals("")  &&
+//                        cartonText.equals("")) {
+//                } else if (looseText.length() > 0 &&
+//                        cartonText.length() > 0){
+//                    doubleQuantity += 1;
+//                    checkSelectionExist++;
+//                } else if (looseText.length() > 0 &&
+//                        cartonText.equals("")){
+//                    looseItem = Integer.parseInt(looseText);
+//                } else if (looseText.equals("") &&
+//                        cartonText.length() > 0){
+//                    cartonItem = Integer.parseInt(cartonText);
+//                }
 
 //                if (looseItem != 0 || cartonItem != 0 && doubleQuantity == 0) {
 //                    checkSelectionExist++;
@@ -397,21 +430,29 @@ public class OrderActivity extends BaseActivity implements LocationListener, Rad
 
                     checkSelectionExist++;
 
-                    int saleTypes, totalItem;
-                    if (cartonItem != null) {
-                        saleTypes = 1;
-                        totalItem = cartonItem;
-                    } else {
-                        saleTypes = 0;
-                        totalItem = looseItem;
+                    skuArrayResponse = salesSKUArrayResponseArrayList.get(i);
+                    try {
+                        totalItem = ((skuArrayResponse.getItemPerCarton() * cartonItem) + looseItem);
+                        totalAmount = (totalItem * skuArrayResponse.getPrice());
+                    } catch (NumberFormatException e) {
+                        Log.e(LOG_TAG, "Total Number of Item :   " + e.getStackTrace().toString());
                     }
 
-                    skuArrayResponse = salesSKUArrayResponseArrayList.get(i);
+//                    int saleTypes;
+//                    if (cartonItem != null) {
+//                        saleTypes = cartonItem;
+////                        totalItem = cartonItem;
+//                    } else {
+//                        saleTypes = 0;
+////                        totalItem = looseItem;
+//                    }
+
+//                    skuArrayResponse = salesSKUArrayResponseArrayList.get(i);
                     LoginResponse loginResponse = beemDatabase.getUserDetail();
 
                     HolderListModel holder =  new HolderListModel(Integer.valueOf(loginResponse.getStoreId()), sale_id, nextIdSales,
-                            appUtils.getDate(), skuArrayResponse.getBrand(), skuArrayResponse.getCateId(), skuArrayResponse.getId(), saleTypes, totalItem,
-                            skuArrayResponse.getPrice(),skuArrayResponse.getPrice() * totalItem, 0);
+                            appUtils.getDate(), skuArrayResponse.getBrand(), skuArrayResponse.getCateId(), skuArrayResponse.getId(), cartonItem, totalItem,
+                            skuArrayResponse.getPrice(),totalAmount, 0);
 
                     holderListModelList.add(holder);
 
@@ -419,15 +460,23 @@ public class OrderActivity extends BaseActivity implements LocationListener, Rad
 
             }
 
-            if (checkSelectionExist > 0) {
+//            if (checkSelectionExist > 0) {
+//
+//                if (doubleQuantity > 0) {
+//                    holderListModelList.clear();
+//                    customAlertDialog.hideDialog();
+//                    customAlertDialog.showDialog(false);
+//                } else {
+//                    sendOrder(sale_id);
+//                }
 
-                if (doubleQuantity > 0) {
-                    holderListModelList.clear();
-                    customAlertDialog.hideDialog();
-                    customAlertDialog.showDialog(false);
-                } else {
-                    sendOrder(sale_id);
-                }
+
+            //Changes requested by humza Friday 15-9-2018
+            //Start
+            if (checkSelectionExist > 0) {
+                getSalesId(saleStatus);
+//                    sendOrder(sale_id);
+                    //End
             } else {
                 customAlertDialog.hideDialog();
                 customAlertDialog.showDialog(true);
@@ -440,7 +489,7 @@ public class OrderActivity extends BaseActivity implements LocationListener, Rad
 
     }
 
-    void getSalesId() {
+    void getSalesId(int saleStatus) {
 
         getLocation();
 
@@ -469,8 +518,8 @@ public class OrderActivity extends BaseActivity implements LocationListener, Rad
 
             progressShow();
 
-            networkUtils.sendSaleDetail(cusName, contact, email, gender, calculatedAge, cBrand, pBrand, 1,
-                    loginResponse.getUserId(), loginResponse.getName(), "Manager", "Karachi", (int) latitude, new LoginInterface() {
+            networkUtils.sendSaleDetail(cusName, contact, email, gender, calculatedAge, cBrand, pBrand, saleStatus,
+                    loginResponse.getUserId(), loginResponse.getName(), "Manager", "Karachi", Integer.valueOf(loginResponse.getStoreId()), new LoginInterface() {
                         @Override
                         public void success(Response<LoginResponse> loginResponseBody) {
                             Log.i(LOG_TAG, "getSalesId Status" + loginResponseBody.body().getStatus());
@@ -479,10 +528,13 @@ public class OrderActivity extends BaseActivity implements LocationListener, Rad
                                 progressHide();
                                 sale_id = loginResponseBody.body().getSales_id();
 
-
-                                insertSalesDetails(cusName, contact, email, gender, calculatedAge, cBrand, pBrand, 1,
-                                        loginResponse.getUserId(), loginResponse.getName(), "Manager", "Karachi", (int) latitude,
+                                insertSalesDetails(cusName, contact, email, gender, calculatedAge, cBrand, pBrand, saleStatus,
+                                        loginResponse.getUserId(), loginResponse.getName(), "Manager", "Karachi", Integer.valueOf(loginResponse.getStoreId()),
                                         loginResponseBody.body().getSales_id(), loginResponseBody.body().getStatus(), 1);
+
+                                if (saleStatus == 1) {
+                                    sendOrder(sale_id);
+                                }
 
                             }
                         }
@@ -491,8 +543,12 @@ public class OrderActivity extends BaseActivity implements LocationListener, Rad
                         public void failed(String error) {
                             progressHide();
 
-                            insertSalesDetails(cusName, contact, email, gender, calculatedAge, cBrand, pBrand, 1,
-                                    loginResponse.getUserId(), loginResponse.getName(), "Manager", "Karachi", (int) latitude,
+                            if (saleStatus == 1) {
+                                sendOrder(0);
+                            }
+
+                            insertSalesDetails(cusName, contact, email, gender, calculatedAge, cBrand, pBrand, saleStatus,
+                                    loginResponse.getUserId(), loginResponse.getName(), "Manager", "Karachi", Integer.valueOf(loginResponse.getStoreId()),
                                     0, 0, 0);
 
                             Toast.makeText(OrderActivity.this, error, Toast.LENGTH_SHORT).show();
@@ -510,8 +566,11 @@ public class OrderActivity extends BaseActivity implements LocationListener, Rad
 //                        @Override
 //                        public void onClick(DialogInterface dialogInterface, int i) {
 
+            if (saleStatus == 1 ){
+                sendOrder(0);
+            }
                             insertSalesDetails(cusName, contact, email, gender, calculatedAge, cBrand, pBrand, 1,
-                                    loginResponse.getUserId(), loginResponse.getName(), "Manager", "Karachi", (int) latitude,
+                                    loginResponse.getUserId(), loginResponse.getName(), "Manager", "Karachi", Integer.valueOf(loginResponse.getStoreId()),
                                     0, 0, 0);
 //                        }
 //                    });

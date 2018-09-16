@@ -473,6 +473,8 @@ public class SalesActivity extends BaseActivity implements AdapterView.OnItemSel
     protected void onStart() {
         super.onStart();
         edtText_name.setText("");
+        edtText_email.setText("");
+        edtText_contact.setText("");
     }
 
     @Override

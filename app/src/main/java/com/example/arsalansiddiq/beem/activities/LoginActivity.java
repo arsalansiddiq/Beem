@@ -8,11 +8,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.RequiresApi;
 import android.text.TextUtils;
-import android.util.TypedValue;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -22,14 +20,12 @@ import com.example.arsalansiddiq.beem.R;
 import com.example.arsalansiddiq.beem.databases.BeemDatabase;
 import com.example.arsalansiddiq.beem.databases.BeemPreferences;
 import com.example.arsalansiddiq.beem.databases.RealmCRUD;
-import com.example.arsalansiddiq.beem.databases.room.tables.LoginInfoTable;
 import com.example.arsalansiddiq.beem.interfaces.LoginInterface;
 import com.example.arsalansiddiq.beem.models.requestmodels.LoginRequest;
 import com.example.arsalansiddiq.beem.models.responsemodels.LoginResponse;
 import com.example.arsalansiddiq.beem.utils.Constants;
 import com.example.arsalansiddiq.beem.utils.NetworkUtils;
 
-import io.realm.Realm;
 import retrofit2.Response;
 
 public class LoginActivity extends Activity {
@@ -119,20 +115,28 @@ public class LoginActivity extends Activity {
                                     beemPreferences.initialize_and_createPreferences_forLoginSession(Constants.STATUS_ON);
                                     beemPreferences.initialize_and_createPreferences_forBrand(loginResponse.body().getBrand());
 
+                                    //User Desingnation
+                                    //Start
+                                    if (loginResponse.body().getuT().toLowerCase().equals("SUP")) {
+                                        beemPreferences.initialize_and_createPreferences_loginUserDesignation(true);
+                                    } else if (loginResponse.body().getuT().toLowerCase().equals("BA")) {
+                                        beemPreferences.initialize_and_createPreferences_loginUserDesignation(false);
+                                    }
+                                    //End
+
                                     realmCRUD.addUserLoginInformation(loginResponse.body(), 1);
 
-                                    if (beemDatabase.checkUserExist(loginResponse.body().getUserId()) &&
-                                            realmCRUD.checkLoginIdExist(loginResponse.body().getUserId())) {
-                                        intent = new Intent(LoginActivity.this, NavigationDrawerActivity.class);
-                                        startActivity(intent);
-                                    } else {
-
+//                                    if (beemDatabase.checkUserExist(loginResponse.body().getUserId()) &&
+//                                            realmCRUD.checkLoginIdExist(loginResponse.body().getUserId())) {
+//                                        intent = new Intent(LoginActivity.this, NavigationDrawerActivity.class);
+//                                        startActivity(intent);
+//                                    } else {
                                         beemDatabase.insertBAInfo(loginResponse.body().getUserId(),
                                                 loginResponse.body().getName(), loginResponse.body().getBrand(), loginResponse.body().getuT(),
                                                 loginResponse.body().getStoreId(), loginResponse.body().getStatus());
                                         intent = new Intent(LoginActivity.this, NavigationDrawerActivity.class);
                                         startActivity(intent);
-                                    }
+//                                    }
                                 } else {
                                     beemPreferences.initialize_and_createPreferences_forLoginSession(Constants.STATUS_OFF);
                                     txtView_validationResponse.setVisibility(View.VISIBLE);

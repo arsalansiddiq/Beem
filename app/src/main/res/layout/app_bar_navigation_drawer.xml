@@ -24,11 +24,12 @@
     <include layout="@layout/content_navigation_drawer" />
 
     <com.github.clans.fab.FloatingActionMenu
-        android:id="@+id/fab_menu"
+        android:id="@+id/fab_menu_ba"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         fab:menu_colorNormal="@color/colorBlue"
+        android:visibility="gone"
         android:layout_margin="@dimen/fab_margin">
 
         <com.github.clans.fab.FloatingActionButton
@@ -84,6 +85,98 @@
             android:src="@drawable/ic_menu_share"
             app:fab_size="mini"
             fab:fab_label="Map"
+            app:fab_colorNormal="@color/colorBlue" />
+
+    </com.github.clans.fab.FloatingActionMenu>
+
+
+    <com.github.clans.fab.FloatingActionMenu
+        android:id="@+id/fab_menu_supervisor"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:visibility="gone"
+        fab:menu_colorNormal="@color/colorBlue"
+        android:layout_margin="@dimen/fab_margin">
+
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/fab_menu_scanQR"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_menu_send"
+            app:fab_size="mini"
+            fab:fab_label="Scan QR"
+            android:visibility="gone"
+            app:fab_colorNormal="@color/colorBlue" />
+
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/fab_menu_markAttendance_supervisor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_menu_send"
+            app:fab_size="mini"
+            fab:fab_label="Mark Attendance"
+            android:visibility="gone"
+            app:fab_colorNormal="@color/colorBlue" />
+
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/fab_menu_endAttendance_supervisor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_menu_send"
+            app:fab_size="mini"
+            fab:fab_label="End Day"
+            android:visibility="gone"
+            app:fab_colorNormal="@color/colorBlue" />
+
+
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/fab_menu_startMeeting_supervisor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_menu_manage"
+            app:fab_size="mini"
+            android:visibility="gone"
+            fab:fab_label="Start Meeting"
+            app:fab_colorNormal="@color/colorBlue" />
+
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/fab_menu_endMeeting_supervisor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_menu_share"
+            app:fab_size="mini"
+            fab:fab_label="End Meeting"
+            android:visibility="gone"
+            app:fab_colorNormal="@color/colorBlue" />
+
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/fab_menu_takePictures_supervisor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_menu_share"
+            app:fab_size="mini"
+            fab:fab_label="Take Pictures"
+            android:visibility="gone"
+            app:fab_colorNormal="@color/colorBlue" />
+
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/fab_menu_addNotes_supervisor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_menu_share"
+            app:fab_size="mini"
+            fab:fab_label="Add Notes"
+            android:visibility="gone"
+            app:fab_colorNormal="@color/colorBlue" />
+
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/fab_menu_addShop_supervisor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_menu_camera"
+            app:fab_size="mini"
+            fab:fab_label="Add Shop"
             app:fab_colorNormal="@color/colorBlue" />
 
     </com.github.clans.fab.FloatingActionMenu>

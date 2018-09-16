@@ -48,4 +48,17 @@ public class BeemPreferences {
         sharedPreEditor.apply();
     }
 
+
+    public void initialize_and_createPreferences_loginUserDesignation (boolean isSupervisor) {
+        sharedPreEditor = context.getSharedPreferences(Constants.LOGIN_USER_DESIGNATION, MODE_PRIVATE).edit();
+        sharedPreEditor.putBoolean(Constants.KEY_LOGIN_USER_DESIGNATION, isSupervisor);
+        sharedPreEditor.apply();
+    }
+
+    public void initialize_and_createPreferences_meetingStatusSupervisor (boolean isSupervisorInMeeting) {
+        sharedPreEditor = context.getSharedPreferences(Constants.SUPERVISOR_MEETING_STATUS, MODE_PRIVATE).edit();
+        sharedPreEditor.putBoolean(Constants.KEY_SUPERVISOR_MEETING_STATUS, isSupervisorInMeeting);
+        sharedPreEditor.apply();
+    }
+
 }

@@ -108,4 +108,21 @@ public interface NetworkRequestInterfaces {
     Call<TargetsandAchievementsModel> getTargetsAndAchievements(@Path("storeId") Integer storeId);
 
 
+    @Multipart
+    @POST("supattendance")
+    Call<AttandanceResponse> attandanceSUP(@Part("empid") int userId,
+                                          @Part("name") String name,
+                                          @Part("startTime") String startTime,
+                                          @Part("latitude") double latitude,
+                                          @Part("longitude") double longitude,
+                                          @Part("status") int status);
+
+
+    @Multipart
+    @POST("supendattendance")
+    Call<AttandanceResponse> endAttandanceSUP(@Part("id") int meetingId,
+                                             @Part("endTime") String endTime,
+                                             @Part("elat") float eLatitude,
+                                             @Part("elng") float eLongitude,
+                                              @Part("status") int status);
 }
