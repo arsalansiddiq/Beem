@@ -3,6 +3,7 @@ package com.example.arsalansiddiq.beem.databases;
 import android.content.Context;
 import android.util.Log;
 
+import com.example.arsalansiddiq.beem.interfaces.RealmCallback;
 import com.example.arsalansiddiq.beem.models.HolderListModel;
 import com.example.arsalansiddiq.beem.models.databasemodels.EndMarkAttendanceTable;
 import com.example.arsalansiddiq.beem.models.databasemodels.MarkAttendance;
@@ -10,6 +11,7 @@ import com.example.arsalansiddiq.beem.models.databasemodels.SaleApiResponseTable
 import com.example.arsalansiddiq.beem.models.databasemodels.SalesAndNoSales;
 import com.example.arsalansiddiq.beem.models.responsemodels.LoginResponse;
 import com.example.arsalansiddiq.beem.models.responsemodels.salesresponsemodels.SalesSKUArrayResponse;
+import com.example.arsalansiddiq.beem.models.responsemodels.tasksresponsemodels.Task;
 import com.example.arsalansiddiq.beem.utils.ProgressDialogCustom;
 
 import java.util.List;
@@ -30,6 +32,10 @@ public class RealmCRUD {
 
     private Realm realm;
     private ProgressDialogCustom progressDialogCustom;
+
+    public RealmCRUD() {
+        realm = Realm.getDefaultInstance();
+    }
 
     public RealmCRUD(Context context) {
         this.context = context;
@@ -511,7 +517,58 @@ public class RealmCRUD {
 
     }
 
+    public void insertTasksDetails(final List<Task> taskList, final RealmCallback realmCallback) {
+        realm.executeTransactionAsync(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
 
+                for (int i=0; i < taskList.size(); i++) {
+                    Task task = realm.createObject(Task.class);
+                    task.setId(taskList.get(i).getId());
+                    task.setAssetId(taskList.get(i).getAssetId());
+                    task.setAssetId(taskList.get(i).getAssetId());
+                    task.setEmpId(taskList.get(i).getEmpId());
+                    task.setAssignBy(taskList.get(i).getAssignBy());
+                    task.setTasktype(taskList.get(i).getTasktype());
+                    task.setStartDate(taskList.get(i).getStartDate());
+                    task.setEndDate(taskList.get(i).getEndDate());
+                    task.setDescription(taskList.get(i).getDescription());
+                    task.setStatus(taskList.get(i).getStatus());
+                    task.setCreatedAt(taskList.get(i).getCreatedAt());
+                    task.setUpdatedAt(taskList.get(i).getUpdatedAt());
+                    task.setDeletedAt(taskList.get(i).getDeletedAt());
+                    task.setShopId(taskList.get(i).getShopId());
+                    task.setShopName(taskList.get(i).getShopName());
+                    task.setShopLat(taskList.get(i).getShopLat());
+                    task.setShopLng(taskList.get(i).getShopLng());
+
+                }
+            }
+        }, new Realm.Transaction.OnSuccess() {
+            @Override
+            public void onSuccess() {
+                realmCallback.onSuccess();
+                Log.i("OnSuccess for Task", "inserted");
+            }
+        }, new Realm.Transaction.OnError() {
+            @Override
+            public void onError(Throwable error) {
+                realmCallback.onError();
+                Log.i("OnError for Task", "Not inserted");
+            }
+        });
+    }
+
+    public List<Task> getAllTasks () {
+
+        List<Task> taskRealmResults = realm.where(Task.class).findAll();
+
+        if (taskRealmResults.size() > 0) {
+            return taskRealmResults;
+        } else {
+            return taskRealmResults = null;
+        }
+    }
 
 }
 

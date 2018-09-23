@@ -9,14 +9,22 @@ import android.util.Log;
 import com.example.arsalansiddiq.beem.interfaces.AttandanceInterface;
 import com.example.arsalansiddiq.beem.interfaces.EndAttendanceInterface;
 import com.example.arsalansiddiq.beem.interfaces.LoginInterface;
+import com.example.arsalansiddiq.beem.interfaces.MeetingCallBack;
 import com.example.arsalansiddiq.beem.interfaces.SKUCategoryInterface;
 import com.example.arsalansiddiq.beem.interfaces.SampleInterface;
 import com.example.arsalansiddiq.beem.interfaces.TargetsAndAchievementResponseInterface;
+import com.example.arsalansiddiq.beem.models.requestmodels.AddShopRequest;
 import com.example.arsalansiddiq.beem.models.requestmodels.LoginRequest;
+import com.example.arsalansiddiq.beem.models.requestmodels.StartMeetingRequest;
 import com.example.arsalansiddiq.beem.models.responsemodels.AttandanceResponse;
 import com.example.arsalansiddiq.beem.models.responsemodels.LoginResponse;
+import com.example.arsalansiddiq.beem.models.responsemodels.MeetingResponseModel;
+import com.example.arsalansiddiq.beem.models.responsemodels.ResponseSUP;
 import com.example.arsalansiddiq.beem.models.responsemodels.salesresponsemodels.SalesObjectResponse;
 import com.example.arsalansiddiq.beem.models.responsemodels.targetsandachievementsmodel.TargetsandAchievementsModel;
+import com.example.arsalansiddiq.beem.models.responsemodels.tasksresponsemodels.TaskResponse;
+import com.example.arsalansiddiq.beem.utils.data.UpdateCallback;
+import com.example.arsalansiddiq.beem.utils.data.UpdateRH;
 
 import java.io.File;
 
@@ -318,4 +326,91 @@ public class NetworkUtils {
         });
     }
 
+    public void startMeeting (StartMeetingRequest startMeetingRequest, MeetingCallBack meetingCallBack) {
+
+        MultipartBody.Part filePart = MultipartBody.Part.createFormData("img1", startMeetingRequest.getFile().getName(), RequestBody.create(MediaType.parse("image/*"), startMeetingRequest.getFile()));
+
+        networkRequestInterfaces.startMeeting(startMeetingRequest.getTask_id(), startMeetingRequest.getDateTime(), filePart).enqueue(new Callback<MeetingResponseModel>() {
+            @Override
+            public void onResponse(Call<MeetingResponseModel> call, Response<MeetingResponseModel> response) {
+                if (response.isSuccessful()) {
+                    meetingCallBack.success(response);
+                } else {
+                    meetingCallBack.error("Something went wrong!");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<MeetingResponseModel> call, Throwable t) {
+                meetingCallBack.error(t.getLocalizedMessage().toString());
+            }
+        });
+
+    }
+
+
+//    public void startMeeting (StartMeetingRequest startMeetingRequest, UpdateCallback updateCallback) {
+//
+//        MultipartBody.Part filePart = MultipartBody.Part.createFormData("img1", startMeetingRequest.getFile().getName(), RequestBody.create(MediaType.parse("image/*"), startMeetingRequest.getFile()));
+//
+//        networkRequestInterfaces.startMeeting(startMeetingRequest.getTask_id(), startMeetingRequest.getDateTime(), filePart).enqueue(new UpdateRH<MeetingResponseModel>(updateCallback));
+//
+//    }
+
+    public void getTaskList (int empId, UpdateCallback updateCallback) {
+        networkRequestInterfaces.getTasks(String.valueOf(empId)).enqueue(new UpdateRH<TaskResponse>(updateCallback));
+    }
+
+    public void updateMeeting (StartMeetingRequest startMeetingRequest, MeetingCallBack meetingCallBack) {
+        MultipartBody.Part filePart;
+
+        if (startMeetingRequest.getNotes() != null) {
+            filePart = null;
+        } else {
+            filePart = MultipartBody.Part.createFormData("img2", startMeetingRequest.getFile().getName(), RequestBody.create(MediaType.parse("image/*"), startMeetingRequest.getFile()));
+        }
+
+        networkRequestInterfaces.updateMeeting(startMeetingRequest.getTask_id(), startMeetingRequest.getNotes(), filePart).enqueue(new Callback<MeetingResponseModel>() {
+            @Override
+            public void onResponse(Call<MeetingResponseModel> call, Response<MeetingResponseModel> response) {
+                if (response.isSuccessful()) {
+                    meetingCallBack.success(response);
+                } else {
+                    meetingCallBack.error("Something went wrong!");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<MeetingResponseModel> call, Throwable t) {
+                meetingCallBack.error(t.getLocalizedMessage().toString());
+            }
+        });
+    }
+
+    public void endMeeting(StartMeetingRequest startMeetingRequest, MeetingCallBack meetingCallBack) {
+        MultipartBody.Part filePart = MultipartBody.Part.createFormData("img4", startMeetingRequest.getFile().getName(), RequestBody.create(MediaType.parse("image/*"), startMeetingRequest.getFile()));
+        networkRequestInterfaces.updateMeeting(startMeetingRequest.getTask_id(), startMeetingRequest.getNotes(), filePart).enqueue(new Callback<MeetingResponseModel>() {
+            @Override
+            public void onResponse(Call<MeetingResponseModel> call, Response<MeetingResponseModel> response) {
+                if (response.isSuccessful()) {
+                    meetingCallBack.success(response);
+                } else {
+                    meetingCallBack.error("Something went wrong!");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<MeetingResponseModel> call, Throwable t) {
+                meetingCallBack.error(t.getLocalizedMessage().toString());
+            }
+        });
+    }
+
+    public void addShop (AddShopRequest addShopRequest, UpdateCallback updateCallback) {
+
+        networkRequestInterfaces.addShop(addShopRequest.getEmp_id(), addShopRequest.getShopname(), addShopRequest.getOwner(),
+                addShopRequest.getContactperson(), addShopRequest.getContactnumber(), addShopRequest.getLat(), addShopRequest.getLng())
+                .enqueue(new UpdateRH<ResponseSUP>(updateCallback));
+
+    }
 }

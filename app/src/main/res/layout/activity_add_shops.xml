@@ -13,28 +13,37 @@
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:hint="@string/shop_name"
-        android:textSize="20sp"/>
+        android:inputType="textPersonName"
+        android:textSize="20sp"
+        android:textCursorDrawable="@null" />
 
     <EditText
         android:id="@+id/edtText_owner"
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:hint="@string/owner"
-        android:textSize="20sp"/>
+        android:inputType="textPersonName"
+        android:textSize="20sp"
+        android:textCursorDrawable="@null"/>
 
     <EditText
         android:id="@+id/edtText_contactPerson"
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:hint="@string/contact_person"
-        android:textSize="20sp"/>
+        android:inputType="textPersonName"
+        android:textSize="20sp"
+        android:textCursorDrawable="@null"/>
 
     <EditText
         android:id="@+id/edtText_shopContactNumber"
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:hint="@string/shop_contact_number"
-        android:textSize="20sp"/>
+        android:inputType="phone"
+        android:textSize="20sp"
+        android:cursorVisible="false"
+        android:maxLength="13"/>
 
     <Button
         android:id="@+id/btn_addShop"

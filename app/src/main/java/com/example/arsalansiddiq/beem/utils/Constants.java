@@ -29,6 +29,9 @@ public class Constants {
     public static final String SUPERVISOR_MEETING_STATUS = "meeting";
     public static final String KEY_SUPERVISOR_MEETING_STATUS = "keyMeeting";
 
+    public static final String MEETING_START_ID = "meetingId";
+    public static final String KEY_MEETING_START_ID = "keyMeetingId";
+
     public static final int STATUS_ON = 1;
     public static final int STATUS_OFF = 0;
 

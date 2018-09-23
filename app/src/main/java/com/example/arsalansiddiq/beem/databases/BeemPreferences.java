@@ -61,4 +61,10 @@ public class BeemPreferences {
         sharedPreEditor.apply();
     }
 
+    public void initialize_and_createPreferences_startMeetingSupervisorID (int startMeetingId) {
+        sharedPreEditor = context.getSharedPreferences(Constants.MEETING_START_ID, MODE_PRIVATE).edit();
+        sharedPreEditor.putInt(Constants.KEY_MEETING_START_ID, startMeetingId);
+        sharedPreEditor.apply();
+    }
+
 }

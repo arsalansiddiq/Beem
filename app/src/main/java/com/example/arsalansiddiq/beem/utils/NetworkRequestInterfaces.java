@@ -3,8 +3,11 @@ package com.example.arsalansiddiq.beem.utils;
 import com.example.arsalansiddiq.beem.models.requestmodels.LoginRequest;
 import com.example.arsalansiddiq.beem.models.responsemodels.AttandanceResponse;
 import com.example.arsalansiddiq.beem.models.responsemodels.LoginResponse;
+import com.example.arsalansiddiq.beem.models.responsemodels.MeetingResponseModel;
+import com.example.arsalansiddiq.beem.models.responsemodels.ResponseSUP;
 import com.example.arsalansiddiq.beem.models.responsemodels.salesresponsemodels.SalesObjectResponse;
 import com.example.arsalansiddiq.beem.models.responsemodels.targetsandachievementsmodel.TargetsandAchievementsModel;
+import com.example.arsalansiddiq.beem.models.responsemodels.tasksresponsemodels.TaskResponse;
 import com.jakewharton.retrofit2.adapter.rxjava2.Result;
 
 import io.reactivex.Observable;
@@ -86,16 +89,6 @@ public interface NetworkRequestInterfaces {
                                                @Part("Location") Integer location);
 
 
-//
-//    @Multipart
-//    @POST("order")
-//    Call<LoginResponse> sendOrderDetails(@Part("salesId") Integer salesId, @Part("oDate") String oDate,
-//                                         @Part("brand") String brand, @Part("skuCategory") String skuCategory,
-//                                         @Part("SKU") Integer SKU, @Part("saleType") Integer saleType,
-//                                         @Part("noItem") Integer noItem, @Part("price") Float price,
-//                                         @Part("sAmount") Float sAmount);
-
-
     @Multipart
     @POST("order")
     Observable<LoginResponse> sendOrderDetails(@Part("storeId") Integer storeId, @Part("salesId") Integer salesId,
@@ -125,4 +118,32 @@ public interface NetworkRequestInterfaces {
                                              @Part("elat") float eLatitude,
                                              @Part("elng") float eLongitude,
                                               @Part("status") int status);
+
+    @Multipart
+    @POST("startmeeting")
+    Call<MeetingResponseModel> startMeeting(@Part("task_id") int task_id,
+                                            @Part("StartTime") String StartTime,
+                                            @Part MultipartBody.Part file);
+
+    @Multipart
+    @POST("updatemeeting")
+    Call<MeetingResponseModel> updateMeeting(@Part("task_id") int task_id,
+                                   @Part("notes") String notes,
+                                   @Part MultipartBody.Part file);
+
+    @Multipart
+    @POST("endmeeting")
+    Call<MeetingResponseModel> endMeeting(@Part("task_id") int task_id,
+                                   @Part("EndTime") String EndTime,
+                                   @Part MultipartBody.Part file);
+
+    @Multipart
+    @POST("shopapp")
+    Call<ResponseSUP> addShop(@Part("emp_id") Integer emp_id, @Part("shopname") String shopname,
+                              @Part("owner") String owner, @Part("contactperson") String contactperson,
+                              @Part("contactnumber") String contactnumber, @Part("lat") Double lat,
+                              @Part("lng") Double lng);
+
+    @GET("gettasks/{emp_id}")
+    Call<TaskResponse> getTasks(@Path("emp_id") String emp_id);
 }

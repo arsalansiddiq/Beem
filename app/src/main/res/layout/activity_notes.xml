@@ -12,7 +12,9 @@
         android:id="@+id/edtText_title"
         android:layout_width="match_parent"
         android:layout_height="60dp"
+        android:inputType="textPersonName"
         android:textSize="20sp"
+        android:cursorVisible="false"
         android:hint="@string/title"/>
 
     <EditText

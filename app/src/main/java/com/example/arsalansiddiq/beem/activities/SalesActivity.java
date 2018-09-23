@@ -51,10 +51,10 @@ public class SalesActivity extends BaseActivity implements AdapterView.OnItemSel
 
     private Spinner spinner_gender, spinner_age, spinner_pBrand, spinner_cBrand = null;
 
-    String name, email, gender, age,  pBrand = null;
+    String name, email, gender, age;
 
     String contact = null;
-    private Integer cBrand;
+    private Integer cBrand, pBrand;
 
     private EditText edtText_name, edtText_contact, edtText_email;
 
@@ -72,6 +72,7 @@ public class SalesActivity extends BaseActivity implements AdapterView.OnItemSel
     private List<SalesSKUArrayResponse> salesSKUArrayResponseListDuplicateComparator;
 
     private String valueBrandId;
+    private String valuePreviousBrandId;
 
 
     //    @RequiresApi(api = Build.VERSION_CODES.N)
@@ -273,7 +274,7 @@ public class SalesActivity extends BaseActivity implements AdapterView.OnItemSel
         } else {
 
             valueBrandId = String.valueOf(salesSKUArrayResponseListDuplicateComparator.get(cBrand - 1).getCateId());
-//            valueBrandId = String.valueOf(salesSKUArrayResponseList.get(cBrand - 1).getBrandId());
+            valuePreviousBrandId = String.valueOf(salesSKUArrayResponseListDuplicateComparator.get(pBrand - 1).getCateId());
 
             if (!TextUtils.isEmpty(edtText_name.getText().toString()) &&
                     (TextUtils.isEmpty(edtText_email.getText().toString()) && TextUtils.isEmpty(edtText_contact.getText().toString()))) {
@@ -283,7 +284,8 @@ public class SalesActivity extends BaseActivity implements AdapterView.OnItemSel
                 intent.putExtra("email", "");
                 intent.putExtra("gender", gender);
                 intent.putExtra("age", age);
-                intent.putExtra("pBrand", pBrand);
+//                intent.putExtra("pBrand", pBrand);
+                intent.putExtra("pBrand", valuePreviousBrandId);
                 intent.putExtra("cBrand", valueBrandId);
 //                intent.putExtra("cBrand", cBrand);
                 startActivity(intent);
@@ -299,7 +301,8 @@ public class SalesActivity extends BaseActivity implements AdapterView.OnItemSel
                     intent.putExtra("email", email);
                     intent.putExtra("gender", gender);
                     intent.putExtra("age", age);
-                    intent.putExtra("pBrand", pBrand);
+//                    intent.putExtra("pBrand", pBrand);
+                    intent.putExtra("pBrand", valuePreviousBrandId);
                     intent.putExtra("cBrand", valueBrandId);
 //                    intent.putExtra("cBrand", cBrand);
                     startActivity(intent);
@@ -322,7 +325,8 @@ public class SalesActivity extends BaseActivity implements AdapterView.OnItemSel
                     intent.putExtra("email", "");
                     intent.putExtra("gender", gender);
                     intent.putExtra("age", age);
-                    intent.putExtra("pBrand", pBrand);
+//                    intent.putExtra("pBrand", pBrand);
+                    intent.putExtra("pBrand", valuePreviousBrandId);
                     intent.putExtra("cBrand", valueBrandId);
 //                    intent.putExtra("cBrand", cBrand);
                     startActivity(intent);
@@ -348,10 +352,11 @@ public class SalesActivity extends BaseActivity implements AdapterView.OnItemSel
                     intent.putExtra("email", "");
                     intent.putExtra("gender", gender);
                     intent.putExtra("age", age);
-                    intent.putExtra("pBrand", pBrand);
+//                    intent.putExtra("pBrand", pBrand);
+                    intent.putExtra("pBrand", valuePreviousBrandId);
                     intent.putExtra("cBrand", valueBrandId);
 //                    intent.putExtra("cBrand", cBrand);
-//                    intent.putExtra("cBrand", cBrand);
+
                     startActivity(intent);
                 }
             } else {
@@ -365,33 +370,24 @@ public class SalesActivity extends BaseActivity implements AdapterView.OnItemSel
         Spinner spinner = (Spinner) adapterView;
         switch (spinner.getId()) {
             case R.id.spinner_gender:
-//                if (spinner_gender.getSelectedItemPosition() == 0) {
-//                    Toast.makeText(SalesActivity.this, "Please Select Gender", Toast.LENGTH_SHORT).show();
-//                } else {
+
                 gender = spinner_gender.getSelectedItem().toString();
-//                }
+
                 break;
             case R.id.spinner_age:
-//                if (spinner_age.getSelectedItemPosition() == 0) {
-//                    Toast.makeText(SalesActivity.this, "Please Select Gender", Toast.LENGTH_SHORT).show();
-//                } else {
+
                 age = spinner_age.getSelectedItem().toString();
-//                }
+
                 break;
             case R.id.spinner_pBrand:
-//                if (spinner_pBrand.getSelectedItemPosition() == 0) {
-//                    Toast.makeText(SalesActivity.this, "Please Select Gender", Toast.LENGTH_SHORT).show();
-//                } else {
-                pBrand = spinner_pBrand.getSelectedItem().toString();
-//                }
+
+                pBrand = spinner_pBrand.getSelectedItemPosition();
+
                 break;
             case R.id.spinner_cBrand:
-//                if (spinner_cBrand.getSelectedItemPosition() == 0) {
-//                    Toast.makeText(SalesActivity.this, "Please Select Gender", Toast.LENGTH_SHORT).show();
-//                } else {
+
                 cBrand = spinner_cBrand.getSelectedItemPosition();
-//                    cBrand = spinner_cBrand.getSelectedItem().toString();
-//                }
+
                 break;
         }
     }
