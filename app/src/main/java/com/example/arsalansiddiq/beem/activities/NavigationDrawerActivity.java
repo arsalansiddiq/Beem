@@ -268,7 +268,7 @@ public class NavigationDrawerActivity extends BaseActivity
                                 getlocationFromTaskAPI.setLongitude(taskList.get(i).getShopLng());
 
                                 float distanceInMeters = getlocationFromListener.distanceTo(getlocationFromTaskAPI);
-                                boolean isWithinRadius = distanceInMeters < 50;
+                                boolean isWithinRadius = distanceInMeters < 100000;
 
                                 Log.i("RadiusIn", String.valueOf(isWithinRadius));
 
@@ -706,6 +706,7 @@ public class NavigationDrawerActivity extends BaseActivity
                     if (salesAndNoSales.getTotal_nosales() > 0) {
                         Toast.makeText(this, "please sync data before end day", Toast.LENGTH_SHORT).show();
                     } else {
+                        realmCRUD.clearRecordsAtEndDay();
                         meetingStatus = 0;
                         getLocation(false);
 

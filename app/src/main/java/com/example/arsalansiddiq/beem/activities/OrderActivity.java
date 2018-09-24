@@ -88,6 +88,8 @@ public class OrderActivity extends BaseActivity implements LocationListener, Rad
 
     private RealmCRUD realmCRUD;
 
+//    protected ProgressBar progressBar;
+
     private CheckBox checkbox_loose, checkbox_carton;
 
     public static ArrayList<ListViewModelCheck> listViewModelCheckArrayList;
@@ -183,7 +185,7 @@ public class OrderActivity extends BaseActivity implements LocationListener, Rad
         } else {
             if (spinner_saleStatus.getSelectedItemPosition() == 1) {
                 getSalesId(saleStatus);
-                finish();
+//                finish();
             } else {
                 getLocation();
 //                getSalesId(saleStatus);
@@ -362,11 +364,6 @@ public class OrderActivity extends BaseActivity implements LocationListener, Rad
 
         int listLength = 0;
 
-        for (int i  = 0; i < listViewModelCheckArrayList.size(); i++) {
-            Log.i("listViewss Loose", String.valueOf(listViewModelCheckArrayList.get(i).getEditTextView_loose()));
-            Log.i("listViewss Carton", String.valueOf(listViewModelCheckArrayList.get(i).getEditTextView_carton()));
-        }
-
         SalesSKUArrayResponse skuArrayResponse;
 
         beemDatabase.removeSelectedItemTableRaws();
@@ -514,6 +511,8 @@ public class OrderActivity extends BaseActivity implements LocationListener, Rad
 
                                 if (saleStatus == 1) {
                                     sendOrder(sale_id);
+                                } else {
+                                    finish();
                                 }
 
                             }
@@ -525,6 +524,8 @@ public class OrderActivity extends BaseActivity implements LocationListener, Rad
 
                             if (saleStatus == 1) {
                                 sendOrder(0);
+                            } else {
+                                finish();
                             }
 
                             insertSalesDetails(cusName, contact, email, gender, calculatedAge, cBrand, pBrand, saleStatus,
@@ -548,6 +549,8 @@ public class OrderActivity extends BaseActivity implements LocationListener, Rad
 
             if (saleStatus == 1 ){
                 sendOrder(0);
+            } else {
+                finish();
             }
                             insertSalesDetails(cusName, contact, email, gender, calculatedAge, cBrand, pBrand, 1,
                                     loginResponse.getUserId(), loginResponse.getName(), "Manager", "Karachi", Integer.valueOf(loginResponse.getStoreId()),
@@ -589,6 +592,41 @@ public class OrderActivity extends BaseActivity implements LocationListener, Rad
     public void onCheckedChanged(RadioGroup group, int checkedId) {
 
     }
+
+
+//    void initProgressBars() {
+//
+//        if (progressBar == null) {
+//            progressBar = new ProgressBar(this);
+//        }
+//
+//        progressBar = new ProgressBar(this, null, android.R.attr.progressBarStyleLarge);
+//        progressBar.setIndeterminate(true);
+//
+//        RelativeLayout relativeLayout = new RelativeLayout(getApplicationContext());
+//        relativeLayout.setGravity(Gravity.CENTER);
+//        relativeLayout.addView(progressBar);
+//
+//        RelativeLayout.LayoutParams params = new
+//                RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
+//        progressBar.setVisibility(View.INVISIBLE);
+//
+//        this.addContentView(relativeLayout, params);
+//    }
+//
+//    protected void progressShow() {
+//        if (progressBar != null && progressBar.getVisibility() == View.INVISIBLE) {
+//            progressBar.setVisibility(View.VISIBLE);
+//        }
+//    }
+//
+//
+//    protected void progressHide() {
+//        if (progressBar != null && progressBar.getVisibility() == View.VISIBLE) {
+//            progressBar.setVisibility(View.INVISIBLE);
+//            progressBar = null;
+//        }
+//    }
 }
 
 

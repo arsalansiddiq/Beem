@@ -446,7 +446,7 @@ public class RealmCRUD {
                     nextId = currentIdNumber.intValue() + 1;
                 }
 
-                SalesSKUArrayResponse salesSKUArrayResponse1 = realm.createObject(SalesSKUArrayResponse.class, nextId);
+                SalesSKUArrayResponse salesSKUArrayResponse1 = realm.createObject(SalesSKUArrayResponse.class);
                 salesSKUArrayResponse1.setLoginUserRelationIdWithBrands(loginUserRelationIdWithBrands);
                 salesSKUArrayResponse1.setId(salesSKUArrayResponse.getId());
                 salesSKUArrayResponse1.setBrand(salesSKUArrayResponse.getBrand());
@@ -508,13 +508,36 @@ public class RealmCRUD {
         realm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
+
                 realm.delete(SalesSKUArrayResponse.class);
 
                 RealmResults<LoginResponse> result = realm.where(LoginResponse.class).equalTo("userId", loginUserRelationIdWithBrands).findAll();
                 result.deleteAllFromRealm();
+
+//                Realm.de
             }
         });
 
+    }
+
+    public void clearRecordsAtEndDay () {
+        realm.executeTransactionAsync(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                realm.delete(SalesSKUArrayResponse.class);
+                realm.delete(SaleApiResponseTableRealm.class);
+            }
+        }, new Realm.Transaction.OnSuccess() {
+            @Override
+            public void onSuccess() {
+                Log.i(LOG_TAG, "Records Remove " + "onSuccess");
+            }
+        }, new Realm.Transaction.OnError() {
+            @Override
+            public void onError(Throwable error) {
+                Log.i(LOG_TAG, "Records Remove " + "onError");
+            }
+        });
     }
 
     public void insertTasksDetails(final List<Task> taskList, final RealmCallback realmCallback) {

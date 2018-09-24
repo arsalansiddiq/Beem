@@ -4,7 +4,6 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import io.realm.RealmObject;
-import io.realm.annotations.PrimaryKey;
 
 /**
  * Created by jellani on 8/19/2018.
@@ -12,8 +11,8 @@ import io.realm.annotations.PrimaryKey;
 
 public class SalesSKUArrayResponse extends RealmObject{
 
-    @PrimaryKey
-    private int tableIndexId;
+//    @PrimaryKey
+//    private int tableIndexId;
 
     private int loginUserRelationIdWithBrands;
 
@@ -54,13 +53,13 @@ public class SalesSKUArrayResponse extends RealmObject{
 //    @Expose
 //    private Object deletedAt;
 
-    public int getTableIndexId() {
-        return tableIndexId;
-    }
-
-    public void setTableIndexId(int tableIndexId) {
-        this.tableIndexId = tableIndexId;
-    }
+//    public int getTableIndexId() {
+//        return tableIndexId;
+//    }
+//
+//    public void setTableIndexId(int tableIndexId) {
+//        this.tableIndexId = tableIndexId;
+//    }
 
     public int getLoginUserRelationIdWithBrands() {
         return loginUserRelationIdWithBrands;
