@@ -15,8 +15,9 @@
 
         <ImageView
             android:id="@+id/imgView_brandImage"
-            android:layout_width="match_parent"
-            android:layout_height="150dp"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:scaleType="fitXY"
             android:layout_margin="15dp"
             android:layout_gravity="center"/>
 

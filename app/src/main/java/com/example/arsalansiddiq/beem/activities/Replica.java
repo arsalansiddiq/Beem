@@ -14,7 +14,7 @@ public class Replica extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_replica);
 
-        startService(new Intent(Replica.this, TrackingService.class));
+//        startService(new Intent(Replica.this, TrackingService.class));
 
     }
 }

@@ -17,7 +17,7 @@ public class MarkAttendance extends RealmObject{
     private byte[] StartImage;
     private String startTime;
     private float latitude;
-    private float longitude;
+    private double longitude;
     private int status;
     private int markAttendanceResponseID;
     private int syncStatus;
@@ -78,11 +78,11 @@ public class MarkAttendance extends RealmObject{
         this.latitude = latitude;
     }
 
-    public float getLongitude() {
+    public double getLongitude() {
         return longitude;
     }
 
-    public void setLongitude(float longitude) {
+    public void setLongitude(double longitude) {
         this.longitude = longitude;
     }
 

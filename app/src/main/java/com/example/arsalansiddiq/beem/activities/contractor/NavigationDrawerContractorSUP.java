@@ -28,7 +28,7 @@ public interface NavigationDrawerContractorSUP {
         }
 
         void showSuccesofState_getTaskList(Response<TaskResponse> taskResponseResponse);
-        void showTaskList();
+        void showTaskList(TaskResponse taskResponse);
         void showSuccesofState_startMeeting(Response<MeetingResponseModel> taskResponseResponse, String state);
     }
 

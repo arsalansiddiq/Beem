@@ -176,7 +176,7 @@ BeemAppDatabase beemAppDatabase;
 //                        @Override
 //                        public void success(LoginResponse loginResponse) {
 //                            final BeemPreferences beemPreferences = new BeemPreferences(MainActivity.this);
-//                            beemPreferences.initialize_and_createPreferences_forStatus(loginResponse.getStatus());
+//                            beemPreferences.initialize_and_createPreferences_forStatus(loginResponse.getSyncStatus());
 //
 //                        }
 //
@@ -254,7 +254,7 @@ BeemAppDatabase beemAppDatabase;
 //
 //                @Override
 //                public void success(Response<SalesObjectResponse> response) {
-//                    if (response.body().getStatus() == 1) {
+//                    if (response.body().getSyncStatus() == 1) {
 //
 //                        salesSKUArrayResponseArrayList = response.body().getSku();
 //                        CustomListAdapter adapter = new CustomListAdapter(MainActivity.this, 0, salesSKUArrayResponseArrayList);
@@ -397,7 +397,7 @@ BeemAppDatabase beemAppDatabase;
 //                    id, loginResponse.getName(), "Manager", "Karachi", (int) latitude, new LoginInterface() {
 //                        @Override
 //                        public void success(Response<LoginResponse> loginResponse) {
-//                            if (loginResponse.body().getStatus() == 1) {
+//                            if (loginResponse.body().getSyncStatus() == 1) {
 //                                saleStatus = loginResponse.body().getSales_id();
 //                            }
 //                        }

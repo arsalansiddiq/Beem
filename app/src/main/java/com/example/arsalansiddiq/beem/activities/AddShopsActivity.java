@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
@@ -30,13 +31,14 @@ import com.example.arsalansiddiq.beem.utils.data.UpdateCallback;
 
 import retrofit2.Response;
 
-public class AddShopsActivity extends BaseActivity implements UpdateCallback {
+public class AddShopsActivity extends BaseActivity implements UpdateCallback, LocationListener {
 
     private EditText edtText_shopName, edtText_owner, edtText_contactPerson, edtText_shopContactNumber;
     private Button btn_addShop;
     private LoginResponse loginResponse;
     private RealmCRUD realmCRUD;
     private LocationManager locationManager;
+    private float latitude, longitude;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +51,8 @@ public class AddShopsActivity extends BaseActivity implements UpdateCallback {
 
         realmCRUD = new RealmCRUD();
         loginResponse = realmCRUD.getLoginInformationDetails();
+
+        getLocation();
 
         edtText_shopName = findViewById(R.id.edtText_shopName);
         edtText_owner = findViewById(R.id.edtText_owner);
@@ -84,32 +88,26 @@ public class AddShopsActivity extends BaseActivity implements UpdateCallback {
     }
 
     void addShopCall() {
-        Location location;
         NetworkUtils networkUtils = new NetworkUtils(AddShopsActivity.this);
         if (networkUtils.isNetworkConnected()) {
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                // TODO: Consider calling
-                //    ActivityCompat#requestPermissions
-                // here to request the missing permissions, and then overriding
-                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                //                                          int[] grantResults)
-                // to handle the case where the user grants the permission. See the documentation
-                // for ActivityCompat#requestPermissions for more details.
-                return;
-            } else {
-                location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-            }
 
             if (networkUtils.isNetworkConnected()) {
 
                 progressShow();
 
-                AddShopRequest addShopRequest = new AddShopRequest(loginResponse.getUserId(), edtText_shopName.getText().toString(),
-                        edtText_owner.getText().toString(), edtText_contactPerson.getText().toString(), edtText_shopContactNumber.getText().toString(),
-                        location.getLatitude(), location.getLongitude());
+                if (latitude != 0 && longitude != 0) {
+                    AddShopRequest addShopRequest = new AddShopRequest(loginResponse.getUserId(), edtText_shopName.getText().toString(),
+                            edtText_owner.getText().toString(), edtText_contactPerson.getText().toString(), edtText_shopContactNumber.getText().toString(),
+                            latitude, longitude);
 
-                networkUtils.addShop(addShopRequest, this);
+                    networkUtils.addShop(addShopRequest, this);
+                } else {
+                    Toast.makeText(this, "Getting your location! please wait", Toast.LENGTH_SHORT).show();
+
+                    getLocation();
+                }
             } else {
+
                 AlertDialog.Builder alertBuilder = new AlertDialog.Builder(AddShopsActivity.this);
                 alertBuilder.setTitle("Network")
                         .setMessage("Please Check your internet connection")
@@ -126,6 +124,23 @@ public class AddShopsActivity extends BaseActivity implements UpdateCallback {
         }
     }
 
+    void getLocation() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            Toast.makeText(this, "please turn on location!", Toast.LENGTH_SHORT).show();
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 99);
+        } else {
+            locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, AddShopsActivity.this);
+        }
+
+            progressShow();
+
+            Toast.makeText(this, "Gettting your location please wait", Toast.LENGTH_SHORT).show();
+    }
+
     @Override
     public void UpdateSuccess(Response response) {
         progressHide();
@@ -140,5 +155,37 @@ public class AddShopsActivity extends BaseActivity implements UpdateCallback {
         progressHide();
         Toast.makeText(this, "Something went wrong please try again", Toast.LENGTH_SHORT).show();
         finish();
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        latitude = (float) location.getLatitude();
+        longitude = (float) location.getLongitude();
+
+        progressHide();
+
+        Log.i("LocationCoorAddShop", latitude + "  " + longitude);
+    }
+
+    @Override
+    public void onStatusChanged(String s, int i, Bundle bundle) {
+        progressHide();
+    }
+
+    @Override
+    public void onProviderEnabled(String s) {
+        progressHide();
+    }
+
+    @Override
+    public void onProviderDisabled(String s) {
+        progressHide();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        locationManager.removeUpdates(AddShopsActivity.this);
     }
 }

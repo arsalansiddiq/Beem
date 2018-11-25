@@ -11,11 +11,11 @@ public class AddShopRequest {
     private String owner;
     private String contactperson;
     private String contactnumber;
-    private Double lat;
-    private Double lng;
+    private float lat;
+    private float lng;
 
 
-    public AddShopRequest(Integer emp_id, String shopname, String owner, String contactperson, String contactnumber, Double lat, Double lng) {
+    public AddShopRequest(Integer emp_id, String shopname, String owner, String contactperson, String contactnumber, float lat, float lng) {
         this.emp_id = emp_id;
         this.shopname = shopname;
         this.owner = owner;
@@ -45,11 +45,11 @@ public class AddShopRequest {
         return contactnumber;
     }
 
-    public Double getLat() {
+    public float getLat() {
         return lat;
     }
 
-    public Double getLng() {
+    public float getLng() {
         return lng;
     }
 }

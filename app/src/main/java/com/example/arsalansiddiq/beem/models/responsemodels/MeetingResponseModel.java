@@ -18,6 +18,9 @@ public class MeetingResponseModel {
     @SerializedName("id")
     @Expose
     private Integer id;
+    @SerializedName("emp_track_id")
+    @Expose
+    private Integer emp_track_id;
 
     public Integer getStatus() {
         return status;
@@ -41,5 +44,13 @@ public class MeetingResponseModel {
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    public Integer getEmp_track_id() {
+        return emp_track_id;
+    }
+
+    public void setEmp_track_id(Integer emp_track_id) {
+        this.emp_track_id = emp_track_id;
     }
 }

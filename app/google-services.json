@@ -1,0 +1,105 @@
+{
+  "project_info": {
+    "project_number": "35183900475",
+    "firebase_url": "https://fir-eleven.firebaseio.com",
+    "project_id": "fir-eleven",
+    "storage_bucket": "fir-eleven.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:35183900475:android:2e076cfeca43a05b",
+        "android_client_info": {
+          "package_name": "com.example.android.firebaseconsole"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "35183900475-s57ebenmi93mukb5ak8ueqmvtul6r5i6.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.android.firebaseconsole",
+            "certificate_hash": "1d3ca0a8f6650da9e011a58b2e53f81d2ff97eba"
+          }
+        },
+        {
+          "client_id": "35183900475-3lth7o60plm86mig8a2rj30vfq6r1bbc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAXAZoFfbaMQlWxrya4FS8vPbgNbkZe4B8"
+        },
+        {
+          "current_key": "AIzaSyAGyOPOrvnCkjoMdjqhWbDujeeYwNocfss"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "35183900475-3lth7o60plm86mig8a2rj30vfq6r1bbc.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:35183900475:android:378e8d3d847af48c",
+        "android_client_info": {
+          "package_name": "project.arsalansiddiq.beem"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "35183900475-hbi17bj47u5dd33rrj1afnbut15jvarr.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "project.arsalansiddiq.beem",
+            "certificate_hash": "1d3ca0a8f6650da9e011a58b2e53f81d2ff97eba"
+          }
+        },
+        {
+          "client_id": "35183900475-3lth7o60plm86mig8a2rj30vfq6r1bbc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAXAZoFfbaMQlWxrya4FS8vPbgNbkZe4B8"
+        },
+        {
+          "current_key": "AIzaSyAGyOPOrvnCkjoMdjqhWbDujeeYwNocfss"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "35183900475-3lth7o60plm86mig8a2rj30vfq6r1bbc.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

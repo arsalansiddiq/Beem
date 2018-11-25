@@ -6,6 +6,7 @@ package com.example.arsalansiddiq.beem.utils;
 
 public class Constants {
 
+//    public static final String BASE_URL = "http://dayfresh.brandedgesolutions.com/api/";
     public static final String BASE_URL = "http://test.brandedgesolutions.com/api/";
 
     public static final String BA_ATTENDANCE_ID = "id";
@@ -23,8 +24,8 @@ public class Constants {
     public static final String USER_BRAND = "userBrand";
     public static final String KEY_USER_BRAND = "keyUserBrand";
 
-    public static final String LOGIN_USER_DESIGNATION = "userBrand";
-    public static final String KEY_LOGIN_USER_DESIGNATION = "keyUserBrand";
+    public static final String LOGIN_USER_DESIGNATION = "loginUserDesignation";
+    public static final String KEY_LOGIN_USER_DESIGNATION = "keyLoginUserDesignation";
 
     public static final String SUPERVISOR_MEETING_STATUS = "meeting";
     public static final String KEY_SUPERVISOR_MEETING_STATUS = "keyMeeting";
@@ -32,7 +33,35 @@ public class Constants {
     public static final String MEETING_START_ID = "meetingId";
     public static final String KEY_MEETING_START_ID = "keyMeetingId";
 
+    public static final String CUSTOM_RELATION_MEETING_ID = "customRelationMeetingId";
+    public static final String KEY_CUSTOM_RELATION_MEETING_ID = "keyCustomRelationMeetingId";
+
+    public static final String BREAK_START_ID = "breakStartId";
+    public static final String KEY_BREAK_START_ID = "keyBreakStartId";
+
+    public static final String BREAK_STATUS = "breakStatus";
+    public static final String KEY_BREAK_STATUS = "keybreakStatus";
+
+    public static final String BREAK_TYPE = "breakType";
+    public static final String KEY_BREAK_TYPE = "keybreakType";
+
+    public static final String BREAK_TIME = "breakTime";
+    public static final String KEY_BREAK_TIME = "keybreakTime";
+
+    public static final String NOTES_COUNT = "notesCount";
+    public static final String KEY_NOTES_COUNT = "keyNotesCount";
+
+    public static final String PICTURE_COUNT = "pictureCount";
+    public static final String KEY_PICTURE_COUNT = "keyPictureCount";
+
+    public static final String TRACKING_STATUS = "trackingStatus";
+    public static final String KEY_TRACKING_STATUS = "keyTrackingStatus";
+
+    public static final String TRACKING_START_ID = "trackingStartId";
+    public static final String KEY_TRACKING_START_ID = "keyTrackingStartId";
+
     public static final int STATUS_ON = 1;
+    public static final int STATUS_ON_MERCHANT = 2;
     public static final int STATUS_OFF = 0;
 
     public static final String NUMBERS_DASHED_MASK = "999 999 9999999";

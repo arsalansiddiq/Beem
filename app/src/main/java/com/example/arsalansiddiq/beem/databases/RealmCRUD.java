@@ -9,6 +9,10 @@ import com.example.arsalansiddiq.beem.models.databasemodels.EndMarkAttendanceTab
 import com.example.arsalansiddiq.beem.models.databasemodels.MarkAttendance;
 import com.example.arsalansiddiq.beem.models.databasemodels.SaleApiResponseTableRealm;
 import com.example.arsalansiddiq.beem.models.databasemodels.SalesAndNoSales;
+import com.example.arsalansiddiq.beem.models.databasemodels.UpdateTrackingModel;
+import com.example.arsalansiddiq.beem.models.databasemodels.meetingsup.MeetingSUPEndTable;
+import com.example.arsalansiddiq.beem.models.databasemodels.meetingsup.MeetingSUPStartTable;
+import com.example.arsalansiddiq.beem.models.databasemodels.meetingsup.MeetingSUPUpdatesTable;
 import com.example.arsalansiddiq.beem.models.responsemodels.LoginResponse;
 import com.example.arsalansiddiq.beem.models.responsemodels.salesresponsemodels.SalesSKUArrayResponse;
 import com.example.arsalansiddiq.beem.models.responsemodels.tasksresponsemodels.Task;
@@ -65,6 +69,7 @@ public class RealmCRUD {
                 loginResponse1.setuT(loginResponse.getuT());
                 loginResponse1.setStoreId(loginResponse.getStoreId());
                 loginResponse1.setStatus(loginResponse.getStatus());
+                loginResponse1.setStoreName(loginResponse.getStoreName());
                 loginResponse1.setLoginStatus(loginStatus);
             }
         });
@@ -109,7 +114,7 @@ public class RealmCRUD {
         }
     }
 
-     public void addMarkAttendanceDetails(final MarkAttendance markAttendance, final int markAttendanceResponseID) {
+    public void addMarkAttendanceDetails(final MarkAttendance markAttendance, final int markAttendanceResponseID) {
         progressDialogCustom.showProgress();
         realm.executeTransactionAsync(new Realm.Transaction() {
             @Override
@@ -138,13 +143,13 @@ public class RealmCRUD {
             @Override
             public void onSuccess() {
                 progressDialogCustom.hideProgress();
-                Log.i(LOG_TAG, "addMarkAttendanceDetails   "  + "SuccessCalled" );
+                Log.i(LOG_TAG, "addMarkAttendanceDetails   " + "SuccessCalled");
             }
         }, new Realm.Transaction.OnError() {
             @Override
             public void onError(Throwable error) {
                 progressDialogCustom.hideProgress();
-                Log.i(LOG_TAG, "addMarkAttendanceDetails   "  + "onErrorCalled" );
+                Log.i(LOG_TAG, "addMarkAttendanceDetails   " + "onErrorCalled");
             }
         });
     }
@@ -168,7 +173,7 @@ public class RealmCRUD {
 
                 markAttendanceList = markAttendance;
             }
-            });
+        });
 
     }
 
@@ -245,8 +250,8 @@ public class RealmCRUD {
                 saleApiResponseTableRealm1.setSyncStatus(saleApiResponseTableRealm.getSyncStatus());
 
 
-
-                nextIdSales = saleApiResponseTableRealm1.getId();
+//                nextIdSales = saleApiResponseTableRealm1.getId();
+                nextIdSales = nextId;
             }
         });
 
@@ -265,7 +270,7 @@ public class RealmCRUD {
         }
     }
 
-    public void updateUnsavedSalesDetailsStatusAndId (final int id, final int salesResponseStatus, final int sales_id, final int syncStatus) {
+    public void updateUnsavedSalesDetailsStatusAndId(final int id, final int salesResponseStatus, final int sales_id, final int syncStatus) {
 
         realm.executeTransaction(new Realm.Transaction() {
             @Override
@@ -277,7 +282,7 @@ public class RealmCRUD {
 
                 realm.copyToRealmOrUpdate(saleApiResponseTableRealm1);
             }
-            });
+        });
 
     }
 
@@ -305,31 +310,31 @@ public class RealmCRUD {
 
 //                for (int i = 0; i < orderApiResponseTableRealmList.size(); i++) {
 
-                    Number currentIdNumber = realm.where(HolderListModel.class).max("id");
-                    int nextId;
+                Number currentIdNumber = realm.where(HolderListModel.class).max("id");
+                int nextId;
 
-                    if (currentIdNumber == null) {
-                        nextId = 1;
-                    } else {
-                        nextId = currentIdNumber.intValue() + 1;
-                    }
+                if (currentIdNumber == null) {
+                    nextId = 1;
+                } else {
+                    nextId = currentIdNumber.intValue() + 1;
+                }
 
 //                    OrderApiResponseTableRealm holderListModel = orderApiResponseTableRealmList.get(i);
-                    HolderListModel holderListModel1 = realm.createObject(HolderListModel.class, nextId);
-                    holderListModel1.setStoreId(holderListModel.getStoreId());
-                    holderListModel1.setSalesId(sales_id);
-                    holderListModel1.setCustomSaleId(holderListModel.getCustomSaleId());
-                    holderListModel1.setoDate(getDate);
-                    holderListModel1.setBrand(holderListModel.getBrand());
-                    holderListModel1.setSkuCategory(holderListModel.getSkuCategory());
-                    holderListModel1.setSKU(holderListModel.getSKU());
-                    holderListModel1.setSaleType(holderListModel.getSaleType());
-                    holderListModel1.setNoItem(holderListModel.getNoItem());
-                    holderListModel1.setPrice(holderListModel.getPrice());
-                    holderListModel1.setsAmount(holderListModel.getsAmount());
-                    holderListModel1.setOrderStatus(orderStatus);
-                    holderListModel1.setOrderId(orderId);
-                    holderListModel1.setSyncStatus(syncStatus);
+                HolderListModel holderListModel1 = realm.createObject(HolderListModel.class, nextId);
+                holderListModel1.setStoreId(holderListModel.getStoreId());
+                holderListModel1.setSalesId(sales_id);
+                holderListModel1.setCustomSaleId(holderListModel.getCustomSaleId());
+                holderListModel1.setoDate(getDate);
+                holderListModel1.setBrand(holderListModel.getBrand());
+                holderListModel1.setSkuCategory(holderListModel.getSkuCategory());
+                holderListModel1.setSKU(holderListModel.getSKU());
+                holderListModel1.setSaleType(holderListModel.getSaleType());
+                holderListModel1.setNoItem(holderListModel.getNoItem());
+                holderListModel1.setPrice(holderListModel.getPrice());
+                holderListModel1.setsAmount(holderListModel.getsAmount());
+                holderListModel1.setOrderStatus(orderStatus);
+                holderListModel1.setOrderId(orderId);
+                holderListModel1.setSyncStatus(syncStatus);
 //                }
 
             }
@@ -359,6 +364,15 @@ public class RealmCRUD {
     }
 
 
+    public int getPendingOrdersForRequestNumber() {
+        int pendingOrders = (int) realm.where(HolderListModel.class).equalTo("syncStatus", 0).count();
+        if (pendingOrders > 0) {
+            return pendingOrders;
+        } else {
+            return 0;
+        }
+    }
+
 //    public List<HolderListModel> getPendingOrder() {
 //        List<HolderListModel> holderListModelList = realm.where(HolderListModel.class).equalTo("orderStatus", 0).findAll();
 //
@@ -369,7 +383,7 @@ public class RealmCRUD {
 //        }
 //    }
 
-    public void updateOrderStatus (final int id, final int orderId, final int orderStatus, final int syncStatus) {
+    public void updateOrderStatus(final int id, final int orderId, final int orderStatus, final int syncStatus) {
         realm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
@@ -384,7 +398,7 @@ public class RealmCRUD {
         });
     }
 
-    public SalesAndNoSales getSaleAndNoSales () {
+    public SalesAndNoSales getSaleAndNoSales() {
 
         SalesAndNoSales salesAndNoSales = null;
 
@@ -392,9 +406,9 @@ public class RealmCRUD {
             int sale = (int) realm.where(SaleApiResponseTableRealm.class).equalTo("syncStatus", 1).count();
             int noSale = (int) realm.where(SaleApiResponseTableRealm.class).equalTo("syncStatus", 0).count();
 
-        salesAndNoSales = new SalesAndNoSales(sale, noSale);
+            salesAndNoSales = new SalesAndNoSales(sale, noSale);
 
-        }catch (NumberFormatException e) {
+        } catch (NumberFormatException e) {
 
         }
 
@@ -478,7 +492,7 @@ public class RealmCRUD {
 
     }
 
-    public List<SalesSKUArrayResponse> getUserBrandsSKUCategory (int loginUserRelationIdWithBrands) {
+    public List<SalesSKUArrayResponse> getUserBrandsSKUCategory(int loginUserRelationIdWithBrands) {
 
         RealmResults<SalesSKUArrayResponse> salesSKUArrayResponses = realm.where(SalesSKUArrayResponse.class).equalTo("loginUserRelationIdWithBrands",
                 loginUserRelationIdWithBrands).findAll();
@@ -490,7 +504,7 @@ public class RealmCRUD {
         }
     }
 
-    public List<SalesSKUArrayResponse> getUserBrandsSKUCategoryByBrandId (int brandId) {
+    public List<SalesSKUArrayResponse> getUserBrandsSKUCategoryByBrandId(int brandId) {
 
         RealmResults<SalesSKUArrayResponse> salesSKUArrayResponses = realm.where(SalesSKUArrayResponse.class).equalTo("cateId",
                 brandId).findAll();
@@ -503,7 +517,7 @@ public class RealmCRUD {
     }
 
 
-    public void removeUserBrandsSKUCategories (int loginUserRelationIdWithBrands) {
+    public void removeUserBrandsSKUCategories(int loginUserRelationIdWithBrands) {
 
         realm.executeTransaction(new Realm.Transaction() {
             @Override
@@ -520,7 +534,7 @@ public class RealmCRUD {
 
     }
 
-    public void clearRecordsAtEndDay () {
+    public void clearRecordsAtEndDay() {
         realm.executeTransactionAsync(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
@@ -545,7 +559,7 @@ public class RealmCRUD {
             @Override
             public void execute(Realm realm) {
 
-                for (int i=0; i < taskList.size(); i++) {
+                for (int i = 0; i < taskList.size(); i++) {
                     Task task = realm.createObject(Task.class);
                     task.setId(taskList.get(i).getId());
                     task.setAssetId(taskList.get(i).getAssetId());
@@ -582,7 +596,7 @@ public class RealmCRUD {
         });
     }
 
-    public List<Task> getAllTasks () {
+    public List<Task> getAllTasks() {
 
         List<Task> taskRealmResults = realm.where(Task.class).findAll();
 
@@ -591,6 +605,275 @@ public class RealmCRUD {
         } else {
             return taskRealmResults = null;
         }
+    }
+
+
+    public int insertStartMeetingSUPOffline(MeetingSUPStartTable meetingSUPStartTable) {
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+
+                Number currentIdNumber = realm.where(MeetingSUPStartTable.class).max("id");
+                int nextId;
+
+                if (currentIdNumber == null) {
+                    nextId = 1;
+                } else {
+                    nextId = currentIdNumber.intValue() + 1;
+                }
+
+                MeetingSUPStartTable meetingSUPStartTable1 = realm.createObject(MeetingSUPStartTable.class, nextId);
+                meetingSUPStartTable1.setTask_id(meetingSUPStartTable.getTask_id());
+                meetingSUPStartTable1.setStartTime(meetingSUPStartTable.getStartTime());
+                meetingSUPStartTable1.setImg1(meetingSUPStartTable.getImg1());
+                meetingSUPStartTable1.setLat(meetingSUPStartTable.getLat());
+                meetingSUPStartTable1.setLng(meetingSUPStartTable.getLng());
+                meetingSUPStartTable1.setEmp_id(meetingSUPStartTable.getEmp_id());
+                meetingSUPStartTable1.setStartMeetingResponseId(meetingSUPStartTable.getStartMeetingResponseId());
+                meetingSUPStartTable1.setSyncStatus(meetingSUPStartTable.getSyncStatus());
+
+                nextIdSales = nextId;
+            }
+        });
+
+        return nextIdSales;
+    }
+
+    public List<MeetingSUPStartTable> getUnSynycedStartMeetingDataOfSUP() {
+        List<MeetingSUPStartTable> meetingSUPStartTableList = realm.where(MeetingSUPStartTable.class).
+                equalTo("syncStatus", 0).findAll();
+
+        if (meetingSUPStartTableList.size() > 0) {
+            return meetingSUPStartTableList;
+        } else {
+            return null;
+        }
+    }
+
+    public void updateStartMeetingTable(int rowId, int startMeetingId, int syncStatus) {
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                MeetingSUPStartTable meetingSUPStartTable = realm.where(MeetingSUPStartTable.class).equalTo("id", rowId).findFirst();
+                meetingSUPStartTable.setStartMeetingResponseId(startMeetingId);
+                meetingSUPStartTable.setSyncStatus(syncStatus);
+
+                realm.copyToRealmOrUpdate(meetingSUPStartTable);
+            }
+        });
+    }
+
+    public void insertEndMeetingSUPOffline(MeetingSUPEndTable meetingSUPEndTable) {
+        realm.executeTransactionAsync(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+
+
+                Number currentIdNumber = realm.where(MeetingSUPEndTable.class).max("id");
+                int nextId;
+
+                if (currentIdNumber == null) {
+                    nextId = 1;
+                } else {
+                    nextId = currentIdNumber.intValue() + 1;
+                }
+
+                MeetingSUPEndTable meetingSUPEndTable1 = realm.createObject(MeetingSUPEndTable.class, nextId);
+                meetingSUPEndTable1.setCustomRelationMeetingId(meetingSUPEndTable.getCustomRelationMeetingId());
+                meetingSUPEndTable1.setStartMeetingResponseId(meetingSUPEndTable.getStartMeetingResponseId());
+                meetingSUPEndTable1.setEndTime(meetingSUPEndTable.getEndTime());
+                meetingSUPEndTable1.setImg4(meetingSUPEndTable.getImg4());
+                meetingSUPEndTable1.setSyncStatus(meetingSUPEndTable.getSyncStatus());
+
+            }
+        }, new Realm.Transaction.OnSuccess() {
+            @Override
+            public void onSuccess() {
+                Log.i(LOG_TAG, "MeetingSUPStartTable" + " onSuccess");
+            }
+        }, new Realm.Transaction.OnError() {
+            @Override
+            public void onError(Throwable error) {
+                Log.i(LOG_TAG, "MeetingSUPStartTable" + " onError");
+            }
+        });
+    }
+
+    public MeetingSUPEndTable getUnSynycedEndMeetingDataOfSUP(int rowId) {
+        MeetingSUPEndTable meetingSUPEndTable = realm.where(MeetingSUPEndTable.class).
+                equalTo("customRelationMeetingId", rowId).and().equalTo("syncStatus", 0).findFirst();
+
+        if (meetingSUPEndTable != null) {
+            return meetingSUPEndTable;
+        } else {
+            return null;
+        }
+    }
+
+    public void updateEndMeetingTable(int rowId, int startMeetingId, int syncStatus) {
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                MeetingSUPEndTable meetingSUPEndTable = realm.where(MeetingSUPEndTable.class).equalTo("customRelationMeetingId", rowId).findFirst();
+                meetingSUPEndTable.setStartMeetingResponseId(startMeetingId);
+                meetingSUPEndTable.setSyncStatus(syncStatus);
+
+                realm.copyToRealmOrUpdate(meetingSUPEndTable);
+            }
+        });
+    }
+
+    public void insertImageUpdateMeetingSUPOffline(MeetingSUPUpdatesTable meetingSUPUpdatesTable) {
+        realm.executeTransactionAsync(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+
+                Number currentIdNumber = realm.where(MeetingSUPUpdatesTable.class).max("primaryKey");
+                int nextId;
+
+                if (currentIdNumber == null) {
+                    nextId = 1;
+                } else {
+                    nextId = currentIdNumber.intValue() + 1;
+                }
+
+                MeetingSUPUpdatesTable meetingSUPUpdatesTable1 = realm.createObject(MeetingSUPUpdatesTable.class, nextId);
+                meetingSUPUpdatesTable1.setCustomRelationMeetingId(meetingSUPUpdatesTable.getCustomRelationMeetingId());
+                meetingSUPUpdatesTable1.setStartMeetingResponseId(meetingSUPUpdatesTable.getStartMeetingResponseId());
+                meetingSUPUpdatesTable1.setImg2(meetingSUPUpdatesTable.getImg2());
+                meetingSUPUpdatesTable1.setNotes(meetingSUPUpdatesTable.getNotes());
+                meetingSUPUpdatesTable1.setIsImage(meetingSUPUpdatesTable.getIsImage());
+                meetingSUPUpdatesTable1.setIsNote(meetingSUPUpdatesTable.getIsNote());
+                meetingSUPUpdatesTable1.setSyncStatus(meetingSUPUpdatesTable.getSyncStatus());
+
+            }
+        }, new Realm.Transaction.OnSuccess() {
+            @Override
+            public void onSuccess() {
+                Log.i(LOG_TAG, "MeetingSUPStartTable" + " onSuccess");
+            }
+        }, new Realm.Transaction.OnError() {
+            @Override
+            public void onError(Throwable error) {
+                Log.i(LOG_TAG, "MeetingSUPStartTable" + " onError");
+            }
+        });
+    }
+
+    public List<MeetingSUPUpdatesTable> getUnSynycedUpdateMeetingDataOfSUP(int rowId) {
+        List<MeetingSUPUpdatesTable> meetingSUPUpdatesTableList = realm.where(MeetingSUPUpdatesTable.class)
+                .equalTo("customRelationMeetingId", rowId).equalTo("syncStatus", 0).findAll();
+
+        if (meetingSUPUpdatesTableList != null) {
+            return meetingSUPUpdatesTableList;
+        } else {
+            return null;
+        }
+    }
+
+
+    public void saveUpdateTablesUpdates(int primRowId, int startMeetingId, int syncStatus) {
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+
+                MeetingSUPUpdatesTable meetingSUPUpdatesTable = realm.where(MeetingSUPUpdatesTable.class)
+                        .equalTo("primaryKey", primRowId).findFirst();
+
+                meetingSUPUpdatesTable.setStartMeetingResponseId(startMeetingId);
+                meetingSUPUpdatesTable.setSyncStatus(syncStatus);
+
+                realm.copyToRealmOrUpdate(meetingSUPUpdatesTable);
+            }
+        });
+    }
+
+
+//    public void saveUpdateTablesUpdates(List<MeetingSUPUpdatesTable> meetingSUPUpdatesTableList) {
+//        if (meetingSUPUpdatesTableList.size() > 0) {
+//            for (int i = 0; i < meetingSUPUpdatesTableList.size(); ) {
+//                realm.executeTransaction(new Realm.Transaction() {
+//                    @Override
+//                    public void execute(Realm realm) {
+//
+//                        MeetingSUPUpdatesTable meetingSUPUpdatesTable = realm.where(MeetingSUPUpdatesTable.class)
+//                                .equalTo("primaryKey", meetingSUPUpdatesTableList.get(i).getPrimaryKey()).findFirst();
+//
+//                        meetingSUPUpdatesTable.setStartMeetingResponseId(meetingSUPUpdatesTableList.get(i).getStartMeetingResponseId());
+//                        meetingSUPUpdatesTable.setIsNote(meetingSUPUpdatesTableList.get(i).getIsNote());
+//                        meetingSUPUpdatesTable.setIsImage(meetingSUPUpdatesTableList.get(i).getIsImage());
+//                        meetingSUPUpdatesTable.setImg2(meetingSUPUpdatesTableList.get(i).getImg2());
+//                        meetingSUPUpdatesTable.setNotes(meetingSUPUpdatesTableList.get(i).getNotes());
+//                        meetingSUPUpdatesTable.setSyncStatus(meetingSUPUpdatesTableList.get(i).getSyncStatus());
+//
+//                        realm.copyToRealmOrUpdate(meetingSUPUpdatesTable);
+//                    }
+//                });
+//            }
+//        }
+//    }
+
+    public void getSampleUpdate() {
+        List<MeetingSUPUpdatesTable> meetingSUPUpdatesTableList = realm.where(MeetingSUPUpdatesTable.class).findAll();
+    }
+
+    public void insertUpdateTrackingOffline(UpdateTrackingModel updateTrackingModel) {
+        realm.executeTransactionAsync(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+
+                Number currentIdNumber = realm.where(UpdateTrackingModel.class).max("customPrivateKey");
+                int nextId;
+
+                if (currentIdNumber == null) {
+                    nextId = 1;
+                } else {
+                    nextId = currentIdNumber.intValue() + 1;
+                }
+
+                UpdateTrackingModel updateTrackingModel1 = realm.createObject(UpdateTrackingModel.class, nextId);
+                updateTrackingModel1.setEmp_track_id(updateTrackingModel.getEmp_track_id());
+                updateTrackingModel1.setLatitude(updateTrackingModel.getLatitude());
+                updateTrackingModel1.setLongitude(updateTrackingModel.getLongitude());
+                updateTrackingModel1.setSyncStatus(updateTrackingModel.getSyncStatus());
+            }
+        }, new Realm.Transaction.OnSuccess() {
+            @Override
+            public void onSuccess() {
+                Log.i(LOG_TAG, "UpdateTrackingModel" + " onSuccess");
+            }
+        }, new Realm.Transaction.OnError() {
+            @Override
+            public void onError(Throwable error) {
+                Log.i(LOG_TAG, "UpdateTrackingModel" + " onError");
+            }
+        });
+    }
+
+    public List<UpdateTrackingModel> getOfflineTrackingCoordinates() {
+        List<UpdateTrackingModel> updateTrackingModelList = realm.where(UpdateTrackingModel.class)
+                .equalTo("syncStatus", 0).findAll();
+
+        if (updateTrackingModelList.size() > 0) {
+            return updateTrackingModelList;
+        } else {
+            return null;
+        }
+    }
+
+    public void updateTrackingOfflineSyncStatus (int customPrivateKey, int syncStatus) {
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+
+                UpdateTrackingModel updateTrackingModel = realm.where(UpdateTrackingModel.class)
+                        .equalTo("customPrivateKey", customPrivateKey).findFirst();
+
+                updateTrackingModel.setSyncStatus(syncStatus);
+
+                realm.copyToRealmOrUpdate(updateTrackingModel);
+            }
+        });
     }
 
 }

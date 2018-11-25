@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">BEEM</string>
+    <string name="app_name">BE force</string>
     <string name="title_activity_navigation">NavigationActivity</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -53,5 +53,7 @@
     <string name="owner">Owner</string>
     <string name="contact_person">Contact Person</string>
     <string name="shop_contact_number">Shop Contact No</string>
+    <string name="channel_name">BeemChannel</string>
+    <string name="channel_description">BeemChannelLocation</string>
 
 </resources>

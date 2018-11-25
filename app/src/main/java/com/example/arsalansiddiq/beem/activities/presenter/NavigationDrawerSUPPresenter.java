@@ -44,16 +44,16 @@ public class NavigationDrawerSUPPresenter implements NavigationDrawerContractorS
     @Override
     public void getTaskOnActivityLaunch(String state, int empd) {
         this.state = state;
-        if (realmCRUD.getAllTasks() != null) {
-            navigationView.showTaskList();
-        } else {
+//        if (realmCRUD.getAllTasks() != null) {
+//            navigationView.showTaskList();
+//        } else {
             if (networkUtils.isNetworkConnected()) {
                 navigationView.showProgress();
                 networkUtils.getTaskList(empd, this);
             } else {
                 navigationView.showError("please check you internet connection");
             }
-        }
+//        }
     }
 
     @Override

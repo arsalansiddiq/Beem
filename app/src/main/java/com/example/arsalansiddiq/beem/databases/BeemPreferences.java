@@ -67,4 +67,57 @@ public class BeemPreferences {
         sharedPreEditor.apply();
     }
 
+    public void initialize_and_createPreferences_customRelationMeetingId (int customRelationMeetingId) {
+        sharedPreEditor = context.getSharedPreferences(Constants.CUSTOM_RELATION_MEETING_ID, MODE_PRIVATE).edit();
+        sharedPreEditor.putInt(Constants.KEY_CUSTOM_RELATION_MEETING_ID, customRelationMeetingId);
+        sharedPreEditor.apply();
+    }
+
+    public void initialize_and_createPreferences_breakId(int startBreakId) {
+        sharedPreEditor = context.getSharedPreferences(Constants.BREAK_START_ID, MODE_PRIVATE).edit();
+        sharedPreEditor.putInt(Constants.KEY_BREAK_START_ID, startBreakId);
+        sharedPreEditor.apply();
+    }
+
+    public void initialize_and_createPreferences_breakStatus(int customRelationMeetingId) {
+        sharedPreEditor = context.getSharedPreferences(Constants.BREAK_STATUS, MODE_PRIVATE).edit();
+        sharedPreEditor.putInt(Constants.KEY_BREAK_STATUS, customRelationMeetingId);
+        sharedPreEditor.apply();
+    }
+
+    public void initialize_and_createPreferences_breakType(String breakType) {
+        sharedPreEditor = context.getSharedPreferences(Constants.BREAK_TYPE, MODE_PRIVATE).edit();
+        sharedPreEditor.putString(Constants.KEY_BREAK_TYPE, breakType);
+        sharedPreEditor.apply();
+    }
+
+    public void initialize_and_createPreferences_breakTime(String breakTime) {
+        sharedPreEditor = context.getSharedPreferences(Constants.BREAK_TIME, MODE_PRIVATE).edit();
+        sharedPreEditor.putString(Constants.KEY_BREAK_TIME, breakTime);
+        sharedPreEditor.apply();
+    }
+
+    public void initialize_and_createPreferences_notesCount(int notesCount) {
+        sharedPreEditor = context.getSharedPreferences(Constants.NOTES_COUNT, MODE_PRIVATE).edit();
+        sharedPreEditor.putInt(Constants.KEY_NOTES_COUNT, notesCount);
+        sharedPreEditor.apply();
+    }
+
+    public void initialize_and_createPreferences_picturesCount(int picturesCount) {
+        sharedPreEditor = context.getSharedPreferences(Constants.PICTURE_COUNT, MODE_PRIVATE).edit();
+        sharedPreEditor.putInt(Constants.KEY_PICTURE_COUNT, picturesCount);
+        sharedPreEditor.apply();
+    }
+
+    public void initialize_and_createPreferences_trackingStatus(int trackingStatus) {
+        sharedPreEditor = context.getSharedPreferences(Constants.TRACKING_STATUS, MODE_PRIVATE).edit();
+        sharedPreEditor.putInt(Constants.KEY_TRACKING_STATUS, trackingStatus);
+        sharedPreEditor.apply();
+    }
+
+    public void initialize_and_createPreferences_trackingStartId(int trackingStartId) {
+        sharedPreEditor = context.getSharedPreferences(Constants.TRACKING_START_ID, MODE_PRIVATE).edit();
+        sharedPreEditor.putInt(Constants.KEY_TRACKING_START_ID, trackingStartId);
+        sharedPreEditor.apply();
+    }
 }

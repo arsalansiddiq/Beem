@@ -1,17 +1,21 @@
 package com.example.arsalansiddiq.beem.activities;
 
 import android.Manifest;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
+import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.GravityCompat;
@@ -39,30 +43,55 @@ import com.example.arsalansiddiq.beem.databases.RealmCRUD;
 import com.example.arsalansiddiq.beem.interfaces.AttandanceInterface;
 import com.example.arsalansiddiq.beem.interfaces.EndAttendanceInterface;
 import com.example.arsalansiddiq.beem.interfaces.MeetingCallBack;
-import com.example.arsalansiddiq.beem.interfaces.RealmCallback;
 import com.example.arsalansiddiq.beem.models.databasemodels.MarkAttendance;
 import com.example.arsalansiddiq.beem.models.databasemodels.SalesAndNoSales;
+import com.example.arsalansiddiq.beem.models.databasemodels.meetingsup.MeetingSUPEndTable;
+import com.example.arsalansiddiq.beem.models.databasemodels.meetingsup.MeetingSUPStartTable;
+import com.example.arsalansiddiq.beem.models.databasemodels.meetingsup.MeetingSUPUpdatesTable;
 import com.example.arsalansiddiq.beem.models.requestmodels.StartMeetingRequest;
 import com.example.arsalansiddiq.beem.models.responsemodels.AttandanceResponse;
 import com.example.arsalansiddiq.beem.models.responsemodels.LoginResponse;
 import com.example.arsalansiddiq.beem.models.responsemodels.MeetingResponseModel;
+import com.example.arsalansiddiq.beem.models.responsemodels.ResponseSUP;
+import com.example.arsalansiddiq.beem.models.responsemodels.babreak.BreakTypeResponseModel;
+import com.example.arsalansiddiq.beem.models.responsemodels.babreak.Status;
 import com.example.arsalansiddiq.beem.models.responsemodels.tasksresponsemodels.Task;
 import com.example.arsalansiddiq.beem.models.responsemodels.tasksresponsemodels.TaskResponse;
+import com.example.arsalansiddiq.beem.receiver.LocationProvider;
+import com.example.arsalansiddiq.beem.services.BreakService;
+import com.example.arsalansiddiq.beem.services.MyService;
+import com.example.arsalansiddiq.beem.services.TrackingService;
 import com.example.arsalansiddiq.beem.utils.AppUtils;
 import com.example.arsalansiddiq.beem.utils.Constants;
 import com.example.arsalansiddiq.beem.utils.FabViewVisibility;
 import com.example.arsalansiddiq.beem.utils.NetworkUtils;
 import com.example.arsalansiddiq.beem.utils.SyncDataToServerClass;
+import com.example.arsalansiddiq.beem.utils.data.BaseResponse;
+import com.example.arsalansiddiq.beem.utils.data.UpdateCallback;
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResponse;
+import com.google.android.gms.location.SettingsClient;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import retrofit2.Response;
 
+import static com.google.android.gms.common.api.CommonStatusCodes.RESOLUTION_REQUIRED;
+
 
 public class NavigationDrawerActivity extends BaseActivity
-        implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener, LocationListener, NavigationDrawerContractorSUP.NavigationView{
+        implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener, NavigationDrawerContractorSUP.NavigationView, UpdateCallback {
 
     static final int REQUEST_IMAGE_CAPTURE = 1;
     Bitmap imageBitmap;
@@ -73,38 +102,52 @@ public class NavigationDrawerActivity extends BaseActivity
             fab_menu_takePictures_supervisor, fab_menu_addNotes_supervisor;
 
     private com.github.clans.fab.FloatingActionButton fab_menu_startBreak, fab_menu_endDay, fab_menu_sale, fab_menu_attandance,
-            fab_menu_target, fab_menu_map;
+            fab_menu_target, fab_menu_map, fab_menu_endBreak;
 
-    private LocationManager locationManager;
-    private float latitude, longitude;
+    private TextView txtView_minutes, txtView_seconds;
+
+    private double latitude;
+    private double longitude;
+    private boolean isSUP;
     private BeemDatabase beemDatabase;
     private AppUtils appUtils;
 
-    private int meetingUpdateImage = 0;
-    private boolean isStartMeetingRequest;
-    private boolean isUpdateMeetingRequest;
-    private boolean isEndMeetingRequest;
     private int meetingStatus = 0;
-    private int supervisorMeetingStatus = 0;
+    private String callTag;
     private BeemPreferences beemPreferences;
 
     //MVP
     private NavigationDrawerContractorSUP.NavigationDrawerPresenter navigationDrawerPresenter;
     private NetworkUtils networkUtils;
 
-//    private Realm realm;
+    //    private Realm realm;
     private RealmCRUD realmCRUD;
     private LoginResponse loginResponseRealm;
-    private TextView txtView_navigationName;
+    private TextView txtView_navigationName, txtView_shopNameBA;
     private ListView listView_taskNav;
+    private ConstraintLayout constraintLayout_NavigationBeemLogo;
 
-    private Location getlocationFromListener;
     private Location getlocationFromTaskAPI;
 
     NavigationView navigationView;
     FabViewVisibility fabViewVisibility;
     private List<Task> withInRadiusStores;
 
+    private String meetingTag;
+    private int count;
+    private SharedPreferences pictureNotesCount;
+    private List<Task> taskList;
+    private Intent intentMerchantActivity;
+
+
+    //Location Api
+    private FusedLocationProviderClient fusedLocationProviderClient;
+    private LocationRequest locationRequest;
+    private LocationCallback locationCallback;
+
+    private LocationProvider locationProvider;
+
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -113,8 +156,44 @@ public class NavigationDrawerActivity extends BaseActivity
         setSupportActionBar(toolbar);
 
         withInRadiusStores = new ArrayList<>();
+        intentMerchantActivity = new Intent(NavigationDrawerActivity.this,
+                MerchantActivity.class);
+
+        locationCallback = new LocationCallback(){
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                if (locationResult == null) {
+                    Log.i("LocationCallBack", "Failed!");
+                    Toast.makeText(NavigationDrawerActivity.this, "Failed to get Lcoation", Toast.LENGTH_SHORT).show();
+                } else {
+//                    for (Location location : locationResult.getLastLocation())) {
+
+                    Location location = locationResult.getLastLocation();
+                    latitude = 0;
+                    longitude = 0;
+                    latitude = location.getLatitude();
+                    longitude = location.getLongitude();
+
+                    Log.i("LocCoor", latitude + " " + longitude);
+
+                    fusedLocationProviderClient.removeLocationUpdates(this);
+
+                    hideProgress();
+//                    }
+                    if (isSUP) {
+                        attendanceSupervisor();
+                    } else {
+                        dispatchTakePictureIntent();
+                    }
+
+                }
+            }
+        };
 
         initProgressBar();
+
+        pictureNotesCount = getSharedPreferences(Constants.PICTURE_COUNT, MODE_PRIVATE);
+        count = pictureNotesCount.getInt(Constants.KEY_PICTURE_COUNT, 0);
 
         networkUtils = new NetworkUtils(NavigationDrawerActivity.this);
 
@@ -125,6 +204,7 @@ public class NavigationDrawerActivity extends BaseActivity
         beemDatabase.getReadableDatabase();
 
         realmCRUD = new RealmCRUD(this);
+        realmCRUD.getSampleUpdate();
         fabViewVisibility = new FabViewVisibility(this);
 
         loginResponseRealm = realmCRUD.getLoginInformationDetails();
@@ -132,14 +212,20 @@ public class NavigationDrawerActivity extends BaseActivity
         appUtils = new AppUtils(this);
 
         listView_taskNav = findViewById(R.id.listView_taskNav);
+        constraintLayout_NavigationBeemLogo = findViewById(R.id.constraintLayout_NavigationBeemLogo);
         navigationView = (NavigationView) findViewById(R.id.nav_view);
         View headerView = navigationView.getHeaderView(0);
         txtView_navigationName = headerView.findViewById(R.id.txtView_navigationName);
+        txtView_shopNameBA = headerView.findViewById(R.id.txtView_shopNameBA);
+
+        txtView_minutes = (TextView) findViewById(R.id.txtView_minutes);
+        txtView_seconds = (TextView) findViewById(R.id.txtView_seconds);
 
         //Fabs BA
         //Start
         fab_menu_ba = findViewById(R.id.fab_menu_ba);
         fab_menu_startBreak = (com.github.clans.fab.FloatingActionButton) findViewById(R.id.fab_menu_startBreak);
+        fab_menu_endBreak = (com.github.clans.fab.FloatingActionButton) findViewById(R.id.fab_menu_endBreak);
         fab_menu_endDay = (com.github.clans.fab.FloatingActionButton) findViewById(R.id.fab_menu_endDay);
         fab_menu_sale = (com.github.clans.fab.FloatingActionButton) findViewById(R.id.fab_menu_sale);
         fab_menu_attandance = (com.github.clans.fab.FloatingActionButton) findViewById(R.id.fab_menu_attandance);
@@ -147,6 +233,7 @@ public class NavigationDrawerActivity extends BaseActivity
         fab_menu_map = (com.github.clans.fab.FloatingActionButton) findViewById(R.id.fab_menu_map);
 
         fab_menu_startBreak.setOnClickListener(this);
+        fab_menu_endBreak.setOnClickListener(this);
         fab_menu_endDay.setOnClickListener(this);
         fab_menu_sale.setOnClickListener(this);
         fab_menu_attandance.setOnClickListener(this);
@@ -174,8 +261,6 @@ public class NavigationDrawerActivity extends BaseActivity
         fab_menu_addNotes_supervisor.setOnClickListener(this);
         //End
 
-//        hideTopFabs();
-
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -188,6 +273,31 @@ public class NavigationDrawerActivity extends BaseActivity
         SharedPreferences preferences = this.getSharedPreferences(Constants.ATTENDANCE_STATUS, MODE_PRIVATE);
         int id = preferences.getInt(Constants.KEY_ATTENDANCE_STATUS, 0);
 
+        if (loginResponseRealm.getuT().toLowerCase().equals("mcd")) {
+            SharedPreferences preferencesMeeting = this.getSharedPreferences(Constants.SUPERVISOR_MEETING_STATUS, MODE_PRIVATE);
+            boolean meetingStatus = preferencesMeeting.getBoolean(Constants.KEY_SUPERVISOR_MEETING_STATUS, false);
+
+            fab_menu_addShop_supervisor.setVisibility(View.GONE);
+            fab_menu_supervisor.setVisibility(View.VISIBLE);
+
+            if (id == 1 && meetingStatus) {
+                fabViewVisibility.fabMarkAttendance(false);
+                fabViewVisibility.fabEndAttendance(false);
+                fabViewVisibility.fabStartMeeting(false);
+                fabViewVisibility.fabEndMeeting(true);
+            } else if (id == 1 && !meetingStatus) {
+                fabViewVisibility.fabMarkAttendance(false);
+                fabViewVisibility.fabEndAttendance(true);
+                fabViewVisibility.fabStartMeeting(true);
+                fabViewVisibility.fabEndMeeting(false);
+            } else if (id == 0) {
+                fabViewVisibility.fabMarkAttendance(true);
+                fabViewVisibility.fabEndAttendance(false);
+                fabViewVisibility.fabStartMeeting(false);
+                fabViewVisibility.fabEndMeeting(false);
+            }
+
+        }
         if (loginResponseRealm.getuT().toLowerCase().equals("sup")) {
 
             SharedPreferences preferencesMeeting = this.getSharedPreferences(Constants.SUPERVISOR_MEETING_STATUS, MODE_PRIVATE);
@@ -209,12 +319,12 @@ public class NavigationDrawerActivity extends BaseActivity
                 fabViewVisibility.fabEndMeeting(false);
                 fabViewVisibility.fabsAfterStartMeeting(false);
             } else if (id == 0) {
-                 fabViewVisibility.fabMarkAttendance(true);
-                 fabViewVisibility.fabEndAttendance(false);
-                 fabViewVisibility.fabStartMeeting(false);
-                 fabViewVisibility.fabEndMeeting(false);
-                 fabViewVisibility.fabsAfterStartMeeting(false);
-             }
+                fabViewVisibility.fabMarkAttendance(true);
+                fabViewVisibility.fabEndAttendance(false);
+                fabViewVisibility.fabStartMeeting(false);
+                fabViewVisibility.fabEndMeeting(false);
+                fabViewVisibility.fabsAfterStartMeeting(false);
+            }
 
         } else {
 
@@ -230,10 +340,28 @@ public class NavigationDrawerActivity extends BaseActivity
         }
 
         txtView_navigationName.setText(loginResponseRealm.getName().toUpperCase());
-
+        if (loginResponseRealm.getuT().equals("BA")){
+            txtView_shopNameBA.setVisibility(View.VISIBLE);
+            txtView_shopNameBA.setText("Shop: " + loginResponseRealm.getStoreName());
+        }
 
         if (loginResponseRealm.getuT().equals("SUP")) {
+            listView_taskNav.setVisibility(View.VISIBLE);
+            constraintLayout_NavigationBeemLogo.setBackground(null);
             navigationDrawerPresenter.getTaskOnActivityLaunch("GetTask", loginResponseRealm.getUserId());
+
+            startService(new Intent(NavigationDrawerActivity.this, BreakService.class));
+        }
+
+        SharedPreferences preferencesMeeting = this.getSharedPreferences(Constants.BREAK_STATUS, MODE_PRIVATE);
+        int breakStatus = preferencesMeeting.getInt(Constants.KEY_BREAK_STATUS, 0);
+
+        if (breakStatus == 1) {
+            fab_menu_startBreak.setVisibility(View.GONE);
+            fab_menu_endBreak.setVisibility(View.VISIBLE);
+
+            txtView_minutes.setVisibility(View.VISIBLE);
+            txtView_seconds.setVisibility(View.VISIBLE);
         }
 
     }
@@ -254,11 +382,15 @@ public class NavigationDrawerActivity extends BaseActivity
             File userImageFile = appUtils.getImageFile(imageBitmap);
             final LoginResponse loginResponse = beemDatabase.getUserDetail();
 
-            if (loginResponseRealm.getuT().toLowerCase().equals("sup")) {
+            if (latitude == 0 || longitude == 0) {
+                Toast.makeText(this, "Unable to get location, please check your location", Toast.LENGTH_SHORT).show();
+            } else {
 
-                if (isStartMeetingRequest) {
-                    if (supervisorMeetingStatus == 1) {
-                        List<Task> taskList = realmCRUD.getAllTasks();
+                if (loginResponseRealm.getuT().toLowerCase().equals("sup") ||
+                        loginResponseRealm.getuT().toLowerCase().equals("mcd")) {
+
+                    if (meetingTag.equals("StartMeeting")) {
+                        withInRadiusStores.clear();
 
                         if (taskList != null) {
 
@@ -267,8 +399,11 @@ public class NavigationDrawerActivity extends BaseActivity
                                 getlocationFromTaskAPI.setLatitude(taskList.get(i).getShopLat());
                                 getlocationFromTaskAPI.setLongitude(taskList.get(i).getShopLng());
 
-                                float distanceInMeters = getlocationFromListener.distanceTo(getlocationFromTaskAPI);
-                                boolean isWithinRadius = distanceInMeters < 100000;
+                                Location locationFromListener = new Location("");
+                                locationFromListener.setLatitude(latitude);
+                                locationFromListener.setLongitude(longitude);
+                                float distanceInMeters = locationFromListener.distanceTo(getlocationFromTaskAPI);
+                                boolean isWithinRadius = distanceInMeters < 100;
 
                                 Log.i("RadiusIn", String.valueOf(isWithinRadius));
 
@@ -279,7 +414,8 @@ public class NavigationDrawerActivity extends BaseActivity
 
                             if (withInRadiusStores.size() > 1) {
 
-                                String[] storesWithinCircle = new String[withInRadiusStores.size()];
+                                String[] storesWithinCircle = null;
+                                storesWithinCircle = new String[withInRadiusStores.size()];
                                 for (int j = 0; j < withInRadiusStores.size(); j++) {
                                     storesWithinCircle[j] = withInRadiusStores.get(j).getShopName();
                                 }
@@ -289,10 +425,10 @@ public class NavigationDrawerActivity extends BaseActivity
                                         .setSingleChoiceItems(storesWithinCircle, -1, new DialogInterface.OnClickListener() {
                                             @Override
                                             public void onClick(DialogInterface dialogInterface, int i) {
-//                                                selectedStore = i;
                                                 if (i >= 0) {
                                                     StartMeetingRequest startMeetingRequest = new StartMeetingRequest(withInRadiusStores.get(i).getId(),
-                                                            appUtils.getDate() + " " + appUtils.getTime(), userImageFile);
+                                                            appUtils.getDate() + " " + appUtils.getTime(), userImageFile,
+                                                            latitude, longitude, loginResponseRealm.getUserId());
 
                                                     if (networkUtils.isNetworkConnected()) {
                                                         showProgress();
@@ -300,26 +436,68 @@ public class NavigationDrawerActivity extends BaseActivity
                                                             @Override
                                                             public void success(Response<MeetingResponseModel> responseModelResponse) {
 
-                                                                isEndMeetingRequest = false;
+                                                                if (responseModelResponse.isSuccessful()) {
 
-                                                                hideProgress();
+                                                                    beemPreferences.initialize_and_createPreferences_startMeetingSupervisorID(Integer.parseInt(responseModelResponse.body().getTaskId()));
+
+                                                                    insertStartMeetingSUP(startMeetingRequest.getTask_id(),
+                                                                            startMeetingRequest.getDateTime(),
+                                                                            appUtils.imageBitmapToBiteConversion(imageBitmap),
+                                                                            latitude, longitude, loginResponseRealm.getUserId(),
+                                                                            Integer.parseInt(responseModelResponse.body().getTaskId()), 1);
+                                                                } else {
+
+                                                                    insertStartMeetingSUP(startMeetingRequest.getTask_id(),
+                                                                            startMeetingRequest.getDateTime(),
+                                                                            appUtils.imageBitmapToBiteConversion(imageBitmap),
+                                                                            latitude, longitude, loginResponseRealm.getUserId(),
+                                                                            0, 0);
+                                                                }
+
+                                                                if (loginResponseRealm.getuT().toLowerCase().equals("mcd")) {
+                                                                    startActivity(intentMerchantActivity);
+                                                                }
+
                                                                 beemPreferences.initialize_and_createPreferences_meetingStatusSupervisor(true);
-                                                                beemPreferences.initialize_and_createPreferences_startMeetingSupervisorID(Integer.parseInt(responseModelResponse.body().getTaskId()));
-                                                                fabViewVisibility.fabStartMeeting(false);
-                                                                fabViewVisibility.fabEndMeeting(true);
-                                                                fabViewVisibility.fabEndAttendance(false);
-                                                                fabViewVisibility.fabMarkAttendance(false);
-                                                                fabViewVisibility.fabsAfterStartMeeting(true);
+                                                                hideProgress();
+                                                                startMeetingFabs();
                                                             }
 
                                                             @Override
                                                             public void error(String error) {
-                                                                beemPreferences.initialize_and_createPreferences_meetingStatusSupervisor(false);
+
+                                                                beemPreferences.initialize_and_createPreferences_meetingStatusSupervisor(true);
+
+                                                                insertStartMeetingSUP(startMeetingRequest.getTask_id(),
+                                                                        startMeetingRequest.getDateTime(),
+                                                                        appUtils.imageBitmapToBiteConversion(imageBitmap),
+                                                                        latitude, longitude, loginResponseRealm.getUserId(),
+                                                                        0, 0);
+
+                                                                if (loginResponseRealm.getuT().toLowerCase().equals("mcd")) {
+                                                                    startActivity(intentMerchantActivity);
+                                                                }
+
                                                                 hideProgress();
+                                                                startMeetingFabs();
                                                                 Toast.makeText(NavigationDrawerActivity.this, error, Toast.LENGTH_SHORT).show();
                                                             }
                                                         });
                                                     } else {
+                                                        beemPreferences.initialize_and_createPreferences_meetingStatusSupervisor(true);
+
+                                                        insertStartMeetingSUP(startMeetingRequest.getTask_id(),
+                                                                startMeetingRequest.getDateTime(),
+                                                                appUtils.imageBitmapToBiteConversion(imageBitmap),
+                                                                latitude, longitude, loginResponseRealm.getUserId(),
+                                                                0, 0);
+
+                                                        if (loginResponseRealm.getuT().toLowerCase().equals("mcd")) {
+                                                            startActivity(intentMerchantActivity);
+                                                        }
+
+                                                        startMeetingFabs();
+
                                                         alterDialog(true);
                                                     }
                                                 }
@@ -332,82 +510,141 @@ public class NavigationDrawerActivity extends BaseActivity
 
                             } else if (withInRadiusStores.size() == 1) {
 
+                                StartMeetingRequest startMeetingRequest = new StartMeetingRequest(withInRadiusStores.get(0).getId(),
+                                        appUtils.getDate() + " " + appUtils.getTime(), userImageFile, latitude, longitude,
+                                        loginResponseRealm.getUserId());
+
                                 if (networkUtils.isNetworkConnected()) {
                                     showProgress();
-                                    StartMeetingRequest startMeetingRequest = new StartMeetingRequest(withInRadiusStores.get(0).getId(),
-                                            appUtils.getDate() + " " + appUtils.getTime(), userImageFile);
                                     networkUtils.startMeeting(startMeetingRequest, new MeetingCallBack() {
                                         @Override
                                         public void success(Response<MeetingResponseModel> responseModelResponse) {
 
-                                            isEndMeetingRequest = false;
+                                            if (responseModelResponse.isSuccessful()) {
+
+                                                beemPreferences.initialize_and_createPreferences_startMeetingSupervisorID(Integer.parseInt(responseModelResponse.body().getTaskId()));
+
+                                                insertStartMeetingSUP(startMeetingRequest.getTask_id(),
+                                                        startMeetingRequest.getDateTime(),
+                                                        appUtils.imageBitmapToBiteConversion(imageBitmap),
+                                                        latitude, longitude, loginResponseRealm.getUserId(),
+                                                        Integer.parseInt(responseModelResponse.body().getTaskId()), 1);
+                                            } else {
+                                                insertStartMeetingSUP(startMeetingRequest.getTask_id(),
+                                                        startMeetingRequest.getDateTime(),
+                                                        appUtils.imageBitmapToBiteConversion(imageBitmap),
+                                                        latitude, longitude, loginResponseRealm.getUserId(),
+                                                        0, 0);
+                                            }
+
+                                            if (loginResponseRealm.getuT().toLowerCase().equals("mcd")) {
+                                                startActivity(intentMerchantActivity);
+                                            }
 
                                             hideProgress();
                                             beemPreferences.initialize_and_createPreferences_meetingStatusSupervisor(true);
-                                            beemPreferences.initialize_and_createPreferences_startMeetingSupervisorID(Integer.parseInt(responseModelResponse.body().getTaskId()));
-                                            fabViewVisibility.fabStartMeeting(false);
-                                            fabViewVisibility.fabEndMeeting(true);
-                                            fabViewVisibility.fabEndAttendance(false);
-                                            fabViewVisibility.fabMarkAttendance(false);
-                                            fabViewVisibility.fabsAfterStartMeeting(true);
+                                            startMeetingFabs();
                                         }
 
                                         @Override
                                         public void error(String error) {
                                             hideProgress();
-                                            beemPreferences.initialize_and_createPreferences_meetingStatusSupervisor(false);
+                                            beemPreferences.initialize_and_createPreferences_meetingStatusSupervisor(true);
+
+                                            insertStartMeetingSUP(startMeetingRequest.getTask_id(),
+                                                    startMeetingRequest.getDateTime(),
+                                                    appUtils.imageBitmapToBiteConversion(imageBitmap),
+                                                    latitude, longitude, loginResponseRealm.getUserId(),
+                                                    0, 0);
+
+                                            if (loginResponseRealm.getuT().toLowerCase().equals("mcd")) {
+                                                startActivity(intentMerchantActivity);
+                                            }
+
+                                            startMeetingFabs();
                                             Toast.makeText(NavigationDrawerActivity.this, error, Toast.LENGTH_SHORT).show();
                                         }
                                     });
                                 } else {
+                                    beemPreferences.initialize_and_createPreferences_meetingStatusSupervisor(true);
+
+                                    insertStartMeetingSUP(startMeetingRequest.getTask_id(),
+                                            startMeetingRequest.getDateTime(),
+                                            appUtils.imageBitmapToBiteConversion(imageBitmap),
+                                            latitude, longitude, loginResponseRealm.getUserId(),
+                                            0, 0);
+
+                                    if (loginResponseRealm.getuT().toLowerCase().equals("mcd")) {
+                                        startActivity(intentMerchantActivity);
+                                    }
+
+                                    startMeetingFabs();
+
                                     alterDialog(true);
                                 }
-
-
-//                                navigationDrawerPresenter.onClickButtonStartMeeting("StartMeeting", startMeetingRequest);
 
                             } else if (withInRadiusStores.size() == 0) {
-
-
-                                if (networkUtils.isNetworkConnected()) {
-                                    showProgress();
-                                    StartMeetingRequest startMeetingRequest = new StartMeetingRequest(appUtils.getDate() + " " + appUtils.getTime(), userImageFile);
-//                                    navigationDrawerPresenter.onClickButtonStartMeeting("StartMeeting", startMeetingRequest);
-
-                                    networkUtils.startMeeting(startMeetingRequest, new MeetingCallBack() {
-                                        @Override
-                                        public void success(Response<MeetingResponseModel> responseModelResponse) {
-
-                                            isEndMeetingRequest = false;
-
-                                            hideProgress();
-                                            beemPreferences.initialize_and_createPreferences_meetingStatusSupervisor(true);
-                                            beemPreferences.initialize_and_createPreferences_startMeetingSupervisorID(Integer.parseInt(String.valueOf(responseModelResponse.body().getId())));
-                                            fabViewVisibility.fabStartMeeting(false);
-                                            fabViewVisibility.fabEndMeeting(true);
-                                            fabViewVisibility.fabEndAttendance(false);
-                                            fabViewVisibility.fabMarkAttendance(false);
-                                            fabViewVisibility.fabsAfterStartMeeting(true);
-                                        }
-
-                                        @Override
-                                        public void error(String error) {
-                                            beemPreferences.initialize_and_createPreferences_meetingStatusSupervisor(false);
-                                            Toast.makeText(NavigationDrawerActivity.this, error, Toast.LENGTH_SHORT).show();
-                                        }
-                                    });
-                                } else {
-                                    alterDialog(true);
-                                }
+                                meetingOnNullTask(userImageFile);
                             }
+                        } else {
+                            meetingOnNullTask(userImageFile);
                         }
 
-                    } else if (supervisorMeetingStatus == 0) {
+                    } else if (meetingTag.equals("ImageUpdateMeeting")) {
+                        final SharedPreferences loginStatusPreferences = getSharedPreferences(Constants.MEETING_START_ID, MODE_PRIVATE);
+                        final int getMeetingStartId = loginStatusPreferences.getInt(Constants.KEY_MEETING_START_ID, 0);
 
+                        final SharedPreferences getCustomRelationMeetingId = getSharedPreferences(Constants.CUSTOM_RELATION_MEETING_ID, MODE_PRIVATE);
+                        final int customRelationMeetingId = getCustomRelationMeetingId.getInt(Constants.KEY_CUSTOM_RELATION_MEETING_ID, 0);
+
+                        StartMeetingRequest startMeetingRequest = new StartMeetingRequest(getMeetingStartId, userImageFile, null);
+                        if (networkUtils.isNetworkConnected()) {
+                            showProgress();
+                            networkUtils.updateMeeting(startMeetingRequest, new MeetingCallBack() {
+                                @Override
+                                public void success(Response<MeetingResponseModel> responseModelResponse) {
+                                    if (responseModelResponse.isSuccessful()) {
+
+                                        beemPreferences.initialize_and_createPreferences_picturesCount(count++);
+                                        insertImageUpdateMeetingSUP(customRelationMeetingId, getMeetingStartId,
+                                                appUtils.imageBitmapToBiteConversion(imageBitmap), 1, 0, 1);
+
+                                        Log.i("Update Image in Meeting", "Success");
+                                    } else {
+
+                                        beemPreferences.initialize_and_createPreferences_picturesCount(count++);
+                                        insertImageUpdateMeetingSUP(customRelationMeetingId, getMeetingStartId,
+                                                appUtils.imageBitmapToBiteConversion(imageBitmap), 1, 0, 0);
+
+                                    }
+                                    hideProgress();
+                                }
+
+                                @Override
+                                public void error(String error) {
+
+                                    beemPreferences.initialize_and_createPreferences_picturesCount(count++);
+                                    insertImageUpdateMeetingSUP(customRelationMeetingId, getMeetingStartId,
+                                            appUtils.imageBitmapToBiteConversion(imageBitmap), 1, 0, 0);
+                                    hideProgress();
+                                    Toast.makeText(NavigationDrawerActivity.this, error + " Image not updated", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        } else {
+
+                            beemPreferences.initialize_and_createPreferences_picturesCount(count++);
+                            insertImageUpdateMeetingSUP(customRelationMeetingId, getMeetingStartId,
+                                    appUtils.imageBitmapToBiteConversion(imageBitmap), 1, 0, 0);
+                            hideProgress();
+                            alterDialog(true);
+                        }
+                    } else if (meetingTag.equals("EndMeeting")) {
 
                         final SharedPreferences loginStatusPreferences = getSharedPreferences(Constants.MEETING_START_ID, MODE_PRIVATE);
                         final int getMeetingStartId = loginStatusPreferences.getInt(Constants.KEY_MEETING_START_ID, 0);
 
+                        final SharedPreferences getCustomRelationMeetingId = getSharedPreferences(Constants.CUSTOM_RELATION_MEETING_ID, MODE_PRIVATE);
+                        final int customRelationMeetingId = getCustomRelationMeetingId.getInt(Constants.KEY_CUSTOM_RELATION_MEETING_ID, 0);
 
                         StartMeetingRequest startMeetingRequest = new StartMeetingRequest(getMeetingStartId,
                                 appUtils.getDate() + " " + appUtils.getTime(), userImageFile);
@@ -418,189 +655,152 @@ public class NavigationDrawerActivity extends BaseActivity
                                 @Override
                                 public void success(Response<MeetingResponseModel> responseModelResponse) {
 
-                                    isEndMeetingRequest = true;
+                                    if (responseModelResponse.isSuccessful()) {
+                                        insertEndMeetingSUP(customRelationMeetingId, getMeetingStartId, appUtils.getTime(),
+                                                appUtils.imageBitmapToBiteConversion(imageBitmap), 1);
+                                    } else {
+                                        insertEndMeetingSUP(customRelationMeetingId, getMeetingStartId, appUtils.getTime(),
+                                                appUtils.imageBitmapToBiteConversion(imageBitmap), 0);
+                                    }
 
                                     beemPreferences.initialize_and_createPreferences_meetingStatusSupervisor(false);
-                                    fabViewVisibility.fabStartMeeting(true);
-                                    fabViewVisibility.fabEndMeeting(false);
-                                    fabViewVisibility.fabEndAttendance(true);
-                                    fabViewVisibility.fabMarkAttendance(false);
-                                    fabViewVisibility.fabsAfterStartMeeting(false);
+                                    if (loginResponseRealm.getuT().toLowerCase().equals("mcd")) {
+                                        fabViewVisibility.fabStartMeeting(true);
+                                        fabViewVisibility.fabEndMeeting(false);
+                                    } else {
+                                        fabViewVisibility.fabStartMeeting(true);
+                                        fabViewVisibility.fabEndMeeting(false);
+                                        fabViewVisibility.fabEndAttendance(true);
+                                        fabViewVisibility.fabMarkAttendance(false);
+                                        fabViewVisibility.fabsAfterStartMeeting(false);
+                                    }
                                     hideProgress();
                                 }
 
                                 @Override
                                 public void error(String error) {
-                                    beemPreferences.initialize_and_createPreferences_meetingStatusSupervisor(true);
+
+                                    insertEndMeetingSUP(customRelationMeetingId, getMeetingStartId, appUtils.getTime(),
+                                            appUtils.imageBitmapToBiteConversion(imageBitmap), 0);
+
+                                    beemPreferences.initialize_and_createPreferences_meetingStatusSupervisor(false);
                                     hideProgress();
+
+                                    if (loginResponseRealm.getuT().toLowerCase().equals("mcd")) {
+                                        fabViewVisibility.fabStartMeeting(true);
+                                        fabViewVisibility.fabEndMeeting(false);
+                                    } else {
+                                        fabViewVisibility.fabStartMeeting(true);
+                                        fabViewVisibility.fabEndMeeting(false);
+                                        fabViewVisibility.fabEndAttendance(true);
+                                        fabViewVisibility.fabMarkAttendance(false);
+                                        fabViewVisibility.fabsAfterStartMeeting(false);
+                                    }
                                     Toast.makeText(NavigationDrawerActivity.this, error, Toast.LENGTH_SHORT).show();
                                 }
                             });
                         } else {
+                            beemPreferences.initialize_and_createPreferences_meetingStatusSupervisor(false);
+                            insertEndMeetingSUP(customRelationMeetingId, getMeetingStartId, appUtils.getTime(),
+                                    appUtils.imageBitmapToBiteConversion(imageBitmap), 0);
+
+                            if (loginResponseRealm.getuT().toLowerCase().equals("mcd")) {
+                                fabViewVisibility.fabStartMeeting(true);
+                                fabViewVisibility.fabEndMeeting(false);
+                            } else {
+                                fabViewVisibility.fabStartMeeting(true);
+                                fabViewVisibility.fabEndMeeting(false);
+                                fabViewVisibility.fabEndAttendance(true);
+                                fabViewVisibility.fabMarkAttendance(false);
+                                fabViewVisibility.fabsAfterStartMeeting(false);
+                            }
                             alterDialog(true);
                         }
                     }
-                } else {
-                    if (meetingUpdateImage == 1) {
+                } else if (loginResponseRealm.getuT().toLowerCase().equals("ba")) {
 
-                        final SharedPreferences loginStatusPreferences = getSharedPreferences(Constants.MEETING_START_ID, MODE_PRIVATE);
-                        final int getMeetingStartId = loginStatusPreferences.getInt(Constants.KEY_MEETING_START_ID, 0);
-                        StartMeetingRequest startMeetingRequest = new StartMeetingRequest(getMeetingStartId, userImageFile, null);
+                    if (meetingStatus == 1) {
+
                         if (networkUtils.isNetworkConnected()) {
-                            showProgress();
-                            networkUtils.updateMeeting(startMeetingRequest, new MeetingCallBack() {
-                                @Override
-                                public void success(Response<MeetingResponseModel> responseModelResponse) {
-                                    hideProgress();
-                                    Log.i("Update Image in Meeting", "Success");
-                                }
 
-                                @Override
-                                public void error(String error) {
-                                    hideProgress();
-                                    Toast.makeText(NavigationDrawerActivity.this, error + " Image not updated", Toast.LENGTH_SHORT).show();
-                                }
-                            });
+                            final int status = 1;
+
+                            networkUtils.attandanceBA(appUtils.getDate(), loginResponseRealm.getUserId(), loginResponseRealm.getName(), userImageFile,
+                                    appUtils.getTime(), latitude, longitude, status, new AttandanceInterface() {
+                                        @Override
+                                        public void success(Response<AttandanceResponse> attandanceResponseResponse) {
+                                            if (attandanceResponseResponse.body().getStatus() == 1) {
+                                                beemPreferences.initialize_and_createPreferences(attandanceResponseResponse.body().getId());
+                                                beemPreferences.initialize_and_createPreferences_forAttendanceStatus(1);
+
+                                                hideBottomFabs();
+                                            } else {
+                                                Toast.makeText(NavigationDrawerActivity.this, "Something went wrong!", Toast.LENGTH_SHORT).show();
+                                            }
+                                        }
+
+                                        @Override
+                                        public void failed(String error) {
+
+                                            Toast.makeText(NavigationDrawerActivity.this, error, Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
                         } else {
-                            alterDialog(true);
+
+                            AlertDialog.Builder alertBuilder = new AlertDialog.Builder(NavigationDrawerActivity.this);
+                            alertBuilder.setTitle("Network")
+                                    .setMessage("Please Check your internet connection")
+                                    .setCancelable(false)
+                                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialogInterface, int i) {
+                                        }
+                                    });
+
+                            alertBuilder.show();
+
                         }
-                    }
-                }
-            } else if (loginResponseRealm.getuT().toLowerCase().equals("ba")) {
+                    } else if (meetingStatus == 0) {
 
-                if (meetingStatus == 1) {
+                        SharedPreferences preferences = this.getSharedPreferences(Constants.BA_ATTENDANCE_ID, MODE_PRIVATE);
+                        final int id = preferences.getInt(Constants.KEY_BA_ATTENDANCE_ID, 0);
 
-                    if (networkUtils.isNetworkConnected()) {
+                        if (networkUtils.isNetworkConnected()) {
 
-                        final int status = 1;
+                            Log.i("thisClass", "token" + id);
 
-                        networkUtils.attandanceBA(appUtils.getDate(), loginResponseRealm.getUserId(), loginResponseRealm.getName(), userImageFile,
-                                appUtils.getTime(), latitude, longitude, status, new AttandanceInterface() {
-                                    @Override
-                                    public void success(Response<AttandanceResponse> attandanceResponseResponse) {
-                                        if (attandanceResponseResponse.body().getStatus() == 1) {
-                                            beemPreferences.initialize_and_createPreferences(attandanceResponseResponse.body().getId());
-                                            beemPreferences.initialize_and_createPreferences_forAttendanceStatus(1);
+                            networkUtils.endAttandenceBA(id, appUtils.getTime(), latitude, longitude, userImageFile,
+                                    new EndAttendanceInterface() {
+                                        @Override
+                                        public void success(Response<AttandanceResponse> attandanceResponseResponse) {
+                                            if (attandanceResponseResponse.body().getStatus() == 1) {
+                                                beemPreferences.initialize_and_createPreferences_forAttendanceStatus(0);
 
-                                            insertDataMarkAttendance(appUtils.getDate(), loginResponseRealm.getUserId(), loginResponseRealm.getName(),
-                                                    appUtils.imageBitmapToBiteConversion(imageBitmap), appUtils.getTime(), latitude, longitude,
-                                                    attandanceResponseResponse.body().getStatus(), attandanceResponseResponse.body().getId());
+                                                hideTopFabs();
 
-                                            beemDatabase.insertMark_BA_attendanceInfo(loginResponse.getUserId(), appUtils.getDate(), loginResponse.getName(),
-                                                    appUtils.imageBitmapToBiteConversion(imageBitmap), appUtils.getTime(),
-                                                    latitude, longitude, attandanceResponseResponse.body().getStatus(), attandanceResponseResponse.body().getId());
-
-                                            hideBottomFabs();
-                                        } else {
-
-                                            insertDataMarkAttendance(appUtils.getDate(), loginResponseRealm.getUserId(), loginResponseRealm.getName(),
-                                                    appUtils.imageBitmapToBiteConversion(imageBitmap), appUtils.getTime(), latitude, longitude,
-                                                    attandanceResponseResponse.body().getStatus(), 0);
-
-                                            beemPreferences.initialize_and_createPreferences_forAttendanceStatus(1);
-                                            beemDatabase.insertMark_BA_attendanceInfo(loginResponse.getUserId(), appUtils.getDate(), loginResponse.getName(),
-                                                    appUtils.imageBitmapToBiteConversion(imageBitmap), appUtils.getTime(),
-                                                    latitude, longitude, 0, 0);
-
-                                            hideBottomFabs();
-
-                                            Toast.makeText(NavigationDrawerActivity.this, "Something Went Wrong Please Try Again!", Toast.LENGTH_SHORT).show();
-
+                                            } else {
+                                                Toast.makeText(NavigationDrawerActivity.this, "Something Went Wrong Please Try Again!", Toast.LENGTH_SHORT).show();
+                                            }
                                         }
-                                    }
 
-                                    @Override
-                                    public void failed(String error) {
-
-                                        beemPreferences.initialize_and_createPreferences_forAttendanceStatus(1);
-                                        insertDataMarkAttendance(appUtils.getDate(), loginResponseRealm.getUserId(), loginResponseRealm.getName(),
-                                                appUtils.imageBitmapToBiteConversion(imageBitmap), appUtils.getTime(), latitude, longitude,
-                                                0, 0);
-
-                                        beemDatabase.insertMark_BA_attendanceInfo(loginResponse.getUserId(), appUtils.getDate(), loginResponse.getName(),
-                                                appUtils.imageBitmapToBiteConversion(imageBitmap), appUtils.getTime(),
-                                                latitude, longitude, 0, 0);
-
-                                        hideBottomFabs();
-
-                                        Toast.makeText(NavigationDrawerActivity.this, error, Toast.LENGTH_SHORT).show();
-                                    }
-                                });
-                    } else {
-
-                        AlertDialog.Builder alertBuilder = new AlertDialog.Builder(NavigationDrawerActivity.this);
-                        alertBuilder.setTitle("Network")
-                                .setMessage("Please Check your internet connection")
-                                .setCancelable(false)
-                                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialogInterface, int i) {
-                                        insertDataMarkAttendance(appUtils.getDate(), loginResponseRealm.getUserId(), loginResponseRealm.getName(),
-                                                appUtils.imageBitmapToBiteConversion(imageBitmap), appUtils.getTime(), latitude, longitude,
-                                                0, 0);
-                                        beemPreferences.initialize_and_createPreferences_forAttendanceStatus(1);
-
-                                        hideBottomFabs();
-
-                                        Toast.makeText(NavigationDrawerActivity.this, "Data Saved!", Toast.LENGTH_SHORT).show();
-                                    }
-                                });
-
-                        alertBuilder.show();
-
-                    }
-                } else if (meetingStatus == 0) {
-
-                    SharedPreferences preferences = this.getSharedPreferences(Constants.BA_ATTENDANCE_ID, MODE_PRIVATE);
-                    final int id = preferences.getInt(Constants.KEY_BA_ATTENDANCE_ID, 0);
-
-                    if (networkUtils.isNetworkConnected()) {
-
-                        Log.i("thisClass", "token" + id);
-
-                        networkUtils.endAttandenceBA(id, appUtils.getTime(), latitude, longitude, userImageFile,
-                                new EndAttendanceInterface() {
-                                    @Override
-                                    public void success(Response<AttandanceResponse> attandanceResponseResponse) {
-                                        if (attandanceResponseResponse.body().getStatus() == 1) {
-                                            beemPreferences.initialize_and_createPreferences_forAttendanceStatus(0);
-
-                                            insertDataEndMarkAttendance(appUtils.getDate(), id, loginResponseRealm.getName(), appUtils.imageBitmapToBiteConversion(imageBitmap), appUtils.getTime(),
-                                                    latitude, longitude, attandanceResponseResponse.body().getStatus(), 0);
-
-                                            hideTopFabs();
-
-                                        } else {
-
-                                            insertDataEndMarkAttendance(appUtils.getDate(), id, loginResponseRealm.getName(), appUtils.imageBitmapToBiteConversion(imageBitmap), appUtils.getTime(),
-                                                    latitude, longitude, 0, 0);
-                                            Toast.makeText(NavigationDrawerActivity.this, "Something Went Wrong Please Try Again!", Toast.LENGTH_SHORT).show();
-                                            hideTopFabs();
+                                        @Override
+                                        public void failed(String error) {
+                                            Toast.makeText(NavigationDrawerActivity.this, error, Toast.LENGTH_SHORT).show();
                                         }
-                                    }
+                                    });
+                        } else {
+                            AlertDialog.Builder alertBuilder = new AlertDialog.Builder(NavigationDrawerActivity.this);
+                            alertBuilder.setTitle("Network")
+                                    .setMessage("Please Check your internet connection")
+                                    .setCancelable(false)
+                                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialogInterface, int i) {
+                                        }
+                                    });
 
-                                    @Override
-                                    public void failed(String error) {
-                                        Toast.makeText(NavigationDrawerActivity.this, error, Toast.LENGTH_SHORT).show();
-                                    }
-                                });
-                    } else {
-                        AlertDialog.Builder alertBuilder = new AlertDialog.Builder(NavigationDrawerActivity.this);
-                        alertBuilder.setTitle("Network")
-                                .setMessage("Please Check your internet connection")
-                                .setCancelable(false)
-                                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialogInterface, int i) {
-                                        insertDataEndMarkAttendance(appUtils.getDate(), id, loginResponseRealm.getName(), appUtils.imageBitmapToBiteConversion(imageBitmap), appUtils.getTime(),
-                                                latitude, longitude, 0, 0);
-
-                                        Toast.makeText(NavigationDrawerActivity.this, "Data Saved!", Toast.LENGTH_SHORT).show();
-                                        hideTopFabs();
-                                    }
-                                });
-
-                        alertBuilder.show();
+                            alertBuilder.show();
+                        }
                     }
                 }
             }
@@ -652,15 +852,20 @@ public class NavigationDrawerActivity extends BaseActivity
             // Handle the camera action
         } else if (id == R.id.nav_sync) {
 
-            if (salesAndNoSales != null) {
-                if (salesAndNoSales.getTotal_nosales() > 0) {
-                    SyncDataToServerClass syncDataToServerClass = new SyncDataToServerClass(NavigationDrawerActivity.this);
-                    syncDataToServerClass.updateSalesData();
+            SyncDataToServerClass syncDataToServerClass = new SyncDataToServerClass(NavigationDrawerActivity.this);
+
+            if (loginResponseRealm.getuT().toLowerCase().equals("ba")) {
+                if (salesAndNoSales != null) {
+                    if (salesAndNoSales.getTotal_nosales() > 0) {
+                        syncDataToServerClass.updateSalesData();
+                    } else {
+                        Toast.makeText(this, "No Pending Data", Toast.LENGTH_SHORT).show();
+                    }
                 } else {
                     Toast.makeText(this, "No Pending Data", Toast.LENGTH_SHORT).show();
                 }
-            } else {
-                Toast.makeText(this, "No Pending Data", Toast.LENGTH_SHORT).show();
+            } else if (loginResponseRealm.getuT().toLowerCase().equals("sup")) {
+                syncDataToServerClass.startMeetingUpdate();
             }
         } else if (id == R.id.nav_logout) {
 
@@ -673,19 +878,42 @@ public class NavigationDrawerActivity extends BaseActivity
             } else if (endDayStatus == 1) {
                 Toast.makeText(this, "please end day before logout", Toast.LENGTH_SHORT).show();
             } else {
-                beemPreferences.initialize_and_createPreferences_forLoginSession(Constants.STATUS_OFF);
-                beemPreferences.initialize_and_createPreferences_forAttendanceStatus(Constants.STATUS_OFF);
-                beemPreferences.initialize_and_createPreferences_forBrand("");
-                realmCRUD.removeUserBrandsSKUCategories(loginResponseRealm.getUserId());
-                Intent intent = new Intent(NavigationDrawerActivity.this, LoginActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(intent);
+                if (loginResponseRealm.getuT().equals("BA")) {
+                    logout();
+                } else if (loginResponseRealm.getuT().equals("SUP")){
+                    locationProvider = new LocationProvider(this);
+                    locationProvider.initializeLocationManager();
+                }
             }
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void logout() {
+        beemPreferences.initialize_and_createPreferences_forLoginSession(Constants.STATUS_OFF);
+        beemPreferences.initialize_and_createPreferences_forAttendanceStatus(Constants.STATUS_OFF);
+        beemPreferences.initialize_and_createPreferences_forBrand("");
+        realmCRUD.removeUserBrandsSKUCategories(loginResponseRealm.getUserId());
+        Intent intent = new Intent(NavigationDrawerActivity.this, LoginActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
+    }
+
+    public void endTracking(double latitude, double longitude) {
+        locationProvider.removeUpdateLocation();
+        callTag = "EndTracking";
+        SharedPreferences preferences = this.getSharedPreferences(Constants.TRACKING_START_ID, MODE_PRIVATE);
+        int trackingId = preferences.getInt(Constants.KEY_TRACKING_START_ID, 0);
+        if (networkUtils.isNetworkConnected()) {
+            showProgress();
+            networkUtils.endTracking(trackingId, latitude, longitude, 0, appUtils.getDate() + " " +
+                    appUtils.getTime(), this);
+        } else {
+            alterDialog(true);
+        }
     }
 
     @Override
@@ -701,18 +929,18 @@ public class NavigationDrawerActivity extends BaseActivity
                 getLocation(false);
 
                 break;
-                case R.id.fab_menu_endDay:
+            case R.id.fab_menu_endDay:
 
-                    if (salesAndNoSales.getTotal_nosales() > 0) {
-                        Toast.makeText(this, "please sync data before end day", Toast.LENGTH_SHORT).show();
-                    } else {
-                        realmCRUD.clearRecordsAtEndDay();
-                        meetingStatus = 0;
-                        getLocation(false);
+                if (salesAndNoSales.getTotal_nosales() > 0) {
+                    Toast.makeText(this, "please sync data before end day", Toast.LENGTH_SHORT).show();
+                } else {
+                    realmCRUD.clearRecordsAtEndDay();
+                    meetingStatus = 0;
+                    getLocation(false);
 
-                    }
+                }
 
-                    break;
+                break;
             case R.id.fab_menu_map:
                 break;
             case R.id.fab_menu_sale:
@@ -720,8 +948,31 @@ public class NavigationDrawerActivity extends BaseActivity
                 startActivity(intent);
                 break;
             case R.id.fab_menu_startBreak:
-                Intent intent1 = new Intent(NavigationDrawerActivity.this, Replica.class);
-                startActivity(intent1);
+
+                if (networkUtils.isNetworkConnected()) {
+                    callTag = "BreakType";
+                    networkUtils.getBreakTypes(this);
+                    showProgress();
+                } else {
+                    alterDialog(true);
+                }
+
+                break;
+
+            case R.id.fab_menu_endBreak:
+
+                if (networkUtils.isNetworkConnected()) {
+                    callTag = "EndBreak";
+
+                    final SharedPreferences loginStatusPreferences = getSharedPreferences(Constants.BREAK_START_ID, MODE_PRIVATE);
+                    final int getBreakId = loginStatusPreferences.getInt(Constants.KEY_BREAK_START_ID, 0);
+
+                    networkUtils.endBreak(getBreakId, appUtils.getDate() + " " + appUtils.getTime(), 0, this);
+                    showProgress();
+                } else {
+                    alterDialog(true);
+                }
+
                 break;
             case R.id.fab_menu_target:
                 Intent intent2 = new Intent(NavigationDrawerActivity.this, TargetsAndAchievementsActivity.class);
@@ -738,22 +989,20 @@ public class NavigationDrawerActivity extends BaseActivity
                 break;
             case R.id.fab_menu_endAttendance_supervisor:
 
-                    meetingStatus = 0;
-                    getLocation(true);
+                meetingStatus = 0;
+                getLocation(true);
 
                 break;
 
             case R.id.fab_menu_startMeeting_supervisor:
 
-                isStartMeetingRequest = true;
-                supervisorMeetingStatus = 1;
+                meetingTag = "StartMeeting";
                 meetingConfirmationDialog(true);
 
                 break;
             case R.id.fab_menu_endMeeting_supervisor:
 
-                isStartMeetingRequest = true;
-                supervisorMeetingStatus = 0;
+                meetingTag = "EndMeeting";
                 meetingConfirmationDialog(false);
 
                 break;
@@ -768,16 +1017,29 @@ public class NavigationDrawerActivity extends BaseActivity
 
             case R.id.fab_menu_addNotes_supervisor:
 
-                intent = new Intent(NavigationDrawerActivity.this, NotesActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(intent);
+                final SharedPreferences getNotesCount = getSharedPreferences(Constants.NOTES_COUNT, MODE_PRIVATE);
+                int notesCounts = getNotesCount.getInt(Constants.KEY_NOTES_COUNT, 0);
+
+                if (notesCounts >= 4) {
+                    Toast.makeText(this, "you have added 4 notes!", Toast.LENGTH_SHORT).show();
+                } else {
+                    intent = new Intent(NavigationDrawerActivity.this, NotesActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(intent);
+                }
 
                 break;
 
             case R.id.fab_menu_takePictures_supervisor:
 
-                meetingUpdateImage = 1;
-                dispatchTakePictureIntent();
+                int counts = pictureNotesCount.getInt(Constants.KEY_PICTURE_COUNT, 0);
+
+                if (counts >= 4) {
+                    Toast.makeText(this, "you have captured 4 images!", Toast.LENGTH_SHORT).show();
+                } else {
+                    meetingTag = "ImageUpdateMeeting";
+                    dispatchTakePictureIntent();
+                }
 
                 break;
 
@@ -810,49 +1072,42 @@ public class NavigationDrawerActivity extends BaseActivity
         fab_menu_map.setVisibility(View.GONE);
     }
 
-    @Override
-    public void onLocationChanged(Location location) {
-        getlocationFromListener = location;
-        latitude = (float) location.getLatitude();
-        longitude = (float) location.getLongitude();
-
-        Log.i("LocationCoor", latitude + "  " + longitude);
-    }
-
-    @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
-        Log.i("onStatusChanged", provider + "  " + status + "   " + extras);
-    }
-
-    @Override
-    public void onProviderEnabled(String provider) {
-        Log.i("onProviderEnabled", provider);
-    }
-
-    @Override
-    public void onProviderDisabled(String provider) {
-        Log.i("onProviderDisabled", provider);
-    }
-
     void getLocation(boolean isSUP) {
 
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},99);
-            return;
-        } else {
-            locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+        locationRequest = new LocationRequest();
+//        locationRequest.setInterval(1000);
+//        locationRequest.setFastestInterval(500);
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
-            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, NavigationDrawerActivity.this);
+        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
+                .addLocationRequest(locationRequest);
 
-            if (isSUP) {
-                attendanceSupervisor();
-            } else {
-                dispatchTakePictureIntent();
+        SettingsClient settingsClient = LocationServices.getSettingsClient(NavigationDrawerActivity.this);
+        com.google.android.gms.tasks.Task<LocationSettingsResponse> task = settingsClient
+                .checkLocationSettings(builder.build());
+
+        task.addOnSuccessListener(this, new OnSuccessListener<LocationSettingsResponse>() {
+            @Override
+            public void onSuccess(LocationSettingsResponse locationSettingsResponse) {
+                Log.i("LocationClient", "SettingsSatisfied!");
+
+                startLocationUpdates(isSUP);
             }
+        });
 
-        }
+        task.addOnFailureListener(this, new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                ApiException apiException = (ApiException) e;
+
+                if (apiException.getStatusCode() == RESOLUTION_REQUIRED){
+                    Log.i("exception on Failure", e.getMessage().toString());
+                    startLocationUpdates(isSUP);
+                }
+                Toast.makeText(NavigationDrawerActivity.this, "Please check your Location settings!", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Override
@@ -865,7 +1120,7 @@ public class NavigationDrawerActivity extends BaseActivity
     }
 
     void insertDataMarkAttendance(String date, int userId, String name, byte[] startImage, String startTime,
-                                  float latitude, float longitude, int status, int markAttendanceResponseID) {
+                                  double latitude, double longitude, int status, int markAttendanceResponseID) {
         MarkAttendance markAttendance = new MarkAttendance();
         markAttendance.setEmpid(userId);
         markAttendance.setDate(date);
@@ -880,7 +1135,7 @@ public class NavigationDrawerActivity extends BaseActivity
     }
 
     void insertDataEndMarkAttendance(String date, int userId, String name, byte[] startImage, String startTime,
-                                  float latitude, float longitude, int status, int markAttendanceResponseID) {
+                                     float latitude, float longitude, int status, int markAttendanceResponseID) {
         MarkAttendance markAttendance = new MarkAttendance();
         markAttendance.setEmpid(userId);
         markAttendance.setDate(date);
@@ -897,83 +1152,82 @@ public class NavigationDrawerActivity extends BaseActivity
     void attendanceSupervisor() {
 
 
-        if (meetingStatus == 1) {
+        if (latitude == 0 && longitude == 0) {
+            Toast.makeText(this, "Unable to get location, is your location on?", Toast.LENGTH_SHORT).show();
+        } else {
+            if (meetingStatus == 1) {
 
-            if (networkUtils.isNetworkConnected()) {
+                if (networkUtils.isNetworkConnected()) {
 
-                final int status = 1;
+                    final int status = 1;
 
-                networkUtils.attandanceSUP(loginResponseRealm.getUserId(), loginResponseRealm.getName(),
-                        appUtils.getTime(), latitude, longitude, status, new AttandanceInterface() {
-                            @Override
-                            public void success(Response<AttandanceResponse> attandanceResponseResponse) {
-                                if (attandanceResponseResponse.body().getStatus() == 1) {
-                                    beemPreferences.initialize_and_createPreferences(attandanceResponseResponse.body().getId());
-                                    beemPreferences.initialize_and_createPreferences_forAttendanceStatus(1);
+                    networkUtils.attandanceSUP(loginResponseRealm.getUserId(), loginResponseRealm.getName(),
+                            appUtils.getTime(), latitude, longitude, status, new AttandanceInterface() {
+                                @Override
+                                public void success(Response<AttandanceResponse> attandanceResponseResponse) {
+                                    if (attandanceResponseResponse.body().getStatus() == 1) {
+                                        beemPreferences.initialize_and_createPreferences(attandanceResponseResponse.body().getId());
+                                        beemPreferences.initialize_and_createPreferences_forAttendanceStatus(1);
 
-                                    fabViewVisibility.fabMarkAttendance(false);
-                                    fabViewVisibility.fabEndAttendance(true);
-                                    fabViewVisibility.fabStartMeeting(true);
-                                    fabViewVisibility.fabEndMeeting(false);
-                                    fabViewVisibility.fabsAfterStartMeeting(false);
+                                        fabViewVisibility.fabMarkAttendance(false);
+                                        fabViewVisibility.fabEndAttendance(true);
+                                        fabViewVisibility.fabStartMeeting(true);
+                                        fabViewVisibility.fabEndMeeting(false);
+                                        fabViewVisibility.fabsAfterStartMeeting(false);
 
-                                } else {
+                                    } else {
 
-//                                    fabsAttendance(false);
+                                        Toast.makeText(NavigationDrawerActivity.this, "Something Went Wrong Please Try Again!", Toast.LENGTH_SHORT).show();
 
-                                    Toast.makeText(NavigationDrawerActivity.this, "Something Went Wrong Please Try Again!", Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+
+                                @Override
+                                public void failed(String error) {
+
+                                    Toast.makeText(NavigationDrawerActivity.this, error, Toast.LENGTH_SHORT).show();
 
                                 }
-                            }
+                            });
+                } else {
+                    alterDialog(true);
+                }
 
-                            @Override
-                            public void failed(String error) {
+            } else if (meetingStatus == 0) {
 
-//                                fabsAttendance(false);
-                                Toast.makeText(NavigationDrawerActivity.this, error, Toast.LENGTH_SHORT).show();
+                SharedPreferences preferences = this.getSharedPreferences(Constants.BA_ATTENDANCE_ID, MODE_PRIVATE);
+                final int id = preferences.getInt(Constants.KEY_BA_ATTENDANCE_ID, 0);
 
-                            }
-                        });
-            } else {
-                alterDialog(true);
-            }
+                if (networkUtils.isNetworkConnected()) {
 
-        } else if (meetingStatus == 0){
+                    Log.i("thisClass", "token" + id);
 
-            SharedPreferences preferences = this.getSharedPreferences(Constants.BA_ATTENDANCE_ID, MODE_PRIVATE);
-            final int id = preferences.getInt(Constants.KEY_BA_ATTENDANCE_ID, 0);
+                    networkUtils.endAttandenceSUP(id, appUtils.getTime(), latitude, longitude, 0,
+                            new EndAttendanceInterface() {
+                                @Override
+                                public void success(Response<AttandanceResponse> attandanceResponseResponse) {
+                                    if (attandanceResponseResponse.body().getStatus() == 1) {
+                                        beemPreferences.initialize_and_createPreferences_forAttendanceStatus(0);
 
-            if (networkUtils.isNetworkConnected()) {
+                                        fabViewVisibility.fabMarkAttendance(true);
+                                        fabViewVisibility.fabEndAttendance(false);
+                                        fabViewVisibility.fabStartMeeting(false);
+                                        fabViewVisibility.fabEndMeeting(false);
+                                        fabViewVisibility.fabsAfterStartMeeting(false);
 
-                Log.i("thisClass", "token" + id);
+                                    } else {
 
-                networkUtils.endAttandenceSUP(id, appUtils.getTime(), latitude, longitude, 0,
-                        new EndAttendanceInterface() {
-                            @Override
-                            public void success(Response<AttandanceResponse> attandanceResponseResponse) {
-                                if (attandanceResponseResponse.body().getStatus() == 1) {
-                                    beemPreferences.initialize_and_createPreferences_forAttendanceStatus(0);
-
-                                    fabViewVisibility.fabMarkAttendance(true);
-                                    fabViewVisibility.fabEndAttendance(false);
-                                    fabViewVisibility.fabStartMeeting(false);
-                                    fabViewVisibility.fabEndMeeting(false);
-                                    fabViewVisibility.fabsAfterStartMeeting(false);
-
-                                } else {
-
-//                                    fabsAttendance(true);
+                                    }
                                 }
-                            }
 
-                            @Override
-                            public void failed(String error) {
-//                                fabsAttendance(true);
-                                Toast.makeText(NavigationDrawerActivity.this, error, Toast.LENGTH_SHORT).show();
-                            }
-                        });
-            } else {
-                alterDialog(true);
+                                @Override
+                                public void failed(String error) {
+                                    Toast.makeText(NavigationDrawerActivity.this, error, Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                } else {
+                    alterDialog(true);
+                }
             }
         }
     }
@@ -1025,24 +1279,55 @@ public class NavigationDrawerActivity extends BaseActivity
                     public void onClick(DialogInterface dialogInterface, int i) {
 
                         getLocation(false);
-//                        dispatchTakePictureIntent();
 
-                        }
+                    }
                 })
-        .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                Toast.makeText(NavigationDrawerActivity.this, "Meeting Not Started", Toast.LENGTH_SHORT).show();
-            }
-        });
+                .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        Toast.makeText(NavigationDrawerActivity.this, "Meeting Not Started", Toast.LENGTH_SHORT).show();
+                    }
+                });
 
         alertBuilder.show();
     }
 
 
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     @Override
     protected void onResume() {
         super.onResume();
+
+        if (loginResponseRealm.getuT().equals("SUP")) {
+            listView_taskNav.setVisibility(View.VISIBLE);
+            constraintLayout_NavigationBeemLogo.setBackground(null);
+            navigationDrawerPresenter.getTaskOnActivityLaunch("GetTask", loginResponseRealm.getUserId());
+
+            stopService(new Intent(NavigationDrawerActivity.this, BreakService.class));
+            startService(new Intent(NavigationDrawerActivity.this, BreakService.class));
+
+        }
+        registerReceiver(broadcastReceiver, new IntentFilter(BreakService.COUNTDOWN_BR));
+        Log.i("register", " broadcast");
+    }
+
+    private void startLocationUpdates(boolean isSUP) {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            Toast.makeText(this, "Please check Lcoation Permission", Toast.LENGTH_SHORT).show();
+        } else {
+            showProgress();
+            this.isSUP = isSUP;
+
+            fusedLocationProviderClient.requestLocationUpdates(locationRequest, this.locationCallback, null);
+
+        }
     }
 
     @Override
@@ -1053,10 +1338,24 @@ public class NavigationDrawerActivity extends BaseActivity
     @Override
     protected void onPause() {
         super.onPause();
+        unregisterReceiver(broadcastReceiver);
+        Log.i("register", " unregister broadcast");
+    }
+
+    @Override
+    protected void onStop() {
+        try {
+            unregisterReceiver(broadcastReceiver);
+            Log.i("stop", " stop broadcast");
+        } catch (Exception e) {
+            Log.i("stop", e.getLocalizedMessage().toString());
+        }
+        super.onStop();
     }
 
     @Override
     protected void onDestroy() {
+        Log.i("Destroy", "service");
         super.onDestroy();
     }
 
@@ -1077,41 +1376,307 @@ public class NavigationDrawerActivity extends BaseActivity
 
     @Override
     public void showSuccesofState_getTaskList(Response<TaskResponse> taskResponse) {
-        realmCRUD.insertTasksDetails(taskResponse.body().getTasks(), new RealmCallback() {
-            @Override
-            public void onSuccess() {
-                showTaskList();
-            }
-
-            @Override
-            public void onError() {
-                Log.i("Navigation:  ", "List not added!");
-            }
-        });
+        showTaskList(taskResponse.body());
     }
 
     @Override
-    public void showTaskList() {
+    public void showTaskList(TaskResponse taskResponse) {
+        if (taskList != null) {
+            taskList.clear();
+        }
+        taskList = taskResponse.getTasks();
         CustomListAdapterTasks customListAdapterTasks =
-                new CustomListAdapterTasks(NavigationDrawerActivity.this, 0, realmCRUD.getAllTasks());
+                new CustomListAdapterTasks(NavigationDrawerActivity.this, 0, taskList);
 
+        listView_taskNav.setVisibility(View.VISIBLE);
         listView_taskNav.setAdapter(customListAdapterTasks);
     }
 
     @Override
     public void showSuccesofState_startMeeting(Response<MeetingResponseModel> response, String states) {
-//        if (states.equals("StartMeeting")) {
-//            Log.i("MeetingStatus", "1");
-//            beemPreferences.initialize_and_createPreferences_meetingStatusSupervisor(true);
-//            beemPreferences.initialize_and_createPreferences_startMeetingSupervisorID(Integer.parseInt(response.body().getTaskId()));
-//            fabViewVisibility.fabStartMeeting(false);
-//            fabViewVisibility.fabEndMeeting(true);
-//            fabViewVisibility.fabEndAttendance(false);
-//            fabViewVisibility.fabMarkAttendance(false);
-//            fabViewVisibility.fabsAfterStartMeeting(true);
-//        } else if (states.equals("UpdateMeeting")) {
-//            Log.i("UpdateMeetingStatus", "1");
-//        }
+    }
+
+    void insertStartMeetingSUP(int task_id, String StartTime, byte[] img1, double latitude, double longitude, int emp_id,
+                               int startMeetingResponseId, int syncStatus) {
+
+        MeetingSUPStartTable meetingSUPStartTable = new MeetingSUPStartTable(task_id, StartTime, img1, latitude, longitude, emp_id,
+                startMeetingResponseId, syncStatus);
+        int customRelationMeetingId = realmCRUD.insertStartMeetingSUPOffline(meetingSUPStartTable);
+
+        beemPreferences.initialize_and_createPreferences_customRelationMeetingId(customRelationMeetingId);
+    }
+
+    void insertImageUpdateMeetingSUP(int customRelationMeetingId, int startMeetingResponseId, byte[] img2, int isImage, int isNote, int syncStatus) {
+
+        MeetingSUPUpdatesTable meetingSUPUpdatesTable = new MeetingSUPUpdatesTable(customRelationMeetingId, startMeetingResponseId, img2,
+                isImage, isNote, syncStatus);
+
+        realmCRUD.insertImageUpdateMeetingSUPOffline(meetingSUPUpdatesTable);
+
+    }
+
+    void insertEndMeetingSUP(int customRelationMeetingId, int startMeetingResponseId, String endTime, byte[] img4, int syncStatus) {
+
+        MeetingSUPEndTable meetingSUPEndTable = new MeetingSUPEndTable(customRelationMeetingId, startMeetingResponseId, endTime, img4, syncStatus);
+
+        realmCRUD.insertEndMeetingSUPOffline(meetingSUPEndTable);
+    }
+
+    @Override
+    public void UpdateSuccess(Response response) {
+
+        Response<ResponseSUP> responseSUPResponse;
+
+        if (callTag.equals("BreakType")) {
+            Response<BreakTypeResponseModel> breakTypeResponseModel = response;
+            List<Status> statusList = breakTypeResponseModel.body().getStatus();
+
+            String[] storesWithinCircle = new String[statusList.size()];
+            for (int j = 0; j < statusList.size(); j++) {
+                storesWithinCircle[j] = statusList.get(j).getBreakType();
+            }
+
+            hideProgress();
+
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(NavigationDrawerActivity.this)
+                    .setTitle("Choose Break Type")
+                    .setSingleChoiceItems(storesWithinCircle, -1, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+
+                            if (networkUtils.isNetworkConnected()) {
+                                callTag = "StartBreak";
+                                networkUtils.startBreak(loginResponseRealm.getUserId(), statusList.get(i).getId(),
+                                        appUtils.getDate(), appUtils.getTime(), NavigationDrawerActivity.this);
+
+                                beemPreferences.initialize_and_createPreferences_breakTime(statusList.get(i).getDuration());
+                                beemPreferences.initialize_and_createPreferences_breakType(statusList.get(i).getBreakType());
+
+                                showProgress();
+
+                            } else {
+                                dialogInterface.cancel();
+                                Toast.makeText(NavigationDrawerActivity.this, "No Internet Connection!", Toast.LENGTH_SHORT).show();
+                            }
+
+                            dialogInterface.cancel();
+                        }
+                    });
+            AlertDialog alertDialog1 = alertDialogBuilder.create();
+            alertDialog1.show();
+
+        } else if (callTag.equals("StartBreak")) {
+            responseSUPResponse = response;
+            if (responseSUPResponse.body().getStatus() == 1) {
+                beemPreferences.initialize_and_createPreferences_breakId(responseSUPResponse.body().getId());
+                beemPreferences.initialize_and_createPreferences_breakStatus(responseSUPResponse.body().getStatus());
+                fab_menu_endBreak.setVisibility(View.VISIBLE);
+                fab_menu_startBreak.setVisibility(View.GONE);
+
+                final SharedPreferences loginStatusPreferences = getSharedPreferences(Constants.BREAK_TIME, MODE_PRIVATE);
+                final String getBreakTime = loginStatusPreferences.getString(Constants.KEY_BREAK_TIME, "");
+
+
+                long timeMinute = 0, timeSeconds = 0, totalMillis = 0;
+
+                String time = getBreakTime;
+                String[] getString = time.split(":");
+
+                timeMinute = Long.parseLong(getString[1]);
+                timeSeconds = Long.parseLong(getString[2]);
+
+                totalMillis = timeMinute + timeSeconds;
+
+                totalMillis = TimeUnit.MINUTES.toMillis(totalMillis);
+
+                MyService.TIME = totalMillis;
+
+                startService(new Intent(this, MyService.class));
+
+                txtView_minutes.setVisibility(View.VISIBLE);
+                txtView_seconds.setVisibility(View.VISIBLE);
+
+                Log.i("Service from Navigation", "Started");
+
+                hideProgress();
+            } else {
+                Toast.makeText(this, "Something Went Wrong!", Toast.LENGTH_SHORT).show();
+            }
+        } else if (callTag.equals("EndBreak")) {
+            responseSUPResponse = response;
+            if (response.isSuccessful()) {
+                if (responseSUPResponse.body().getStatus() == 1) {
+                    beemPreferences.initialize_and_createPreferences_breakStatus(0);
+                }
+                fab_menu_endBreak.setVisibility(View.GONE);
+                fab_menu_startBreak.setVisibility(View.VISIBLE);
+
+                Intent intent = new Intent(this, MyService.class);
+                intent.putExtra("isStop", true);
+                MyService.TIME = 0;
+                stopService(intent);
+                txtView_minutes.setVisibility(View.GONE);
+                txtView_seconds.setVisibility(View.GONE);
+
+                hideProgress();
+            } else {
+                Toast.makeText(this, "Something Went Wrong!", Toast.LENGTH_SHORT).show();
+            }
+        } else if (callTag.equals("EndTracking")) {
+            hideProgress();
+//            responseSUPResponse = response;
+//            if (responseSUPResponse.body().getStatus() == 1) {
+            stopService(new Intent(NavigationDrawerActivity.this, TrackingService.class));
+                beemPreferences.initialize_and_createPreferences_trackingStartId(0);
+                beemPreferences.initialize_and_createPreferences_trackingStatus(0);
+                locationProvider.removeUpdateLocation();
+                logout();
+//            }
+        }
+    }
+
+    @Override
+    public void UpdateFailure(BaseResponse baseResponse) {
+        hideProgress();
+        Toast.makeText(this, baseResponse.getError(), Toast.LENGTH_SHORT).show();
+    }
+
+    void startMeetingFabs() {
+        if (loginResponseRealm.getuT().toLowerCase().equals("mcd")) {
+            fabViewVisibility.fabEndMeeting(true);
+        } else {
+            fabViewVisibility.fabStartMeeting(false);
+            fabViewVisibility.fabEndMeeting(true);
+            fabViewVisibility.fabEndAttendance(false);
+            fabViewVisibility.fabMarkAttendance(false);
+            fabViewVisibility.fabsAfterStartMeeting(true);
+        }
+    }
+
+    void meetingOnNullTask(File userImageFile) {
+        StartMeetingRequest startMeetingRequest = new StartMeetingRequest(appUtils.getDate() + " " + appUtils.getTime(),
+                userImageFile, latitude, longitude, loginResponseRealm.getUserId());
+        if (networkUtils.isNetworkConnected()) {
+            showProgress();
+
+            networkUtils.startMeeting(startMeetingRequest, new MeetingCallBack() {
+                @Override
+                public void success(Response<MeetingResponseModel> responseModelResponse) {
+
+                    if (responseModelResponse.isSuccessful()) {
+
+                        beemPreferences.initialize_and_createPreferences_startMeetingSupervisorID(Integer.parseInt(String.valueOf(responseModelResponse.body().getTaskId())));
+                        insertStartMeetingSUP(0,
+                                startMeetingRequest.getDateTime(),
+                                appUtils.imageBitmapToBiteConversion(imageBitmap),
+                                latitude, longitude, loginResponseRealm.getUserId(),
+                                Integer.parseInt(responseModelResponse.body().getTaskId()), 1);
+                    } else {
+
+                        insertStartMeetingSUP(startMeetingRequest.getTask_id(),
+                                startMeetingRequest.getDateTime(),
+                                appUtils.imageBitmapToBiteConversion(imageBitmap),
+                                latitude, longitude, loginResponseRealm.getUserId(),
+                                0, 0);
+                    }
+
+                    if (loginResponseRealm.getuT().toLowerCase().equals("mcd")) {
+                        startActivity(intentMerchantActivity);
+                    }
+
+                    hideProgress();
+                    beemPreferences.initialize_and_createPreferences_meetingStatusSupervisor(true);
+                    startMeetingFabs();
+
+                }
+
+                @Override
+                public void error(String error) {
+
+                    insertStartMeetingSUP(startMeetingRequest.getTask_id(),
+                            startMeetingRequest.getDateTime(),
+                            appUtils.imageBitmapToBiteConversion(imageBitmap),
+                            latitude, longitude, loginResponseRealm.getUserId(),
+                            0, 0);
+                    beemPreferences.initialize_and_createPreferences_meetingStatusSupervisor(true);
+
+                    if (loginResponseRealm.getuT().toLowerCase().equals("mcd")) {
+                        startActivity(intentMerchantActivity);
+                    }
+
+                    hideProgress();
+                    startMeetingFabs();
+
+                    Toast.makeText(NavigationDrawerActivity.this, error, Toast.LENGTH_SHORT).show();
+                }
+            });
+        } else {
+            insertStartMeetingSUP(startMeetingRequest.getTask_id(),
+                    startMeetingRequest.getDateTime(),
+                    appUtils.imageBitmapToBiteConversion(imageBitmap),
+                    latitude, longitude, loginResponseRealm.getUserId(),
+                    0, 0);
+            beemPreferences.initialize_and_createPreferences_meetingStatusSupervisor(true);
+
+            if (loginResponseRealm.getuT().toLowerCase().equals("mcd")) {
+                startActivity(intentMerchantActivity);
+            }
+
+            startMeetingFabs();
+
+            alterDialog(true);
+        }
+    }
+
+    private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            updateUI(intent);
+            Log.i("BR", "on");
+        }
+    };
+
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
+    private void updateUI(Intent intent) {
+        if (intent.getExtras() != null) {
+            boolean getSerivceStatus = intent.getBooleanExtra("GetTaskList", false);
+            if (getSerivceStatus) {
+                listView_taskNav.setVisibility(View.VISIBLE);
+                constraintLayout_NavigationBeemLogo.setBackground(null);
+                navigationDrawerPresenter.getTaskOnActivityLaunch("GetTask", loginResponseRealm.getUserId());
+                stopService(new Intent(NavigationDrawerActivity.this, BreakService.class));
+                startService(new Intent(NavigationDrawerActivity.this, BreakService.class));
+                Log.i("this", "Intent From BroadCast");
+            } else {
+                long millisUntilFinished = intent.getLongExtra("countDown", 0);
+                int minutes, seconds;
+                minutes = (int) ((millisUntilFinished / (1000 * 60)) % 60);
+                seconds = (int) ((millisUntilFinished / 1000) % 60);
+
+                if (minutes < 10) {
+                    txtView_minutes.setText("0" + String.valueOf(minutes));
+                } else {
+                    txtView_minutes.setText(String.valueOf(minutes));
+                }
+                if (seconds < 10) {
+                    txtView_seconds.setText("0" + String.valueOf(seconds));
+                } else {
+                    txtView_seconds.setText(String.valueOf(seconds));
+                }
+
+                if (minutes == 0) {
+                    txtView_minutes.setText("00");
+                }
+
+                if (seconds == 0) {
+                    txtView_seconds.setText("00");
+                }
+
+
+                Log.i("UpdateUi", "Countdown seconds remaining: " + ((millisUntilFinished / 1000) % 60));
+                Log.i("UpdateUi", "Countdown seconds remaining: " + ((millisUntilFinished / (1000 * 60)) % 60));
+            }
+        }
     }
 
 }

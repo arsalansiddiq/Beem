@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -35,6 +36,19 @@ public class AppUtils {
         Log.i("Current time => ", currentDate);
 
         return currentDate;
+    }
+
+    public long getBreakTime(String time) throws ParseException {
+
+        calendar = Calendar.getInstance();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("hh:mm:ss");
+
+        Date date = simpleDateFormat.parse(time);
+        Long timeInMilliSeconds = date.getTime();
+
+        Log.i("BreakTime", String.valueOf(timeInMilliSeconds));
+
+        return timeInMilliSeconds;
     }
 
     public String getTime() {
@@ -83,7 +97,7 @@ public class AppUtils {
 
     public File imageByteToFileConversion (byte[] bytesImage) {
 
-        return getImageFile(BitmapFactory.decodeByteArray(bytesImage, 100, bytesImage.length));
+        return getImageFile(BitmapFactory.decodeByteArray(bytesImage, 0, bytesImage.length));
 
     }
 

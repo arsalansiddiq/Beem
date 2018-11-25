@@ -40,6 +40,9 @@ public class LoginResponse extends RealmObject{
     @Expose
     private String storeId;
 
+    @SerializedName("StoreName")
+    @Expose
+    private String storeName;
     private int loginStatus;
 
     public int getId() {
@@ -112,5 +115,13 @@ public class LoginResponse extends RealmObject{
 
     public void setLoginStatus(int loginStatus) {
         this.loginStatus = loginStatus;
+    }
+
+    public String getStoreName() {
+        return storeName;
+    }
+
+    public void setStoreName(String storeName) {
+        this.storeName = storeName;
     }
 }

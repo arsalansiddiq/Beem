@@ -42,6 +42,16 @@
             app:fab_colorNormal="@color/colorBlue" />
 
         <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/fab_menu_endBreak"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_menu_send"
+            app:fab_size="mini"
+            android:visibility="gone"
+            fab:fab_label="End Break"
+            app:fab_colorNormal="@color/pairing_failed" />
+
+        <com.github.clans.fab.FloatingActionButton
             android:id="@+id/fab_menu_endDay"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

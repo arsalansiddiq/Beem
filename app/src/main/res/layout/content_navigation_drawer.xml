@@ -4,6 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@mipmap/login_bg"
+    android:id="@+id/constraintLayout_NavigationBeemLogo"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context=".activities.NavigationDrawerActivity"
     tools:showIn="@layout/app_bar_navigation_drawer">
@@ -12,6 +14,49 @@
         android:id="@+id/listView_taskNav"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp"/>
+        android:layout_margin="10dp"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/txtView_minutes"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:background="@color/black_color"
+        android:gravity="center"
+        android:padding="4dp"
+        android:text="min"
+        android:textColor="@color/white_color"
+        android:textSize="20sp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/txtView_seconds"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.719" />
+
+    <TextView
+        android:id="@+id/txtView_seconds"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="148dp"
+        android:layout_marginTop="8dp"
+        android:background="@color/black_color"
+        android:gravity="center"
+        android:padding="4dp"
+        android:text="sec"
+        android:visibility="gone"
+        android:textColor="@color/white_color"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.719"
+        android:layout_marginRight="148dp" />
 
 </android.support.constraint.ConstraintLayout>

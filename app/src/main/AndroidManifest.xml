@@ -5,6 +5,8 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <!-- <uses-permission android:name="android.hardware.gps"/> -->
 
     <uses-feature android:name="android.hardware.camera" />
 
@@ -55,20 +57,31 @@
             android:name=".activities.TargetsAndAchievementsActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar2" />
-
         <activity
             android:name=".activities.Replica"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar1" />
-
+            android:theme="@style/AppTheme.NoActionBar1"></activity>
         <activity
             android:name=".activities.NotesActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
-
-        <activity android:name=".activities.AddShopsActivity"
+        <activity
+            android:name=".activities.AddShopsActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme"></activity>
+            android:theme="@style/AppTheme" />
+
+        <!-- <service android:name=".services.BreakService" -->
+        <!-- android:enabled="true"/> -->
+
+        <service
+            android:name=".services.MyService"
+            android:enabled="true" />
+        <service android:name=".services.BreakService" />
+        <service
+            android:name=".services.TrackingService"
+            android:enabled="true" />
+
+        <activity android:name=".activities.MerchantActivity"></activity>
     </application>
 
 </manifest>

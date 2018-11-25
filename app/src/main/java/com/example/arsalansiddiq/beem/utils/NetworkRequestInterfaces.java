@@ -5,10 +5,17 @@ import com.example.arsalansiddiq.beem.models.responsemodels.AttandanceResponse;
 import com.example.arsalansiddiq.beem.models.responsemodels.LoginResponse;
 import com.example.arsalansiddiq.beem.models.responsemodels.MeetingResponseModel;
 import com.example.arsalansiddiq.beem.models.responsemodels.ResponseSUP;
+import com.example.arsalansiddiq.beem.models.responsemodels.babreak.BreakTypeResponseModel;
+import com.example.arsalansiddiq.beem.models.responsemodels.merchant.compulsory.CompulsoryStepsResponseModel;
+import com.example.arsalansiddiq.beem.models.responsemodels.merchant.merchanttask.MerchantTaskResponse;
+import com.example.arsalansiddiq.beem.models.responsemodels.merchant.storesurveyquestions.StoreSurveyQuestionsResponseModel;
+import com.example.arsalansiddiq.beem.models.responsemodels.merchant.surveyquestions.SurveyQuestionsResponseModel;
 import com.example.arsalansiddiq.beem.models.responsemodels.salesresponsemodels.SalesObjectResponse;
 import com.example.arsalansiddiq.beem.models.responsemodels.targetsandachievementsmodel.TargetsandAchievementsModel;
 import com.example.arsalansiddiq.beem.models.responsemodels.tasksresponsemodels.TaskResponse;
 import com.jakewharton.retrofit2.adapter.rxjava2.Result;
+
+import java.util.Map;
 
 import io.reactivex.Observable;
 import okhttp3.MultipartBody;
@@ -19,7 +26,9 @@ import retrofit2.http.Headers;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.Part;
+import retrofit2.http.PartMap;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 /**
  * Created by arsalansiddiq on 7/16/18.
@@ -68,8 +77,8 @@ public interface NetworkRequestInterfaces {
     @POST("endattendance")
     Call<AttandanceResponse> endAttandanceBA(@Part("id") int meetingId,
                                           @Part("endTime") String endTime,
-                                          @Part("elat") float eLatitude,
-                                          @Part("elng") float eLongitude,
+                                          @Part("elat") double eLatitude,
+                                          @Part("elng") double eLongitude,
                                           @Part MultipartBody.Part endImage);
 
     @GET("sku/{SKUCaategory}")
@@ -115,15 +124,17 @@ public interface NetworkRequestInterfaces {
     @POST("supendattendance")
     Call<AttandanceResponse> endAttandanceSUP(@Part("id") int meetingId,
                                              @Part("endTime") String endTime,
-                                             @Part("elat") float eLatitude,
-                                             @Part("elng") float eLongitude,
+                                             @Part("elat") double eLatitude,
+                                             @Part("elng") double eLongitude,
                                               @Part("status") int status);
 
     @Multipart
     @POST("startmeeting")
     Call<MeetingResponseModel> startMeeting(@Part("task_id") int task_id,
                                             @Part("StartTime") String StartTime,
-                                            @Part MultipartBody.Part file);
+                                            @Part MultipartBody.Part file,
+                                            @Part("lat") double lat, @Part("lng") double lng,
+                                            @Part("emp_id") int emp_id);
 
     @Multipart
     @POST("updatemeeting")
@@ -141,9 +152,73 @@ public interface NetworkRequestInterfaces {
     @POST("shopapp")
     Call<ResponseSUP> addShop(@Part("emp_id") Integer emp_id, @Part("shopname") String shopname,
                               @Part("owner") String owner, @Part("contactperson") String contactperson,
-                              @Part("contactnumber") String contactnumber, @Part("lat") Double lat,
-                              @Part("lng") Double lng);
+                              @Part("contactnumber") String contactnumber, @Part("lat") float lat,
+                              @Part("lng") float lng);
 
     @GET("gettasks/{emp_id}")
     Call<TaskResponse> getTasks(@Path("emp_id") String emp_id);
+
+    @GET("breaktype")
+    Call<BreakTypeResponseModel> getBreakTypes();
+
+    @Multipart
+    @POST("startbreak")
+    Call<ResponseSUP> startBreak(@Part("emp_id") Integer emp_id, @Part("break_id") Integer break_id,
+                                 @Part("Date") String Date, @Part("StartTime") String StartTime);
+
+    @Multipart
+    @POST("endbreak")
+    Call<ResponseSUP> endBreak(@Part("id") Integer id, @Part("EndTime") String EndTime, @Part("Status") Integer Status);
+
+    @Multipart
+    @POST("starttracking")
+    Call<MeetingResponseModel> startTracking(@Part("emp_id") Integer id, @Part("StartTime") String StartTime,
+                                    @Part("lat") Double lat, @Part("lng") Double lng);
+
+    @Multipart
+    @POST("updatetracking")
+    Call<MeetingResponseModel> updateTracking(@Part("emp_track_id") Integer id, @Part("lat") Double lat,
+                                     @Part("lng") Double lng);
+
+    @Multipart
+    @POST("endtracking")
+    Call<MeetingResponseModel> endTracking(@Part("emp_track_id") Integer id, @Part("lat") Double lat,
+                                           @Part("lng") Double lng, @Part("status") Integer status,
+                                           @Part("EndTime") String EndTime);
+
+    @GET("brandconfig/{brand_id}")
+    Call<CompulsoryStepsResponseModel> getComplusorySteps(@Path("brand_id") int brand_id);
+
+    @GET("survayquestionconfig/{brand_id}")
+    Call<SurveyQuestionsResponseModel> getSurveyQA(@Path("brand_id") int brand_id);
+
+    @GET("store-survey-response")
+    Call<StoreSurveyQuestionsResponseModel> storeSurveyQuestions(@Query("user_id") int user_id,
+                                                                 @Query("brand_id") int brand_id,
+                                                                 @Query("questions") String questions,
+                                                                 @Query("answers") String answers);
+
+    @Multipart
+    @POST("merchant/task/response")
+    Call<MerchantTaskResponse> storeMerchantTaskResponse(@Part("user_id") int user_id, @Part("task_id") int task_id,
+                                                         @Part("shop_id") int shop_id,
+                                                         @Part("brand_id") int brand_id,
+                                                         @Part MultipartBody.Part Take_Store_Picture_1,
+                                                         @Part MultipartBody.Part Take_Store_Picture_2,
+                                                         @Part MultipartBody.Part Before_Chillers_Pic_Front_2,
+                                                         @Part("Feedback") String Feedback);
+
+    @Multipart
+    @POST("merchant/task/response")
+    Call<MerchantTaskResponse> storeMerchantTaskResponseDynamicKeyValues(@Part("user_id") int user_id, @Part("task_id") int task_id,
+                                                                         @Part("shop_id") int shop_id,
+                                                                         @Part("brand_id") int brand_id,
+                                                                         @PartMap Map<String, String> params);
+
+    @Multipart
+    @POST("merchant/task/response")
+    Call<MerchantTaskResponse> storeMerchantTaskResponseDynamicKeyFiles(@Part("user_id") int user_id, @Part("task_id") int task_id,
+                                                                         @Part("shop_id") int shop_id,
+                                                                         @Part("brand_id") int brand_id,
+                                                                        @Part MultipartBody.Part file);
 }

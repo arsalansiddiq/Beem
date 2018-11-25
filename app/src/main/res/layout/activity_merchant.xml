@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.arsalansiddiq.beem.activities.MerchantActivity">
+
+    <LinearLayout
+        android:layout_height="wrap_content"
+        android:layout_width="350dp"
+        android:layout_gravity="center"
+        android:orientation="vertical">
+
+    <Button
+        android:id="@+id/btn_takeStorePicture"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorBlue"
+        android:textColor="@color/white_color"
+        android:textSize="20sp"
+        android:layout_margin="8dp"
+        android:textStyle="bold|italic"
+        android:text="Take Store Picture" />
+
+    <Button
+        android:id="@+id/btn_submitFeedback"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorBlue"
+        android:textColor="@color/white_color"
+        android:textSize="20sp"
+        android:layout_margin="8dp"
+        android:textStyle="bold|italic"
+        android:text="Submit Feedback" />
+
+    <Button
+        android:id="@+id/btn_takeFrontChillersPicture"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorBlue"
+        android:textColor="@color/white_color"
+        android:textSize="20sp"
+        android:layout_margin="8dp"
+        android:textStyle="bold|italic"
+        android:text="Take Front Chillers Picture" />
+
+    <Button
+        android:id="@+id/btn_viewInstructions"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorBlue"
+        android:textColor="@color/white_color"
+        android:textSize="20sp"
+        android:layout_margin="8dp"
+        android:textStyle="bold|italic"
+        android:text="View Instructions" />
+
+    <Button
+        android:id="@+id/btn_takeAfterChillersPicture"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorBlue"
+        android:textColor="@color/white_color"
+        android:textSize="20sp"
+        android:layout_margin="8dp"
+        android:textStyle="bold|italic"
+        android:text="Take After Chillers Picture" />
+
+    <Button
+        android:id="@+id/btn_takeCompetionsPicture"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorBlue"
+        android:textColor="@color/white_color"
+        android:textSize="20sp"
+        android:layout_margin="8dp"
+        android:textStyle="bold|italic"
+        android:text="Take Completion`s Picture" />
+
+        <Button
+            android:id="@+id/btn_updateStocks"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorBlue"
+            android:textColor="@color/white_color"
+            android:textSize="20sp"
+            android:layout_margin="8dp"
+            android:textStyle="bold|italic"
+            android:text="Update Stocks" />
+
+        <Button
+            android:id="@+id/btn_updateStockPrices"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorBlue"
+            android:textColor="@color/white_color"
+            android:textSize="20sp"
+            android:layout_margin="8dp"
+            android:textStyle="bold|italic"
+            android:text="Update Stock Prices" />
+
+        <Button
+            android:id="@+id/btn_surveyFormQuestions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorBlue"
+            android:textColor="@color/white_color"
+            android:textSize="20sp"
+            android:layout_margin="8dp"
+            android:textStyle="bold|italic"
+            android:text="Survey Form Questions" />
+
+    <Button
+        android:id="@+id/btn_endPicture"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorBlue"
+        android:textColor="@color/white_color"
+        android:textSize="20sp"
+        android:layout_margin="8dp"
+        android:textStyle="bold|italic"
+        android:text="End Picture" />
+    </LinearLayout>
+</ScrollView>

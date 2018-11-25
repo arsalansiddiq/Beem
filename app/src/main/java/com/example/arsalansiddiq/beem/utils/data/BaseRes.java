@@ -24,7 +24,11 @@ public abstract class BaseRes<T> implements Callback<T> {
 
     @Override
     public void onFailure(Call<T> call, Throwable t) {
-        onError(new BaseResponse(t.getLocalizedMessage().toString()));
+        if (t != null) {
+            onError(new BaseResponse(t.getLocalizedMessage().toString()));
+        } else {
+            onError(new BaseResponse("something went wrong!"));
+        }
     }
 
     public abstract void onSuccess(Response<T> response);
