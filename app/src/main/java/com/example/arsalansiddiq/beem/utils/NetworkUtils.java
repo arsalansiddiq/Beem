@@ -507,44 +507,23 @@ public class NetworkUtils {
                 });
     }
 
-    public void dynamicKeyValue(int user_id, int task_id, int shop_id, int brand_id, String key, String value, BaseCallbackInterface baseCallbackInterface) {
+    public void dynamicKeyValue(int user_id, int task_id, int shop_id, int brand_id, String key, String value, UpdateCallback updateCallback) {
 
         Map<String, String> mapParams = new HashMap<>();
         mapParams.put(key, value);
 
-        networkRequestInterfaces.storeMerchantTaskResponseDynamicKeyValues(8, 8, 8, 8, mapParams).enqueue(
-                new Callback<MerchantTaskResponse>() {
-                    @Override
-                    public void onResponse(Call<MerchantTaskResponse> call, Response<MerchantTaskResponse> response) {
-
-                    }
-
-                    @Override
-                    public void onFailure(Call<MerchantTaskResponse> call, Throwable t) {
-
-                    }
-                }
-        );
+        networkRequestInterfaces.storeMerchantTaskResponseDynamicKeyValues(8, 8, 8, 8, mapParams)
+                .enqueue(new UpdateRH<MerchantTaskResponse>(updateCallback));
 
     }
 
-    public void dynamicKeyFiles(int user_id, int task_id, int shop_id, int brand_id, String key, File file, BaseCallbackInterface baseCallbackInterface) {
+    public void dynamicKeyFiles(int user_id, int task_id, int shop_id, int brand_id, String key, File file,
+                                UpdateCallback updateCallback) {
 
         MultipartBody.Part filePart = MultipartBody.Part.createFormData(key,
                 file.getName(), RequestBody.create(MediaType.parse("image/*"), file));
 
-        networkRequestInterfaces.storeMerchantTaskResponseDynamicKeyFiles(8, 8, 8, 8, filePart).enqueue(
-                new Callback<MerchantTaskResponse>() {
-                    @Override
-                    public void onResponse(Call<MerchantTaskResponse> call, Response<MerchantTaskResponse> response) {
-
-                    }
-
-                    @Override
-                    public void onFailure(Call<MerchantTaskResponse> call, Throwable t) {
-
-                    }
-                }
-        );
+        networkRequestInterfaces.storeMerchantTaskResponseDynamicKeyFiles(8, 8, 8, 8, filePart)
+                .enqueue(new UpdateRH<MerchantTaskResponse>(updateCallback));
     }
 }

@@ -345,7 +345,7 @@ public class NavigationDrawerActivity extends BaseActivity
             txtView_shopNameBA.setText("Shop: " + loginResponseRealm.getStoreName());
         }
 
-        if (loginResponseRealm.getuT().equals("SUP")) {
+        if (loginResponseRealm.getuT().equals("SUP") || loginResponseRealm.getuT().equals("MCD")) {
             listView_taskNav.setVisibility(View.VISIBLE);
             constraintLayout_NavigationBeemLogo.setBackground(null);
             navigationDrawerPresenter.getTaskOnActivityLaunch("GetTask", loginResponseRealm.getUserId());
@@ -1565,7 +1565,9 @@ public class NavigationDrawerActivity extends BaseActivity
 
                     if (responseModelResponse.isSuccessful()) {
 
-                        beemPreferences.initialize_and_createPreferences_startMeetingSupervisorID(Integer.parseInt(String.valueOf(responseModelResponse.body().getTaskId())));
+//                        beemPreferences.initialize_and_createPreferences_startMeetingSupervisorID(Integer.parseInt(String.valueOf(responseModelResponse.body().getTaskId())));
+
+                        beemPreferences.initialize_and_createPreferences_startMeetingSupervisorID(Integer.parseInt(responseModelResponse.body().getTaskId()));
                         insertStartMeetingSUP(0,
                                 startMeetingRequest.getDateTime(),
                                 appUtils.imageBitmapToBiteConversion(imageBitmap),
