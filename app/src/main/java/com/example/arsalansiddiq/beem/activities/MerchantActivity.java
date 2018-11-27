@@ -96,7 +96,7 @@ public class MerchantActivity extends AppCompatActivity implements View.OnClickL
     }
 
     private void getCompulsorySteps() {
-        networkUtils.getComplusorySteps(Integer.parseInt(loginResponseRealm.getBrand()), new BaseCallbackInterface() {
+        networkUtils.getComplusorySteps(38, new BaseCallbackInterface() {
             @Override
             public void success(Response response) {
                 CompulsoryStepsResponseModel compulsoryStepsResponseModel = (CompulsoryStepsResponseModel) response.body();
@@ -137,6 +137,14 @@ public class MerchantActivity extends AppCompatActivity implements View.OnClickL
                 CURRENT_KEY = END_PIC_COUNT + "1";
                 dispatchTakePictureIntent();
                 break;
+
+                case R.id.btn_surveyFormQuestions:
+                    Start
+//                CURRENT_KEY = END_PIC_COUNT + "1";
+//                dispatchTakePictureIntent();
+                break;
+
+
         }
     }
 
@@ -155,10 +163,15 @@ public class MerchantActivity extends AppCompatActivity implements View.OnClickL
 
             File userImageFile = appUtils.getImageFile(imageBitmap);
 
-                networkUtils.dynamicKeyFiles(loginResponseRealm.getUserId(), 8,
-                        Integer.parseInt(loginResponseRealm.getStoreId()),
-                        Integer.parseInt(loginResponseRealm.getBrand()),
-                        CURRENT_KEY, userImageFile, this);
+            networkUtils.dynamicKeyFiles(8, 8,
+                    8,
+                    8,
+                    CURRENT_KEY, userImageFile, this);
+
+//                networkUtils.dynamicKeyFiles(loginResponseRealm.getUserId(), 8,
+//                        Integer.parseInt(loginResponseRealm.getStoreId()),
+//                        Integer.parseInt(loginResponseRealm.getBrand()),
+//                        CURRENT_KEY, userImageFile, this);
 
         }
     }

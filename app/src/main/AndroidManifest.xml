@@ -20,9 +20,7 @@
         <activity
             android:name=".activities.LoginActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar1">
-
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar1"></activity>
         <!-- <activity android:name=".activities.LoginActivity"></activity> -->
 
         <activity
@@ -56,7 +54,7 @@
         <activity
             android:name=".activities.Replica"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar1"></activity>
+            android:theme="@style/AppTheme.NoActionBar1" />
         <activity
             android:name=".activities.NotesActivity"
             android:screenOrientation="portrait"
@@ -77,14 +75,17 @@
             android:name=".services.TrackingService"
             android:enabled="true" />
 
-        <activity android:name=".activities.MerchantActivity"
-        android:theme="@style/AppTheme.NoActionBar1">
+        <activity
+            android:name=".activities.MerchantActivity"
+            android:theme="@style/AppTheme.NoActionBar1">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".activities.SurveyFormQuestion"
+            android:theme="@style/AppTheme.NoActionBar1"></activity>
     </application>
 
 </manifest>
