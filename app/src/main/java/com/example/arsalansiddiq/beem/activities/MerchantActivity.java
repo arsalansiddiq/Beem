@@ -139,7 +139,6 @@ public class MerchantActivity extends AppCompatActivity implements View.OnClickL
                 break;
 
                 case R.id.btn_surveyFormQuestions:
-                    Start
 //                CURRENT_KEY = END_PIC_COUNT + "1";
 //                dispatchTakePictureIntent();
                 break;
