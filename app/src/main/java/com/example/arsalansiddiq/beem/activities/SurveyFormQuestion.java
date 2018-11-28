@@ -1,17 +1,14 @@
 package com.example.arsalansiddiq.beem.activities;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.widget.CheckBox;
 import android.widget.TextView;
 
 import com.example.arsalansiddiq.beem.R;
 import com.example.arsalansiddiq.beem.interfaces.merchantcallback.BaseCallbackInterface;
 import com.example.arsalansiddiq.beem.models.responsemodels.merchant.surveyquestions.SurveyQuestionsResponseModel;
-import com.example.arsalansiddiq.beem.utils.NetworkRequestInterfaces;
 import com.example.arsalansiddiq.beem.utils.NetworkUtils;
-
-import org.w3c.dom.Text;
 
 import java.util.List;
 
@@ -60,13 +57,9 @@ public class SurveyFormQuestion extends AppCompatActivity {
                 }
             });
         }
-
-
     }
 
     void viewQA() {
-
-
 
     }
 }

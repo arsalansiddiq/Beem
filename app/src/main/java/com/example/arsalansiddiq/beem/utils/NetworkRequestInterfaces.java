@@ -10,6 +10,7 @@ import com.example.arsalansiddiq.beem.models.responsemodels.merchant.compulsory.
 import com.example.arsalansiddiq.beem.models.responsemodels.merchant.merchanttask.MerchantTaskResponse;
 import com.example.arsalansiddiq.beem.models.responsemodels.merchant.storesurveyquestions.StoreSurveyQuestionsResponseModel;
 import com.example.arsalansiddiq.beem.models.responsemodels.merchant.surveyquestions.SurveyQuestionsResponseModel;
+import com.example.arsalansiddiq.beem.models.responsemodels.merchant.viewinstruction.ViewInstructionResponseModel;
 import com.example.arsalansiddiq.beem.models.responsemodels.salesresponsemodels.SalesObjectResponse;
 import com.example.arsalansiddiq.beem.models.responsemodels.targetsandachievementsmodel.TargetsandAchievementsModel;
 import com.example.arsalansiddiq.beem.models.responsemodels.tasksresponsemodels.TaskResponse;
@@ -221,4 +222,9 @@ public interface NetworkRequestInterfaces {
                                                                          @Part("shop_id") int shop_id,
                                                                          @Part("brand_id") int brand_id,
                                                                         @Part MultipartBody.Part file);
+
+    @Multipart
+    @POST("viewinstruction")
+    Call<ViewInstructionResponseModel> getViewInstruction(@Part("brand_id") int brand_id,
+                                                          @Part("shop_type") String shop_type);
 }

@@ -27,6 +27,7 @@ import com.example.arsalansiddiq.beem.models.responsemodels.merchant.compulsory.
 import com.example.arsalansiddiq.beem.models.responsemodels.merchant.merchanttask.MerchantTaskResponse;
 import com.example.arsalansiddiq.beem.models.responsemodels.merchant.storesurveyquestions.StoreSurveyQuestionsResponseModel;
 import com.example.arsalansiddiq.beem.models.responsemodels.merchant.surveyquestions.SurveyQuestionsResponseModel;
+import com.example.arsalansiddiq.beem.models.responsemodels.merchant.viewinstruction.ViewInstructionResponseModel;
 import com.example.arsalansiddiq.beem.models.responsemodels.salesresponsemodels.SalesObjectResponse;
 import com.example.arsalansiddiq.beem.models.responsemodels.targetsandachievementsmodel.TargetsandAchievementsModel;
 import com.example.arsalansiddiq.beem.models.responsemodels.tasksresponsemodels.TaskResponse;
@@ -525,5 +526,10 @@ public class NetworkUtils {
 
         networkRequestInterfaces.storeMerchantTaskResponseDynamicKeyFiles(8, 8, 8, 8, filePart)
                 .enqueue(new UpdateRH<MerchantTaskResponse>(updateCallback));
+    }
+
+    public void getViewInstruction(int brand_id, String shop_type, UpdateCallback updateCallback) {
+
+        networkRequestInterfaces.getViewInstruction(brand_id, shop_type).enqueue(new UpdateRH<ViewInstructionResponseModel>(updateCallback));
     }
 }

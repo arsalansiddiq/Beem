@@ -138,9 +138,14 @@ public class MerchantActivity extends AppCompatActivity implements View.OnClickL
                 dispatchTakePictureIntent();
                 break;
 
-                case R.id.btn_surveyFormQuestions:
+            case R.id.btn_surveyFormQuestions:
 //                CURRENT_KEY = END_PIC_COUNT + "1";
 //                dispatchTakePictureIntent();
+                break;
+
+            case R.id.btn_viewInstructions:
+                networkUtils.getViewInstruction(Integer.parseInt(loginResponseRealm.getBrand()),
+                        "Visit Shop", this);
                 break;
 
 
