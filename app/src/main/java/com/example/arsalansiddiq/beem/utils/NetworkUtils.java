@@ -36,6 +36,7 @@ import com.example.arsalansiddiq.beem.utils.data.UpdateRH;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import io.reactivex.Observer;
@@ -514,6 +515,19 @@ public class NetworkUtils {
         mapParams.put(key, value);
 
         networkRequestInterfaces.storeMerchantTaskResponseDynamicKeyValues(8, 8, 8, 8, mapParams)
+                .enqueue(new UpdateRH<MerchantTaskResponse>(updateCallback));
+
+    }
+
+    public void dynamicKeyValueQA(int user_id, int task_id, int shop_id, int brand_id,
+                                  String key1, List<String> value1, String key2, List<String> value2,
+                                  UpdateCallback updateCallback) {
+
+        Map<String, String> mapParams = new HashMap<>();
+        mapParams.put(key1, String.valueOf(value1));
+        mapParams.put(key2, String.valueOf(value2));
+
+        networkRequestInterfaces.storeMerchantTaskResponseDynamicKeyValuesQA(8, 8, 8, 8, mapParams)
                 .enqueue(new UpdateRH<MerchantTaskResponse>(updateCallback));
 
     }

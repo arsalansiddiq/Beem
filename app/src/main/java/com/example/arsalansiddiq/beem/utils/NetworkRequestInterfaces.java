@@ -215,6 +215,12 @@ public interface NetworkRequestInterfaces {
                                                                          @Part("shop_id") int shop_id,
                                                                          @Part("brand_id") int brand_id,
                                                                          @PartMap Map<String, String> params);
+    @Multipart
+    @POST("merchant/task/response")
+    Call<MerchantTaskResponse> storeMerchantTaskResponseDynamicKeyValuesQA(@Part("user_id") int user_id, @Part("task_id") int task_id,
+                                                                         @Part("shop_id") int shop_id,
+                                                                         @Part("brand_id") int brand_id,
+                                                                         @PartMap Map<String, String> params);
 
     @Multipart
     @POST("merchant/task/response")

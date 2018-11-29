@@ -66,5 +66,13 @@ public class Constants {
 
     public static final String NUMBERS_DASHED_MASK = "999 999 9999999";
 
+    public static final String BEEM_PREFERENCE_COUNT = "beempreferencecount";
+
+    public static final String TAKE_STORE_PICTURE = "storePicture";
+    public static final String TAKE_FRONT_CHILLER = "frontChiller";
+    public static final String TAKE_AFTER_CHILLER = "afterChiller";
+    public static final String TAKE_COMPETITION_PICTURE = "competitionPicture";
+    public static final String TAKE_END_PICTURE = "endPicture";
+
 
 }

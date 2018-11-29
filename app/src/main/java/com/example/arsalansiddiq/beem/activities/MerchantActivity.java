@@ -1,15 +1,18 @@
 package com.example.arsalansiddiq.beem.activities;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.example.arsalansiddiq.beem.R;
 import com.example.arsalansiddiq.beem.databases.BeemPreferences;
+import com.example.arsalansiddiq.beem.databases.BeemPreferencesCount;
 import com.example.arsalansiddiq.beem.databases.RealmCRUD;
 import com.example.arsalansiddiq.beem.interfaces.merchantcallback.BaseCallbackInterface;
 import com.example.arsalansiddiq.beem.models.responsemodels.LoginResponse;
@@ -29,17 +32,11 @@ public class MerchantActivity extends AppCompatActivity implements View.OnClickL
     private String callTag = null;
 
     private String CURRENT_KEY = "";
-//    private static  final String TAKE_STORE_PICTURE = "take_store_picture";
     private static  final String TAKE_STORE_PICTURE_COUNT = "Take_Store_Picture_";
-//    private static  final String TAKE_FRONT_CHILLER = "take_front_chiller";
     private static  final String TAKE_FRONT_CHILLER_COUNT = "Before_Chillers_Pic_Front_";
     private static  final String TAKE_AFTER_CHILLER_COUNT = "After_Chillers_Pic_Front_";
     private static  final String TAKE_COMPETITION_PICTURE_COUNT = "Take_Competition_Pic_";
     private static  final String END_PIC_COUNT = "End_Pic";
-
-    //API Keys
-    public static final String TAKE_STORE_PICTURE_1 = "Take_Store_Picture_1";
-
 
     static final int REQUEST_IMAGE_CAPTURE = 1;
     private Button btn_takeStorePicture, btn_submitFeedback, btn_takeFrontChillersPicture,
@@ -48,6 +45,7 @@ public class MerchantActivity extends AppCompatActivity implements View.OnClickL
 
     private NetworkUtils networkUtils;
     private BeemPreferences beemPreferences;
+    private BeemPreferencesCount beemPreferencesCount;
 
     private RealmCRUD realmCRUD;
     private LoginResponse loginResponseRealm;
@@ -55,6 +53,8 @@ public class MerchantActivity extends AppCompatActivity implements View.OnClickL
     //Image Instances
     private Bitmap imageBitmap;
     private AppUtils appUtils;
+
+    int i = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +66,8 @@ public class MerchantActivity extends AppCompatActivity implements View.OnClickL
         loginResponseRealm = realmCRUD.getLoginInformationDetails();
 
         beemPreferences = new BeemPreferences(this);
+        beemPreferencesCount = new BeemPreferencesCount(this);
+
         beemPreferences.initialize_and_createPreferences_forLoginSession(Constants.STATUS_ON_MERCHANT);
 
         networkUtils = new NetworkUtils(this);
@@ -114,33 +116,63 @@ public class MerchantActivity extends AppCompatActivity implements View.OnClickL
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btn_takeStorePicture:
-                CURRENT_KEY = TAKE_STORE_PICTURE_COUNT + "1";
-                dispatchTakePictureIntent();
+                i = getCount(Constants.TAKE_STORE_PICTURE);
+                if (i >= 3) {
+                    Toast.makeText(this, "Limit Exceeded", Toast.LENGTH_SHORT).show();
+                } else {
+                    i = i+1;
+                    CURRENT_KEY = TAKE_STORE_PICTURE_COUNT + i;
+                    dispatchTakePictureIntent();
+                }
                 break;
 
             case R.id.btn_takeFrontChillersPicture:
-                CURRENT_KEY = TAKE_FRONT_CHILLER_COUNT + "1";
-                dispatchTakePictureIntent();
+                i = getCount(Constants.TAKE_FRONT_CHILLER);
+                if (i >= 3) {
+                    Toast.makeText(this, "Limit Exceeded", Toast.LENGTH_SHORT).show();
+                } else {
+                    i = i + 1;
+                    CURRENT_KEY = TAKE_FRONT_CHILLER_COUNT + "1";
+                    dispatchTakePictureIntent();
+                }
                 break;
 
             case R.id.btn_takeAfterChillersPicture:
-                CURRENT_KEY = TAKE_AFTER_CHILLER_COUNT + "1";
-                dispatchTakePictureIntent();
+                i = getCount(Constants.TAKE_AFTER_CHILLER);
+                if (i >= 3) {
+                    Toast.makeText(this, "Limit Exceeded", Toast.LENGTH_SHORT).show();
+                } else {
+                    i = i + 1;
+                    CURRENT_KEY = TAKE_AFTER_CHILLER_COUNT + "1";
+                    dispatchTakePictureIntent();
+                }
                 break;
 
             case R.id.btn_takeCompetionsPicture:
-                CURRENT_KEY = TAKE_COMPETITION_PICTURE_COUNT + "1";
-                dispatchTakePictureIntent();
+                i = getCount(Constants.TAKE_COMPETITION_PICTURE);
+                if (i >= 3) {
+                    Toast.makeText(this, "Limit Exceeded", Toast.LENGTH_SHORT).show();
+                } else {
+                    i = i + 1;
+                    CURRENT_KEY = TAKE_COMPETITION_PICTURE_COUNT + "1";
+                    dispatchTakePictureIntent();
+                }
                 break;
 
             case R.id.btn_endPicture:
-                CURRENT_KEY = END_PIC_COUNT + "1";
-                dispatchTakePictureIntent();
+                i = getCount(Constants.TAKE_END_PICTURE);
+                if (i >= 3) {
+                    Toast.makeText(this, "Limit Exceeded", Toast.LENGTH_SHORT).show();
+                } else {
+                    i = i + 1;
+                    CURRENT_KEY = END_PIC_COUNT + "1";
+                    dispatchTakePictureIntent();
+                }
                 break;
 
             case R.id.btn_surveyFormQuestions:
-//                CURRENT_KEY = END_PIC_COUNT + "1";
-//                dispatchTakePictureIntent();
+                Intent intent = new Intent(MerchantActivity.this, SurveyFormQuestion.class);
+                startActivity(intent);
                 break;
 
             case R.id.btn_viewInstructions:
@@ -171,18 +203,24 @@ public class MerchantActivity extends AppCompatActivity implements View.OnClickL
                     8,
                     8,
                     CURRENT_KEY, userImageFile, this);
-
-//                networkUtils.dynamicKeyFiles(loginResponseRealm.getUserId(), 8,
-//                        Integer.parseInt(loginResponseRealm.getStoreId()),
-//                        Integer.parseInt(loginResponseRealm.getBrand()),
-//                        CURRENT_KEY, userImageFile, this);
-
         }
     }
 
     @Override
     public void UpdateSuccess(Response response) {
+        String currentKey = CURRENT_KEY.substring(0, CURRENT_KEY.length() - 1);
 
+        if (currentKey.equals(TAKE_STORE_PICTURE_COUNT)) {
+            beemPreferencesCount.putInt(Constants.TAKE_STORE_PICTURE, i++);
+        } else if (currentKey.equals(TAKE_FRONT_CHILLER_COUNT)) {
+            beemPreferencesCount.putInt(Constants.TAKE_FRONT_CHILLER, i++);
+        } else if (currentKey.equals(TAKE_AFTER_CHILLER_COUNT)) {
+            beemPreferencesCount.putInt(Constants.TAKE_AFTER_CHILLER, i++);
+        } else if (currentKey.equals(TAKE_COMPETITION_PICTURE_COUNT)) {
+            beemPreferencesCount.putInt(Constants.TAKE_COMPETITION_PICTURE, i++);
+        } else if (currentKey.equals(END_PIC_COUNT)) {
+            beemPreferencesCount.putInt(Constants.TAKE_END_PICTURE, i++);
+        }
     }
 
     @Override
@@ -250,5 +288,11 @@ public class MerchantActivity extends AppCompatActivity implements View.OnClickL
         } else {
             btn_endPicture.setVisibility(View.GONE);
         }
+    }
+
+    int getCount(String key) {
+        SharedPreferences prefs = getSharedPreferences(Constants.BEEM_PREFERENCE_COUNT, MODE_PRIVATE);
+        int coutn = prefs.getInt(key, 0);
+        return coutn;
     }
 }

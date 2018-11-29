@@ -9,6 +9,7 @@
     tools:context="com.example.arsalansiddiq.beem.activities.SurveyFormQuestion">
 
     <LinearLayout
+        android:id="@+id/linearLayout_content"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
@@ -71,18 +72,18 @@
             android:layout_height="wrap_content">
 
             <Button
-                android:id="@+id/button2"
+                android:id="@+id/btn_SubmitQ"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Button" />
+                android:text="Submit" />
 
             <Button
-                android:id="@+id/button"
+                android:id="@+id/btn_nextQ"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Button" />
+                android:text="Next" />
         </LinearLayout>
     </LinearLayout>
 
