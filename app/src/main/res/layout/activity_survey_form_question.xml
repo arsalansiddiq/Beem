@@ -5,8 +5,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="15dp"
+    android:gravity="center"
     tools:context="com.example.arsalansiddiq.beem.activities.SurveyFormQuestion">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
     <TextView
         android:id="@+id/txtView_question"
@@ -17,22 +22,68 @@
         android:gravity="center"
         android:text="Hello Friends"/>
 
-    <CheckBox
-        android:id="@+id/checkbox_answer1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="CheckBox" />
+    <!--<CheckBox-->
+        <!--android:id="@+id/checkbox_answer1"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:text="CheckBox" />-->
 
-    <CheckBox
-        android:id="@+id/checkbox_answer2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="CheckBox" />
+    <!--<CheckBox-->
+        <!--android:id="@+id/checkbox_answer2"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:text="CheckBox" />-->
 
-    <CheckBox
-        android:id="@+id/checkbox_answer3"
+    <!--<CheckBox-->
+        <!--android:id="@+id/checkbox_answer3"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:text="CheckBox" />-->
+
+    <RadioGroup
+        android:id="@+id/radiogroup"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="CheckBox" />
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <RadioButton
+            android:id="@+id/radioButton1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="RadioButton" />
+
+        <RadioButton
+            android:id="@+id/radioButton2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="RadioButton" />
+
+        <RadioButton
+            android:id="@+id/radioButton3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="RadioButton" />
+
+    </RadioGroup>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <Button
+                android:id="@+id/button2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Button" />
+
+            <Button
+                android:id="@+id/button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Button" />
+        </LinearLayout>
+    </LinearLayout>
 
 </LinearLayout>
