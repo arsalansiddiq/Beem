@@ -6,11 +6,14 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.RatingBar;
 import android.widget.Toast;
 
 import com.example.arsalansiddiq.beem.R;
+import com.example.arsalansiddiq.beem.base.BaseActivity;
 import com.example.arsalansiddiq.beem.databases.BeemPreferences;
 import com.example.arsalansiddiq.beem.databases.BeemPreferencesCount;
 import com.example.arsalansiddiq.beem.databases.RealmCRUD;
@@ -25,9 +28,11 @@ import com.example.arsalansiddiq.beem.utils.data.UpdateCallback;
 
 import java.io.File;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import retrofit2.Response;
 
-public class MerchantActivity extends AppCompatActivity implements View.OnClickListener, UpdateCallback{
+public class MerchantActivity extends BaseActivity implements View.OnClickListener, UpdateCallback{
 
     private String callTag = null;
 
@@ -37,6 +42,8 @@ public class MerchantActivity extends AppCompatActivity implements View.OnClickL
     private static  final String TAKE_AFTER_CHILLER_COUNT = "After_Chillers_Pic_Front_";
     private static  final String TAKE_COMPETITION_PICTURE_COUNT = "Take_Competition_Pic_";
     private static  final String END_PIC_COUNT = "End_Pic";
+    private static  final String SUBMIT_FEEDBACK = "Feedback";
+    private static  final String VIEW_INSTRUCTIONS = "View_Instruction";
 
     static final int REQUEST_IMAGE_CAPTURE = 1;
     private Button btn_takeStorePicture, btn_submitFeedback, btn_takeFrontChillersPicture,
@@ -54,12 +61,19 @@ public class MerchantActivity extends AppCompatActivity implements View.OnClickL
     private Bitmap imageBitmap;
     private AppUtils appUtils;
 
+    @BindView(R.id.ratingBar_submitFeedback)
+    RatingBar ratingBar_submitFeedback;
+
     int i = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_merchant);
+        ButterKnife.bind(this);
+        ButterKnife.setDebug(true);
+
+        initProgressBar();
 
         appUtils = new AppUtils(this);
         realmCRUD = new RealmCRUD(this);
@@ -83,6 +97,7 @@ public class MerchantActivity extends AppCompatActivity implements View.OnClickL
         btn_updateStockPrices = (Button) findViewById(R.id.btn_updateStockPrices);
         btn_surveyFormQuestions = (Button) findViewById(R.id.btn_surveyFormQuestions);
         btn_endPicture = (Button) findViewById(R.id.btn_endPicture);
+        ratingBar_submitFeedback.setVisibility(View.GONE);
 
 
         btn_takeStorePicture.setOnClickListener(this);
@@ -95,6 +110,19 @@ public class MerchantActivity extends AppCompatActivity implements View.OnClickL
         btn_updateStockPrices.setOnClickListener(this);
         btn_surveyFormQuestions.setOnClickListener(this);
         btn_endPicture.setOnClickListener(this);
+
+        ratingBar_submitFeedback.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
+            @Override
+            public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
+
+                CURRENT_KEY = SUBMIT_FEEDBACK;
+
+                networkUtils.dynamicKeyValue(8, 8,
+                        8,
+                        8,
+                        CURRENT_KEY, String.valueOf(rating), MerchantActivity.this);
+            }
+        });
     }
 
     private void getCompulsorySteps() {
@@ -176,10 +204,17 @@ public class MerchantActivity extends AppCompatActivity implements View.OnClickL
                 break;
 
             case R.id.btn_viewInstructions:
-                networkUtils.getViewInstruction(Integer.parseInt(loginResponseRealm.getBrand()),
-                        "Visit Shop", this);
+
+                Intent intent1 = new Intent(MerchantActivity.this, ViewInstructions.class);
+                startActivity(intent1);
+//                CURRENT_KEY = VIEW_INSTRUCTIONS;
+//                networkUtils.getViewInstruction(38,
+//                        5, this);
                 break;
 
+            case R.id.btn_submitFeedback:
+                ratingBar_submitFeedback.setVisibility(View.VISIBLE);
+                break;
 
         }
     }
@@ -199,6 +234,9 @@ public class MerchantActivity extends AppCompatActivity implements View.OnClickL
 
             File userImageFile = appUtils.getImageFile(imageBitmap);
 
+
+            progressShow();
+
             networkUtils.dynamicKeyFiles(8, 8,
                     8,
                     8,
@@ -208,23 +246,35 @@ public class MerchantActivity extends AppCompatActivity implements View.OnClickL
 
     @Override
     public void UpdateSuccess(Response response) {
-        String currentKey = CURRENT_KEY.substring(0, CURRENT_KEY.length() - 1);
 
-        if (currentKey.equals(TAKE_STORE_PICTURE_COUNT)) {
-            beemPreferencesCount.putInt(Constants.TAKE_STORE_PICTURE, i++);
-        } else if (currentKey.equals(TAKE_FRONT_CHILLER_COUNT)) {
-            beemPreferencesCount.putInt(Constants.TAKE_FRONT_CHILLER, i++);
-        } else if (currentKey.equals(TAKE_AFTER_CHILLER_COUNT)) {
-            beemPreferencesCount.putInt(Constants.TAKE_AFTER_CHILLER, i++);
-        } else if (currentKey.equals(TAKE_COMPETITION_PICTURE_COUNT)) {
-            beemPreferencesCount.putInt(Constants.TAKE_COMPETITION_PICTURE, i++);
-        } else if (currentKey.equals(END_PIC_COUNT)) {
-            beemPreferencesCount.putInt(Constants.TAKE_END_PICTURE, i++);
+        progressHide();
+        if (CURRENT_KEY == SUBMIT_FEEDBACK) {
+            ratingBar_submitFeedback.setVisibility(View.GONE);
+        } else if (CURRENT_KEY == VIEW_INSTRUCTIONS) {
+            Toast.makeText(this, "done", Toast.LENGTH_SHORT).show();
+        } else {
+
+            String currentKey = CURRENT_KEY.substring(0, CURRENT_KEY.length() - 1);
+
+            if (currentKey.equals(TAKE_STORE_PICTURE_COUNT)) {
+                beemPreferencesCount.putInt(Constants.TAKE_STORE_PICTURE, i++);
+            } else if (currentKey.equals(TAKE_FRONT_CHILLER_COUNT)) {
+                beemPreferencesCount.putInt(Constants.TAKE_FRONT_CHILLER, i++);
+            } else if (currentKey.equals(TAKE_AFTER_CHILLER_COUNT)) {
+                beemPreferencesCount.putInt(Constants.TAKE_AFTER_CHILLER, i++);
+            } else if (currentKey.equals(TAKE_COMPETITION_PICTURE_COUNT)) {
+                beemPreferencesCount.putInt(Constants.TAKE_COMPETITION_PICTURE, i++);
+            } else if (currentKey.equals(END_PIC_COUNT)) {
+                beemPreferencesCount.putInt(Constants.TAKE_END_PICTURE, i++);
+            }
         }
     }
 
     @Override
     public void UpdateFailure(BaseResponse baseResponse) {
+        progressHide();
+
+        Toast.makeText(this, baseResponse.getError(), Toast.LENGTH_SHORT).show();
 
     }
 
@@ -294,5 +344,14 @@ public class MerchantActivity extends AppCompatActivity implements View.OnClickL
         SharedPreferences prefs = getSharedPreferences(Constants.BEEM_PREFERENCE_COUNT, MODE_PRIVATE);
         int coutn = prefs.getInt(key, 0);
         return coutn;
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_BACK:
+                return true;
+        }
+        return false;
     }
 }

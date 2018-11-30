@@ -542,8 +542,8 @@ public class NetworkUtils {
                 .enqueue(new UpdateRH<MerchantTaskResponse>(updateCallback));
     }
 
-    public void getViewInstruction(int brand_id, String shop_type, UpdateCallback updateCallback) {
+    public void getViewInstruction(int brand_id, int shop_id, UpdateCallback updateCallback) {
 
-        networkRequestInterfaces.getViewInstruction(brand_id, shop_type).enqueue(new UpdateRH<ViewInstructionResponseModel>(updateCallback));
+        networkRequestInterfaces.getViewInstruction(brand_id, shop_id).enqueue(new UpdateRH<ViewInstructionResponseModel>(updateCallback));
     }
 }

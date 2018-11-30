@@ -40,6 +40,14 @@
         android:textStyle="bold|italic"
         android:text="Submit Feedback" />
 
+        <RatingBar
+            android:id="@+id/ratingBar_submitFeedback"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_gravity="center"
+            android:numStars="5"
+            android:stepSize="1.0" />
+
     <Button
         android:id="@+id/btn_takeFrontChillersPicture"
         android:layout_width="match_parent"

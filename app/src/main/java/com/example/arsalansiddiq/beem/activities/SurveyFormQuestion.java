@@ -1,5 +1,6 @@
 package com.example.arsalansiddiq.beem.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
@@ -13,9 +14,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.arsalansiddiq.beem.R;
+import com.example.arsalansiddiq.beem.base.BaseActivity;
 import com.example.arsalansiddiq.beem.databases.RealmCRUD;
 import com.example.arsalansiddiq.beem.interfaces.merchantcallback.BaseCallbackInterface;
 import com.example.arsalansiddiq.beem.models.responsemodels.LoginResponse;
+import com.example.arsalansiddiq.beem.models.responsemodels.merchant.merchanttask.MerchantTaskResponse;
 import com.example.arsalansiddiq.beem.models.responsemodels.merchant.surveyquestions.SurveyQuestionsResponseModel;
 import com.example.arsalansiddiq.beem.utils.NetworkUtils;
 import com.example.arsalansiddiq.beem.utils.data.BaseResponse;
@@ -28,7 +31,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import retrofit2.Response;
 
-public class SurveyFormQuestion extends AppCompatActivity implements RadioGroup.OnCheckedChangeListener,
+public class SurveyFormQuestion extends BaseActivity implements
         View.OnClickListener, UpdateCallback {
 
     //View
@@ -66,6 +69,8 @@ public class SurveyFormQuestion extends AppCompatActivity implements RadioGroup.
     private RealmCRUD realmCRUD;
     private LoginResponse loginResponseRealm;
 
+    private boolean isSurveyEnd = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,12 +78,13 @@ public class SurveyFormQuestion extends AppCompatActivity implements RadioGroup.
         ButterKnife.bind(this);
         ButterKnife.setDebug(true);
 
+        initProgressBar();
+
 
         realmCRUD = new RealmCRUD(this);
         loginResponseRealm = realmCRUD.getLoginInformationDetails();
 
         linearLayout_content.setVisibility(View.GONE);
-        radiogroup.setOnCheckedChangeListener(this);
         btn_SubmitQ.setOnClickListener(this);
         btn_nextQ.setOnClickListener(this);
 
@@ -106,46 +112,33 @@ public class SurveyFormQuestion extends AppCompatActivity implements RadioGroup.
 
                 }
             });
+        } else {
+            Toast.makeText(this, "please connect with internet", Toast.LENGTH_SHORT).show();
         }
     }
 
     void viewQA() {
 
-        hideNext();
+        if (!TextUtils.isEmpty(questionsList.get(count))) {
 
-        if (count >= 0) {
+            linearLayout_content.setVisibility(View.VISIBLE);
 
-            String question, ans1, ans2, ans3;
-            question = questionsList.get(count);
-            ans1 = answersList1.get(count);
-            ans2 = answersList2.get(count);
-            ans3 = answersList3.get(count);
+            if (TextUtils.isEmpty(questionsList.get(count+1))) {
+                isSurveyEnd = true;
+                hideNext();
+            }
 
-             if (!TextUtils.isEmpty(question)) {
                  txtView_question.setText(questionsList.get(count));
 
-                 if (!TextUtils.isEmpty(ans1)) radioButton1.setText(ans1);
+                 if (!TextUtils.isEmpty(answersList1.get(count))) radioButton1.setText(answersList1.get(count));
                  else radioButton1.setVisibility(View.GONE);
 
-                 if (!TextUtils.isEmpty(ans2)) radioButton2.setText(ans2);
+                 if (!TextUtils.isEmpty(answersList2.get(count))) radioButton2.setText(answersList2.get(count));
                  else radioButton2.setVisibility(View.GONE);
 
-                 if (!TextUtils.isEmpty(ans3)) radioButton3.setText(ans3);
+                 if (!TextUtils.isEmpty(answersList3.get(count))) radioButton3.setText(answersList3.get(count));
                  else radioButton3.setVisibility(View.GONE);
-
-             }
-
         }
-    }
-
-    @Override
-    public void onCheckedChanged(RadioGroup group, int checkedId) {
-        int checkedID = radiogroup.getCheckedRadioButtonId();
-
-        RadioButton checkedRadioButton = (RadioButton) findViewById(checkedID);
-
-        Log.i("value", String.valueOf(checkedRadioButton.getText()));
-
     }
 
     @Override
@@ -161,28 +154,29 @@ public class SurveyFormQuestion extends AppCompatActivity implements RadioGroup.
                     questionListUser.add(txtView_question.getText().toString());
                     answersListUser.add(checkedRadioButton.getText().toString());
 
-                    if (count == questionsList.size()) {
+                    radiogroup.clearCheck();
+
+                    if (isSurveyEnd) {
                         submitQuesitonToServer();
                     }
 
-                    count = count + 1;
                     submitHideShow(false);
 
 
                 }
                 break;
             case R.id.btn_nextQ:
+                count = count+1;
                 viewQA();
-                hideNext();
                 submitHideShow(true);
                 break;
         }
     }
 
     void hideNext() {
-        if (count == questionsList.size()) {
+//        if (count == questionsList.size()) {
             btn_nextQ.setVisibility(View.GONE);
-        }
+//        }
     }
 
     void showNext() {
@@ -198,18 +192,32 @@ public class SurveyFormQuestion extends AppCompatActivity implements RadioGroup.
     }
 
     void submitQuesitonToServer () {
-        networkUtils.dynamicKeyValueQA(loginResponseRealm.getUserId(), 8, 8,
-                Integer.parseInt(loginResponseRealm.getBrand()), "Questions", questionListUser,
-                "Answers", answersListUser, this);
+        progressShow();
+
+        if (networkUtils.isNetworkConnected()) {
+            networkUtils.dynamicKeyValueQA(8, 8, 8,
+                    38, "Questions", questionListUser,
+                    "Answers", answersListUser, this);
+        } else {
+            Toast.makeText(this, "please connect with internet", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override
     public void UpdateSuccess(Response response) {
 
+        progressHide();
+        MerchantTaskResponse merchantTaskResponse = (MerchantTaskResponse) response.body();
+
+        if (merchantTaskResponse.getStatus() == 1) {
+            Intent intent = new Intent(SurveyFormQuestion.this, MerchantActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+        }
     }
 
     @Override
     public void UpdateFailure(BaseResponse baseResponse) {
-
+        progressHide();
     }
 }

@@ -232,5 +232,5 @@ public interface NetworkRequestInterfaces {
     @Multipart
     @POST("viewinstruction")
     Call<ViewInstructionResponseModel> getViewInstruction(@Part("brand_id") int brand_id,
-                                                          @Part("shop_type") String shop_type);
+                                                          @Part("shop_id") int shop_id);
 }
