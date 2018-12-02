@@ -28,6 +28,7 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -36,6 +37,7 @@ import com.example.arsalansiddiq.beem.R;
 import com.example.arsalansiddiq.beem.activities.contractor.NavigationDrawerContractorSUP;
 import com.example.arsalansiddiq.beem.activities.presenter.NavigationDrawerSUPPresenter;
 import com.example.arsalansiddiq.beem.adapters.CustomListAdapterTasks;
+import com.example.arsalansiddiq.beem.adapters.MerchantTaskAdapter;
 import com.example.arsalansiddiq.beem.base.BaseActivity;
 import com.example.arsalansiddiq.beem.databases.BeemDatabase;
 import com.example.arsalansiddiq.beem.databases.BeemPreferences;
@@ -55,6 +57,9 @@ import com.example.arsalansiddiq.beem.models.responsemodels.MeetingResponseModel
 import com.example.arsalansiddiq.beem.models.responsemodels.ResponseSUP;
 import com.example.arsalansiddiq.beem.models.responsemodels.babreak.BreakTypeResponseModel;
 import com.example.arsalansiddiq.beem.models.responsemodels.babreak.Status;
+import com.example.arsalansiddiq.beem.models.responsemodels.merchant.competitionsku.DatumMerchant;
+import com.example.arsalansiddiq.beem.models.responsemodels.merchant.merchanttask.Datum;
+import com.example.arsalansiddiq.beem.models.responsemodels.merchant.merchanttask.MerchantTaskResponse;
 import com.example.arsalansiddiq.beem.models.responsemodels.tasksresponsemodels.Task;
 import com.example.arsalansiddiq.beem.models.responsemodels.tasksresponsemodels.TaskResponse;
 import com.example.arsalansiddiq.beem.receiver.LocationProvider;
@@ -91,7 +96,8 @@ import static com.google.android.gms.common.api.CommonStatusCodes.RESOLUTION_REQ
 
 
 public class NavigationDrawerActivity extends BaseActivity
-        implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener, NavigationDrawerContractorSUP.NavigationView, UpdateCallback {
+        implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener,
+        NavigationDrawerContractorSUP.NavigationView, AdapterView.OnItemClickListener, UpdateCallback {
 
     static final int REQUEST_IMAGE_CAPTURE = 1;
     Bitmap imageBitmap;
@@ -108,7 +114,7 @@ public class NavigationDrawerActivity extends BaseActivity
 
     private double latitude;
     private double longitude;
-    private boolean isSUP;
+    private Boolean isSUP;
     private BeemDatabase beemDatabase;
     private AppUtils appUtils;
 
@@ -137,7 +143,7 @@ public class NavigationDrawerActivity extends BaseActivity
     private int count;
     private SharedPreferences pictureNotesCount;
     private List<Task> taskList;
-    private Intent intentMerchantActivity;
+    private List<Datum> datumMerchantList;
 
 
     //Location Api
@@ -146,6 +152,8 @@ public class NavigationDrawerActivity extends BaseActivity
     private LocationCallback locationCallback;
 
     private LocationProvider locationProvider;
+
+    private Datum datum;
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     @Override
@@ -156,8 +164,6 @@ public class NavigationDrawerActivity extends BaseActivity
         setSupportActionBar(toolbar);
 
         withInRadiusStores = new ArrayList<>();
-        intentMerchantActivity = new Intent(NavigationDrawerActivity.this,
-                MerchantActivity.class);
 
         locationCallback = new LocationCallback(){
             @Override
@@ -179,8 +185,9 @@ public class NavigationDrawerActivity extends BaseActivity
                     fusedLocationProviderClient.removeLocationUpdates(this);
 
                     hideProgress();
-//                    }
-                    if (isSUP) {
+                    if (isSUP == null) {
+                        meetingMerhcant();
+                    } else if (isSUP) {
                         attendanceSupervisor();
                     } else {
                         dispatchTakePictureIntent();
@@ -273,31 +280,6 @@ public class NavigationDrawerActivity extends BaseActivity
         SharedPreferences preferences = this.getSharedPreferences(Constants.ATTENDANCE_STATUS, MODE_PRIVATE);
         int id = preferences.getInt(Constants.KEY_ATTENDANCE_STATUS, 0);
 
-        if (loginResponseRealm.getuT().toLowerCase().equals("mcd")) {
-            SharedPreferences preferencesMeeting = this.getSharedPreferences(Constants.SUPERVISOR_MEETING_STATUS, MODE_PRIVATE);
-            boolean meetingStatus = preferencesMeeting.getBoolean(Constants.KEY_SUPERVISOR_MEETING_STATUS, false);
-
-            fab_menu_addShop_supervisor.setVisibility(View.GONE);
-            fab_menu_supervisor.setVisibility(View.VISIBLE);
-
-            if (id == 1 && meetingStatus) {
-                fabViewVisibility.fabMarkAttendance(false);
-                fabViewVisibility.fabEndAttendance(false);
-                fabViewVisibility.fabStartMeeting(false);
-                fabViewVisibility.fabEndMeeting(true);
-            } else if (id == 1 && !meetingStatus) {
-                fabViewVisibility.fabMarkAttendance(false);
-                fabViewVisibility.fabEndAttendance(true);
-                fabViewVisibility.fabStartMeeting(true);
-                fabViewVisibility.fabEndMeeting(false);
-            } else if (id == 0) {
-                fabViewVisibility.fabMarkAttendance(true);
-                fabViewVisibility.fabEndAttendance(false);
-                fabViewVisibility.fabStartMeeting(false);
-                fabViewVisibility.fabEndMeeting(false);
-            }
-
-        }
         if (loginResponseRealm.getuT().toLowerCase().equals("sup")) {
 
             SharedPreferences preferencesMeeting = this.getSharedPreferences(Constants.SUPERVISOR_MEETING_STATUS, MODE_PRIVATE);
@@ -343,15 +325,18 @@ public class NavigationDrawerActivity extends BaseActivity
         if (loginResponseRealm.getuT().equals("BA")){
             txtView_shopNameBA.setVisibility(View.VISIBLE);
             txtView_shopNameBA.setText("Shop: " + loginResponseRealm.getStoreName());
-        }
-
-        if (loginResponseRealm.getuT().equals("SUP") || loginResponseRealm.getuT().equals("MCD")) {
+        } else if (loginResponseRealm.getuT().equals("SUP")) {
             listView_taskNav.setVisibility(View.VISIBLE);
             constraintLayout_NavigationBeemLogo.setBackground(null);
             navigationDrawerPresenter.getTaskOnActivityLaunch("GetTask", loginResponseRealm.getUserId());
 
             startService(new Intent(NavigationDrawerActivity.this, BreakService.class));
+        } else if (loginResponseRealm.getuT().equals("MCD")) {
+            listView_taskNav.setVisibility(View.VISIBLE);
+            constraintLayout_NavigationBeemLogo.setBackground(null);
+            navigationDrawerPresenter.getMerchantTasks("GetMerchantTasks", loginResponseRealm.getUserId());
         }
+
 
         SharedPreferences preferencesMeeting = this.getSharedPreferences(Constants.BREAK_STATUS, MODE_PRIVATE);
         int breakStatus = preferencesMeeting.getInt(Constants.KEY_BREAK_STATUS, 0);
@@ -386,8 +371,7 @@ public class NavigationDrawerActivity extends BaseActivity
                 Toast.makeText(this, "Unable to get location, please check your location", Toast.LENGTH_SHORT).show();
             } else {
 
-                if (loginResponseRealm.getuT().toLowerCase().equals("sup") ||
-                        loginResponseRealm.getuT().toLowerCase().equals("mcd")) {
+                if (loginResponseRealm.getuT().toLowerCase().equals("sup")) {
 
                     if (meetingTag.equals("StartMeeting")) {
                         withInRadiusStores.clear();
@@ -454,10 +438,6 @@ public class NavigationDrawerActivity extends BaseActivity
                                                                             0, 0);
                                                                 }
 
-                                                                if (loginResponseRealm.getuT().toLowerCase().equals("mcd")) {
-                                                                    startActivity(intentMerchantActivity);
-                                                                }
-
                                                                 beemPreferences.initialize_and_createPreferences_meetingStatusSupervisor(true);
                                                                 hideProgress();
                                                                 startMeetingFabs();
@@ -473,13 +453,7 @@ public class NavigationDrawerActivity extends BaseActivity
                                                                         appUtils.imageBitmapToBiteConversion(imageBitmap),
                                                                         latitude, longitude, loginResponseRealm.getUserId(),
                                                                         0, 0);
-
-                                                                if (loginResponseRealm.getuT().toLowerCase().equals("mcd")) {
-                                                                    startActivity(intentMerchantActivity);
-                                                                }
-
                                                                 hideProgress();
-                                                                startMeetingFabs();
                                                                 Toast.makeText(NavigationDrawerActivity.this, error, Toast.LENGTH_SHORT).show();
                                                             }
                                                         });
@@ -491,12 +465,6 @@ public class NavigationDrawerActivity extends BaseActivity
                                                                 appUtils.imageBitmapToBiteConversion(imageBitmap),
                                                                 latitude, longitude, loginResponseRealm.getUserId(),
                                                                 0, 0);
-
-                                                        if (loginResponseRealm.getuT().toLowerCase().equals("mcd")) {
-                                                            startActivity(intentMerchantActivity);
-                                                        }
-
-                                                        startMeetingFabs();
 
                                                         alterDialog(true);
                                                     }
@@ -537,10 +505,6 @@ public class NavigationDrawerActivity extends BaseActivity
                                                         0, 0);
                                             }
 
-                                            if (loginResponseRealm.getuT().toLowerCase().equals("mcd")) {
-                                                startActivity(intentMerchantActivity);
-                                            }
-
                                             hideProgress();
                                             beemPreferences.initialize_and_createPreferences_meetingStatusSupervisor(true);
                                             startMeetingFabs();
@@ -557,10 +521,6 @@ public class NavigationDrawerActivity extends BaseActivity
                                                     latitude, longitude, loginResponseRealm.getUserId(),
                                                     0, 0);
 
-                                            if (loginResponseRealm.getuT().toLowerCase().equals("mcd")) {
-                                                startActivity(intentMerchantActivity);
-                                            }
-
                                             startMeetingFabs();
                                             Toast.makeText(NavigationDrawerActivity.this, error, Toast.LENGTH_SHORT).show();
                                         }
@@ -573,10 +533,6 @@ public class NavigationDrawerActivity extends BaseActivity
                                             appUtils.imageBitmapToBiteConversion(imageBitmap),
                                             latitude, longitude, loginResponseRealm.getUserId(),
                                             0, 0);
-
-                                    if (loginResponseRealm.getuT().toLowerCase().equals("mcd")) {
-                                        startActivity(intentMerchantActivity);
-                                    }
 
                                     startMeetingFabs();
 
@@ -664,16 +620,11 @@ public class NavigationDrawerActivity extends BaseActivity
                                     }
 
                                     beemPreferences.initialize_and_createPreferences_meetingStatusSupervisor(false);
-                                    if (loginResponseRealm.getuT().toLowerCase().equals("mcd")) {
-                                        fabViewVisibility.fabStartMeeting(true);
-                                        fabViewVisibility.fabEndMeeting(false);
-                                    } else {
-                                        fabViewVisibility.fabStartMeeting(true);
-                                        fabViewVisibility.fabEndMeeting(false);
-                                        fabViewVisibility.fabEndAttendance(true);
-                                        fabViewVisibility.fabMarkAttendance(false);
-                                        fabViewVisibility.fabsAfterStartMeeting(false);
-                                    }
+                                    fabViewVisibility.fabStartMeeting(true);
+                                    fabViewVisibility.fabEndMeeting(false);
+                                    fabViewVisibility.fabEndAttendance(true);
+                                    fabViewVisibility.fabMarkAttendance(false);
+                                    fabViewVisibility.fabsAfterStartMeeting(false);
                                     hideProgress();
                                 }
 
@@ -686,16 +637,11 @@ public class NavigationDrawerActivity extends BaseActivity
                                     beemPreferences.initialize_and_createPreferences_meetingStatusSupervisor(false);
                                     hideProgress();
 
-                                    if (loginResponseRealm.getuT().toLowerCase().equals("mcd")) {
-                                        fabViewVisibility.fabStartMeeting(true);
-                                        fabViewVisibility.fabEndMeeting(false);
-                                    } else {
-                                        fabViewVisibility.fabStartMeeting(true);
-                                        fabViewVisibility.fabEndMeeting(false);
-                                        fabViewVisibility.fabEndAttendance(true);
-                                        fabViewVisibility.fabMarkAttendance(false);
-                                        fabViewVisibility.fabsAfterStartMeeting(false);
-                                    }
+                                    fabViewVisibility.fabStartMeeting(true);
+                                    fabViewVisibility.fabEndMeeting(false);
+                                    fabViewVisibility.fabEndAttendance(true);
+                                    fabViewVisibility.fabMarkAttendance(false);
+                                    fabViewVisibility.fabsAfterStartMeeting(false);
                                     Toast.makeText(NavigationDrawerActivity.this, error, Toast.LENGTH_SHORT).show();
                                 }
                             });
@@ -704,16 +650,11 @@ public class NavigationDrawerActivity extends BaseActivity
                             insertEndMeetingSUP(customRelationMeetingId, getMeetingStartId, appUtils.getTime(),
                                     appUtils.imageBitmapToBiteConversion(imageBitmap), 0);
 
-                            if (loginResponseRealm.getuT().toLowerCase().equals("mcd")) {
-                                fabViewVisibility.fabStartMeeting(true);
-                                fabViewVisibility.fabEndMeeting(false);
-                            } else {
-                                fabViewVisibility.fabStartMeeting(true);
-                                fabViewVisibility.fabEndMeeting(false);
-                                fabViewVisibility.fabEndAttendance(true);
-                                fabViewVisibility.fabMarkAttendance(false);
-                                fabViewVisibility.fabsAfterStartMeeting(false);
-                            }
+                            fabViewVisibility.fabStartMeeting(true);
+                            fabViewVisibility.fabEndMeeting(false);
+                            fabViewVisibility.fabEndAttendance(true);
+                            fabViewVisibility.fabMarkAttendance(false);
+                            fabViewVisibility.fabsAfterStartMeeting(false);
                             alterDialog(true);
                         }
                     }
@@ -1072,7 +1013,7 @@ public class NavigationDrawerActivity extends BaseActivity
         fab_menu_map.setVisibility(View.GONE);
     }
 
-    void getLocation(boolean isSUP) {
+    void getLocation(Boolean isSUP) {
 
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         locationRequest = new LocationRequest();
@@ -1311,7 +1252,7 @@ public class NavigationDrawerActivity extends BaseActivity
         Log.i("register", " broadcast");
     }
 
-    private void startLocationUpdates(boolean isSUP) {
+    private void startLocationUpdates(Boolean isSUP) {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
@@ -1390,6 +1331,27 @@ public class NavigationDrawerActivity extends BaseActivity
 
         listView_taskNav.setVisibility(View.VISIBLE);
         listView_taskNav.setAdapter(customListAdapterTasks);
+    }
+
+    @Override
+    public void showSuccesofState_getTaskListMerchant(Response<MerchantTaskResponse> taskResponseResponse) {
+        showTaskListMerchant(taskResponseResponse.body());
+    }
+
+    @Override
+    public void showTaskListMerchant(MerchantTaskResponse taskResponse) {
+            listView_taskNav.setOnItemClickListener(this);
+            if (datumMerchantList != null) {
+                datumMerchantList.clear();
+            }
+
+            datumMerchantList = taskResponse.getData();
+
+            MerchantTaskAdapter merchantTaskAdapter = new
+                    MerchantTaskAdapter(NavigationDrawerActivity.this, 0, datumMerchantList);
+
+        listView_taskNav.setVisibility(View.VISIBLE);
+        listView_taskNav.setAdapter(merchantTaskAdapter);
     }
 
     @Override
@@ -1527,10 +1489,10 @@ public class NavigationDrawerActivity extends BaseActivity
 //            responseSUPResponse = response;
 //            if (responseSUPResponse.body().getStatus() == 1) {
             stopService(new Intent(NavigationDrawerActivity.this, TrackingService.class));
-                beemPreferences.initialize_and_createPreferences_trackingStartId(0);
-                beemPreferences.initialize_and_createPreferences_trackingStatus(0);
-                locationProvider.removeUpdateLocation();
-                logout();
+            beemPreferences.initialize_and_createPreferences_trackingStartId(0);
+            beemPreferences.initialize_and_createPreferences_trackingStatus(0);
+            locationProvider.removeUpdateLocation();
+            logout();
 //            }
         }
     }
@@ -1542,15 +1504,11 @@ public class NavigationDrawerActivity extends BaseActivity
     }
 
     void startMeetingFabs() {
-        if (loginResponseRealm.getuT().toLowerCase().equals("mcd")) {
-            fabViewVisibility.fabEndMeeting(true);
-        } else {
-            fabViewVisibility.fabStartMeeting(false);
-            fabViewVisibility.fabEndMeeting(true);
-            fabViewVisibility.fabEndAttendance(false);
-            fabViewVisibility.fabMarkAttendance(false);
-            fabViewVisibility.fabsAfterStartMeeting(true);
-        }
+        fabViewVisibility.fabStartMeeting(false);
+        fabViewVisibility.fabEndMeeting(true);
+        fabViewVisibility.fabEndAttendance(false);
+        fabViewVisibility.fabMarkAttendance(false);
+        fabViewVisibility.fabsAfterStartMeeting(true);
     }
 
     void meetingOnNullTask(File userImageFile) {
@@ -1565,9 +1523,7 @@ public class NavigationDrawerActivity extends BaseActivity
 
                     if (responseModelResponse.isSuccessful()) {
 
-//                        beemPreferences.initialize_and_createPreferences_startMeetingSupervisorID(Integer.parseInt(String.valueOf(responseModelResponse.body().getTaskId())));
-
-                        beemPreferences.initialize_and_createPreferences_startMeetingSupervisorID(Integer.parseInt(responseModelResponse.body().getTaskId()));
+                        beemPreferences.initialize_and_createPreferences_startMeetingSupervisorID(Integer.parseInt(String.valueOf(responseModelResponse.body().getTaskId())));
                         insertStartMeetingSUP(0,
                                 startMeetingRequest.getDateTime(),
                                 appUtils.imageBitmapToBiteConversion(imageBitmap),
@@ -1580,10 +1536,6 @@ public class NavigationDrawerActivity extends BaseActivity
                                 appUtils.imageBitmapToBiteConversion(imageBitmap),
                                 latitude, longitude, loginResponseRealm.getUserId(),
                                 0, 0);
-                    }
-
-                    if (loginResponseRealm.getuT().toLowerCase().equals("mcd")) {
-                        startActivity(intentMerchantActivity);
                     }
 
                     hideProgress();
@@ -1601,11 +1553,6 @@ public class NavigationDrawerActivity extends BaseActivity
                             latitude, longitude, loginResponseRealm.getUserId(),
                             0, 0);
                     beemPreferences.initialize_and_createPreferences_meetingStatusSupervisor(true);
-
-                    if (loginResponseRealm.getuT().toLowerCase().equals("mcd")) {
-                        startActivity(intentMerchantActivity);
-                    }
-
                     hideProgress();
                     startMeetingFabs();
 
@@ -1619,10 +1566,6 @@ public class NavigationDrawerActivity extends BaseActivity
                     latitude, longitude, loginResponseRealm.getUserId(),
                     0, 0);
             beemPreferences.initialize_and_createPreferences_meetingStatusSupervisor(true);
-
-            if (loginResponseRealm.getuT().toLowerCase().equals("mcd")) {
-                startActivity(intentMerchantActivity);
-            }
 
             startMeetingFabs();
 
@@ -1645,7 +1588,11 @@ public class NavigationDrawerActivity extends BaseActivity
             if (getSerivceStatus) {
                 listView_taskNav.setVisibility(View.VISIBLE);
                 constraintLayout_NavigationBeemLogo.setBackground(null);
-                navigationDrawerPresenter.getTaskOnActivityLaunch("GetTask", loginResponseRealm.getUserId());
+                if (loginResponseRealm.getuT().equals("SUP")) {
+                    navigationDrawerPresenter.getTaskOnActivityLaunch("GetTask", loginResponseRealm.getUserId());
+                } else if (loginResponseRealm.getuT().equals("MCD")) {
+                    navigationDrawerPresenter.getMerchantTasks("GetMerchantTasks", loginResponseRealm.getUserId());
+                }
                 stopService(new Intent(NavigationDrawerActivity.this, BreakService.class));
                 startService(new Intent(NavigationDrawerActivity.this, BreakService.class));
                 Log.i("this", "Intent From BroadCast");
@@ -1681,4 +1628,20 @@ public class NavigationDrawerActivity extends BaseActivity
         }
     }
 
+    @Override
+    public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+        datum = (Datum) adapterView.getItemAtPosition(position);
+            getLocation(null);
+    }
+
+    void meetingMerhcant () {
+
+        Intent intent = new Intent(NavigationDrawerActivity.this, MerchantActivity.class);
+        startActivity(intent);
+//        if (datum.getLatitude() == 0 || datum.getLongitude() == 0) {
+//
+//        } else {
+//
+//        }
+    }
 }

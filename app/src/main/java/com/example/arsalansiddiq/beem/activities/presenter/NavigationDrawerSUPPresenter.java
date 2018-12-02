@@ -68,6 +68,18 @@ public class NavigationDrawerSUPPresenter implements NavigationDrawerContractorS
     }
 
     @Override
+    public void getMerchantTasks(String state, int emp_id) {
+        this.state = state;
+
+        if (networkUtils.isNetworkConnected()) {
+            navigationView.showProgress();
+            networkUtils.getMerchantTasks(emp_id, this);
+        } else {
+            navigationView.showError("please check you internet connection");
+        }
+    }
+
+    @Override
     public void UpdateSuccess(Response response) {
         navigationView.hideProgress();
         if (response != null) {
@@ -78,6 +90,8 @@ public class NavigationDrawerSUPPresenter implements NavigationDrawerContractorS
                     navigationView.showSuccesofState_getTaskList(response);
                 } else if (state.equals("UpdateMeeting")) {
                     navigationView.showSuccesofState_startMeeting(response, state);
+                } else if (state.equals("GetMerchantTasks")) {
+                    navigationView.showSuccesofState_getTaskListMerchant(response);
                 }
             }
         }

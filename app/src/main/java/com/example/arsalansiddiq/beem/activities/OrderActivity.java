@@ -351,8 +351,6 @@ public class OrderActivity extends BaseActivity implements LocationListener, Rad
                 listViewModelCheck.setEditTextView_carton("");
                 listViewModelCheckArrayList.add(listViewModelCheck);
             }
-//            CustomListAdapter adapter = new CustomListAdapter(OrderActivity.this, 0,
-//                    realmCRUD.getUserBrandsSKUCategory(loginResponse.getUserId()));
             listView_order.setAdapter(adapter);
         } else {
             frameLayout_noProducts.setVisibility(View.VISIBLE);

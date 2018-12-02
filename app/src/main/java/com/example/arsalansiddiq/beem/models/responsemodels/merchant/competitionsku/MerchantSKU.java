@@ -1,4 +1,4 @@
-package com.example.arsalansiddiq.beem.models.responsemodels.merchant.merchanttask;
+package com.example.arsalansiddiq.beem.models.responsemodels.merchant.competitionsku;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
@@ -6,17 +6,16 @@ import com.google.gson.annotations.SerializedName;
 import java.util.List;
 
 /**
- * Created by jellani on 11/24/2018.
+ * Created by jellani on 12/1/2018.
  */
 
-public class MerchantTaskResponse {
-
+public class MerchantSKU {
     @SerializedName("status")
     @Expose
     private Integer status;
     @SerializedName("data")
     @Expose
-    private List<Datum> data = null;
+    private List<DatumMerchant> data = null;
 
     public Integer getStatus() {
         return status;
@@ -26,12 +25,11 @@ public class MerchantTaskResponse {
         this.status = status;
     }
 
-    public List<Datum> getData() {
+    public List<DatumMerchant> getData() {
         return data;
     }
 
-    public void setData(List<Datum> data) {
+    public void setData(List<DatumMerchant> data) {
         this.data = data;
     }
-
 }

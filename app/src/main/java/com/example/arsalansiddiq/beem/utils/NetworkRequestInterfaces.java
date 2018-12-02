@@ -6,6 +6,7 @@ import com.example.arsalansiddiq.beem.models.responsemodels.LoginResponse;
 import com.example.arsalansiddiq.beem.models.responsemodels.MeetingResponseModel;
 import com.example.arsalansiddiq.beem.models.responsemodels.ResponseSUP;
 import com.example.arsalansiddiq.beem.models.responsemodels.babreak.BreakTypeResponseModel;
+import com.example.arsalansiddiq.beem.models.responsemodels.merchant.competitionsku.MerchantSKU;
 import com.example.arsalansiddiq.beem.models.responsemodels.merchant.compulsory.CompulsoryStepsResponseModel;
 import com.example.arsalansiddiq.beem.models.responsemodels.merchant.merchanttask.MerchantTaskResponse;
 import com.example.arsalansiddiq.beem.models.responsemodels.merchant.storesurveyquestions.StoreSurveyQuestionsResponseModel;
@@ -233,4 +234,14 @@ public interface NetworkRequestInterfaces {
     @POST("viewinstruction")
     Call<ViewInstructionResponseModel> getViewInstruction(@Part("brand_id") int brand_id,
                                                           @Part("shop_id") int shop_id);
+
+    @Multipart
+    @POST("merchant/tasks")
+    Call<MerchantTaskResponse> getMerchantTasks(@Part("emp_id") int emp_id);
+
+    @POST("getskucompetition")
+    Call<MerchantSKU> getCompetitionSKU (@Query("brand_id") int brand_id);
+
+    @POST("getsku")
+    Call<MerchantSKU> getMerchantSKU (@Query("brand_id") int brand_id);
 }

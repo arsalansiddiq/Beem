@@ -5,7 +5,6 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
@@ -117,6 +116,7 @@ public class MerchantActivity extends BaseActivity implements View.OnClickListen
 
                 CURRENT_KEY = SUBMIT_FEEDBACK;
 
+                progressShow();
                 networkUtils.dynamicKeyValue(8, 8,
                         8,
                         8,
@@ -214,6 +214,12 @@ public class MerchantActivity extends BaseActivity implements View.OnClickListen
 
             case R.id.btn_submitFeedback:
                 ratingBar_submitFeedback.setVisibility(View.VISIBLE);
+                break;
+
+            case R.id.btn_updateStockPrices:
+                Intent intent2 = new Intent(MerchantActivity.this, PriceUpdateActivity.class);
+                intent2.putExtra("tag", "price");
+                startActivity(intent2);
                 break;
 
         }

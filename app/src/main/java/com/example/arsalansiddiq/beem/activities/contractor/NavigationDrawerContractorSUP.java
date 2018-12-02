@@ -5,6 +5,7 @@ import android.util.Log;
 import com.example.arsalansiddiq.beem.base.BaseViewPresenter;
 import com.example.arsalansiddiq.beem.models.requestmodels.StartMeetingRequest;
 import com.example.arsalansiddiq.beem.models.responsemodels.MeetingResponseModel;
+import com.example.arsalansiddiq.beem.models.responsemodels.merchant.merchanttask.MerchantTaskResponse;
 import com.example.arsalansiddiq.beem.models.responsemodels.tasksresponsemodels.TaskResponse;
 
 import retrofit2.Response;
@@ -18,6 +19,7 @@ public interface NavigationDrawerContractorSUP {
     interface NavigationDrawerPresenter extends BaseViewPresenter.BasePresenter {
         void onClickButtonStartMeeting(String state, StartMeetingRequest startMeetingRequest);
         void getTaskOnActivityLaunch(String state, int empd);
+        void getMerchantTasks(String state, int emp_id);
         void updateMeeting(String state, StartMeetingRequest startMeetingRequest);
     }
 
@@ -29,6 +31,8 @@ public interface NavigationDrawerContractorSUP {
 
         void showSuccesofState_getTaskList(Response<TaskResponse> taskResponseResponse);
         void showTaskList(TaskResponse taskResponse);
+        void showSuccesofState_getTaskListMerchant(Response<MerchantTaskResponse> taskResponseResponse);
+        void showTaskListMerchant(MerchantTaskResponse taskResponse);
         void showSuccesofState_startMeeting(Response<MeetingResponseModel> taskResponseResponse, String state);
     }
 

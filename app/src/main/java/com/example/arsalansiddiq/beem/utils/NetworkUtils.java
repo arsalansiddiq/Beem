@@ -23,6 +23,7 @@ import com.example.arsalansiddiq.beem.models.responsemodels.LoginResponse;
 import com.example.arsalansiddiq.beem.models.responsemodels.MeetingResponseModel;
 import com.example.arsalansiddiq.beem.models.responsemodels.ResponseSUP;
 import com.example.arsalansiddiq.beem.models.responsemodels.babreak.BreakTypeResponseModel;
+import com.example.arsalansiddiq.beem.models.responsemodels.merchant.competitionsku.MerchantSKU;
 import com.example.arsalansiddiq.beem.models.responsemodels.merchant.compulsory.CompulsoryStepsResponseModel;
 import com.example.arsalansiddiq.beem.models.responsemodels.merchant.merchanttask.MerchantTaskResponse;
 import com.example.arsalansiddiq.beem.models.responsemodels.merchant.storesurveyquestions.StoreSurveyQuestionsResponseModel;
@@ -545,5 +546,17 @@ public class NetworkUtils {
     public void getViewInstruction(int brand_id, int shop_id, UpdateCallback updateCallback) {
 
         networkRequestInterfaces.getViewInstruction(brand_id, shop_id).enqueue(new UpdateRH<ViewInstructionResponseModel>(updateCallback));
+    }
+
+    public void getMerchantTasks(int emp_id, UpdateCallback updateCallback) {
+        networkRequestInterfaces.getMerchantTasks(emp_id).enqueue(new UpdateRH<MerchantTaskResponse>(updateCallback));
+    }
+
+    public void getCompetitionSKU (int brand_id, UpdateCallback updateCallback) {
+        networkRequestInterfaces.getCompetitionSKU(brand_id).enqueue(new UpdateRH<MerchantSKU>(updateCallback));
+    }
+
+    public void getMerchantSKU (int brand_id, UpdateCallback updateCallback) {
+        networkRequestInterfaces.getMerchantSKU(brand_id).enqueue(new UpdateRH<MerchantSKU>(updateCallback));
     }
 }

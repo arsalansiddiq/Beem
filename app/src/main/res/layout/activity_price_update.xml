@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.example.arsalansiddiq.beem.activities.OrderActivity">
+
+    <!--<LinearLayout-->
+        <!--android:id="@+id/linearLayout_bottom"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_weight="1"-->
+        <!--android:orientation="vertical">-->
+
+        <ListView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="5dp"
+            android:layout_weight="1"
+            android:background="@drawable/editext_background"
+            android:descendantFocusability="beforeDescendants"
+            android:id="@+id/listView_merchant" />
+
+        <FrameLayout
+            android:layout_height="200dp"
+            android:layout_gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_weight="1"
+            android:id="@+id/frameLayout_noProductsMechant">
+
+            <TextView android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:textSize="20sp"
+                android:layout_gravity="center"
+                android:text="No Products Available"
+                android:id="@+id/txtView_noProductsMerchant"/>
+
+        </FrameLayout>
+
+    <!--</LinearLayout>-->
+
+    <Button
+        android:id="@+id/btn_submitMerchant"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center"
+        android:onClick="onSubmit"
+        android:background="@color/colorBlue"
+        android:textColor="@color/white_color"
+        android:layout_margin="15dp"
+        android:layout_weight="0"
+        android:text="Submit" />
+
+</LinearLayout>

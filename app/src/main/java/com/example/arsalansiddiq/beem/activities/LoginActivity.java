@@ -169,17 +169,13 @@ public class LoginActivity extends Activity implements UpdateCallback{
                                         //User Desingnation
                                         //Start
 
-//                                        if (loginResponse.body().getuT().equals("SUP") || loginResponse.body().getuT().equals("MCD")) {
-                                        if (loginResponse.body().getuT().equals("SUP")) {
+                                        if (loginResponse.body().getuT().equals("SUP") || loginResponse.body().getuT().equals("MCD")) {
                                             empId = loginResponse.body().getUserId();
                                             locationProvider.initializeLocationManager();
                                             beemPreferences.initialize_and_createPreferences_loginUserDesignation(true);
                                         } else if (loginResponse.body().getuT().equals("BA")) {
                                             beemPreferences.initialize_and_createPreferences_loginUserDesignation(false);
                                             startActivity(intent);
-                                        } else if (loginResponse.body().getuT().equals("MCD")) {
-                                            Intent intent1 = new Intent(LoginActivity.this, MerchantActivity.class);
-                                            startActivity(intent1);
                                         }
                                         //End
 

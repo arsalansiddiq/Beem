@@ -40,7 +40,7 @@ public class CustomListAdapter extends ArrayAdapter<SalesSKUArrayResponse> imple
 
     @Override
     public int getViewTypeCount() {
-       return getCount();
+        return getCount();
 //        return salesSKUArrayResponse.size();
     }
 
