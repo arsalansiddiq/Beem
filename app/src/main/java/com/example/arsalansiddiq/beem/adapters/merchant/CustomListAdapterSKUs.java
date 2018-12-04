@@ -28,7 +28,6 @@ public class CustomListAdapterSKUs extends ArrayAdapter<DatumMerchant> {
 
         private Context context;
         List<DatumMerchant> datumMerchantList;
-        CheckBox checkbox_loose, checkbox_carton;
         String tag;
 
         public CustomListAdapterSKUs(@NonNull Context context, int resource, @NonNull List<DatumMerchant> objects,

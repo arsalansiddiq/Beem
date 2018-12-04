@@ -13,6 +13,8 @@ import com.example.arsalansiddiq.beem.R;
 import com.example.arsalansiddiq.beem.adapters.merchant.CustomListAdapterSKUs;
 import com.example.arsalansiddiq.beem.databases.RealmCRUD;
 import com.example.arsalansiddiq.beem.models.ListViewModelCheck;
+import com.example.arsalansiddiq.beem.models.ListViewModelCheckMerchant;
+import com.example.arsalansiddiq.beem.models.requestmodels.merchant.SKUMerchantRequestModel;
 import com.example.arsalansiddiq.beem.models.responsemodels.LoginResponse;
 import com.example.arsalansiddiq.beem.models.responsemodels.merchant.competitionsku.MerchantSKU;
 import com.example.arsalansiddiq.beem.utils.NetworkUtils;
@@ -43,6 +45,8 @@ public class PriceUpdateActivity extends AppCompatActivity implements UpdateCall
     @BindView(R.id.btn_submitMerchant)
     Button btn_submitMerchant;
 
+    public static ArrayList<ListViewModelCheckMerchant> listViewModelCheckMerchants;
+
     private Intent intent = null;
     String tag;
 
@@ -52,6 +56,8 @@ public class PriceUpdateActivity extends AppCompatActivity implements UpdateCall
         setContentView(R.layout.activity_price_update);
         ButterKnife.bind(this);
         ButterKnife.setDebug(true);
+
+        listViewModelCheckArrayList = new ArrayList<>();
 
         if (getIntent().getExtras() != null) intent = getIntent();
         tag = intent.getStringExtra("tag");
@@ -67,6 +73,14 @@ public class PriceUpdateActivity extends AppCompatActivity implements UpdateCall
         if (networkUtils.isNetworkConnected()){
             networkUtils.getMerchantSKU(Integer.parseInt(loginResponse.getBrand()), this);
         }
+
+        btn_submitMerchant.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SKUMerchantRequestModel skuMerchantRequestModel = null;
+                networkUtils.storeSKUPrice(skuMerchantRequestModel, PriceUpdateActivity.this);
+            }
+        });
     }
 
     @Override

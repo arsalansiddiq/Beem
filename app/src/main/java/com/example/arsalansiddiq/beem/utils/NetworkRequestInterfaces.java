@@ -1,6 +1,7 @@
 package com.example.arsalansiddiq.beem.utils;
 
 import com.example.arsalansiddiq.beem.models.requestmodels.LoginRequest;
+import com.example.arsalansiddiq.beem.models.requestmodels.merchant.SKUMerchantRequestModel;
 import com.example.arsalansiddiq.beem.models.responsemodels.AttandanceResponse;
 import com.example.arsalansiddiq.beem.models.responsemodels.LoginResponse;
 import com.example.arsalansiddiq.beem.models.responsemodels.MeetingResponseModel;
@@ -21,6 +22,7 @@ import java.util.Map;
 
 import io.reactivex.Observable;
 import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
@@ -244,4 +246,8 @@ public interface NetworkRequestInterfaces {
 
     @POST("getsku")
     Call<MerchantSKU> getMerchantSKU (@Query("brand_id") int brand_id);
+
+    @POST("storeskuresponse")
+    Call<MerchantTaskResponse> storeSKUPrice (@Body SKUMerchantRequestModel skuMerchantRequestModel);
+
 }

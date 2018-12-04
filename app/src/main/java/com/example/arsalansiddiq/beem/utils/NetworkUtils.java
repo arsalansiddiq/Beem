@@ -18,6 +18,7 @@ import com.example.arsalansiddiq.beem.interfaces.merchantcallback.BaseCallbackIn
 import com.example.arsalansiddiq.beem.models.requestmodels.AddShopRequest;
 import com.example.arsalansiddiq.beem.models.requestmodels.LoginRequest;
 import com.example.arsalansiddiq.beem.models.requestmodels.StartMeetingRequest;
+import com.example.arsalansiddiq.beem.models.requestmodels.merchant.SKUMerchantRequestModel;
 import com.example.arsalansiddiq.beem.models.responsemodels.AttandanceResponse;
 import com.example.arsalansiddiq.beem.models.responsemodels.LoginResponse;
 import com.example.arsalansiddiq.beem.models.responsemodels.MeetingResponseModel;
@@ -558,5 +559,9 @@ public class NetworkUtils {
 
     public void getMerchantSKU (int brand_id, UpdateCallback updateCallback) {
         networkRequestInterfaces.getMerchantSKU(brand_id).enqueue(new UpdateRH<MerchantSKU>(updateCallback));
+    }
+
+    public void storeSKUPrice(SKUMerchantRequestModel skuMerchantRequestModel, UpdateCallback updateCallback) {
+        networkRequestInterfaces.storeSKUPrice(skuMerchantRequestModel).enqueue(new UpdateRH<MerchantTaskResponse>(updateCallback));
     }
 }
