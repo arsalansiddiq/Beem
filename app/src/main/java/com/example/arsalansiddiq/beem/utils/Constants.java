@@ -74,5 +74,9 @@ public class Constants {
     public static final String TAKE_COMPETITION_PICTURE = "competitionPicture";
     public static final String TAKE_END_PICTURE = "endPicture";
 
+    public static final String TASK_ID = "taskId";
+    public static final String SHOP_ID = "shopId";
+    public static final String RADIUS = "radius";
+
 
 }

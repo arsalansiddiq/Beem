@@ -1,6 +1,7 @@
 package com.example.arsalansiddiq.beem.activities;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -12,11 +13,12 @@ import android.widget.TextView;
 import com.example.arsalansiddiq.beem.R;
 import com.example.arsalansiddiq.beem.adapters.merchant.CustomListAdapterSKUs;
 import com.example.arsalansiddiq.beem.databases.RealmCRUD;
-import com.example.arsalansiddiq.beem.models.ListViewModelCheck;
+import com.example.arsalansiddiq.beem.interfaces.merchantcallback.BaseCallbackInterface;
 import com.example.arsalansiddiq.beem.models.ListViewModelCheckMerchant;
 import com.example.arsalansiddiq.beem.models.requestmodels.merchant.SKUMerchantRequestModel;
 import com.example.arsalansiddiq.beem.models.responsemodels.LoginResponse;
 import com.example.arsalansiddiq.beem.models.responsemodels.merchant.competitionsku.MerchantSKU;
+import com.example.arsalansiddiq.beem.utils.Constants;
 import com.example.arsalansiddiq.beem.utils.NetworkUtils;
 import com.example.arsalansiddiq.beem.utils.data.BaseResponse;
 import com.example.arsalansiddiq.beem.utils.data.UpdateCallback;
@@ -34,7 +36,7 @@ public class PriceUpdateActivity extends AppCompatActivity implements UpdateCall
     private List<MerchantSKU> merchantSKUList= null;
     private LoginResponse loginResponse;
     private RealmCRUD realmCRUD;
-    public static ArrayList<ListViewModelCheck> listViewModelCheckArrayList;
+    public static ArrayList<ListViewModelCheckMerchant> listViewModelCheckMerchantArrayList;
 
     @BindView(R.id.listView_merchant)
     ListView listView_merchant;
@@ -57,14 +59,12 @@ public class PriceUpdateActivity extends AppCompatActivity implements UpdateCall
         ButterKnife.bind(this);
         ButterKnife.setDebug(true);
 
-        listViewModelCheckArrayList = new ArrayList<>();
-
         if (getIntent().getExtras() != null) intent = getIntent();
         tag = intent.getStringExtra("tag");
 
         frameLayout_noProductsMechant.setVisibility(View.GONE);
 
-        listViewModelCheckArrayList = new ArrayList<>();
+        listViewModelCheckMerchantArrayList = new ArrayList<>();
         realmCRUD = new RealmCRUD();
         loginResponse = realmCRUD.getLoginInformationDetails();
 
@@ -77,10 +77,17 @@ public class PriceUpdateActivity extends AppCompatActivity implements UpdateCall
         btn_submitMerchant.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SKUMerchantRequestModel skuMerchantRequestModel = null;
-                networkUtils.storeSKUPrice(skuMerchantRequestModel, PriceUpdateActivity.this);
+                storeRecordsOnServer();
             }
         });
+    }
+
+    private void storeRecordsOnServer() {
+
+
+
+        SKUMerchantRequestModel skuMerchantRequestModel = null;
+        networkUtils.storeSKUPrice(skuMerchantRequestModel, PriceUpdateActivity.this);
     }
 
     @Override
@@ -92,6 +99,15 @@ public class PriceUpdateActivity extends AppCompatActivity implements UpdateCall
                 CustomListAdapterSKUs(PriceUpdateActivity.this, 0,
                 merchantSKUS.getData(), tag);
 
+
+        for (int i = 0; i < merchantSKUS.getData().size(); i++) {
+            ListViewModelCheckMerchant listViewModelCheckMerchant = new ListViewModelCheckMerchant();
+            listViewModelCheckMerchant.setId(merchantSKUS.getData().get(i).getId());
+            listViewModelCheckMerchant.setedtText_priceMerchant("");
+
+            listViewModelCheckMerchantArrayList.add(listViewModelCheckMerchant);
+
+        }
         listView_merchant.setAdapter(adapter);
     }
 
@@ -99,4 +115,74 @@ public class PriceUpdateActivity extends AppCompatActivity implements UpdateCall
     public void UpdateFailure(BaseResponse baseResponse) {
 
     }
+
+    void getSelectedItemAndPrice() {
+
+        int listLength = 0;
+
+        List<SKUMerchantRequestModel> skuMerchantRequestModelArrayList = new ArrayList<>();
+
+        SKUMerchantRequestModel skuMerchantRequestModel = new SKUMerchantRequestModel();
+
+        if (listViewModelCheckMerchantArrayList != null || listViewModelCheckMerchantArrayList.size() != 0) {
+            listLength = listViewModelCheckMerchantArrayList.size();
+        }
+
+        int checkSelectionExist = 0;
+
+        Long priceMerchant;
+
+        if (listLength > 0) {
+
+            for (int i = 0; i < listLength; i++) {
+
+                priceMerchant = null;
+
+                String priceEdtText = listViewModelCheckMerchantArrayList.get(i).getedtText_priceMerchant().toString();
+
+                if (priceEdtText.equals("")) {
+
+                } else if (priceEdtText.length() > 0) {
+
+                    priceMerchant = Long.valueOf(priceEdtText);
+                    skuMerchantRequestModel.setUserId(Long.valueOf(loginResponse.getUserId()));
+                    skuMerchantRequestModel.setBrandId(Long.valueOf(loginResponse.getBrand()));
+                    skuMerchantRequestModel.setTaskId(Long.valueOf(getCount(Constants.TASK_ID)));
+                    skuMerchantRequestModel.setShopId(Long.valueOf(getCount(Constants.SHOP_ID)));
+                    skuMerchantRequestModel.setSkuId(Long.valueOf(listViewModelCheckMerchantArrayList.get(i).getId()));
+                    skuMerchantRequestModel.setPrice(priceMerchant);
+                    skuMerchantRequestModel.setCompetition(Long.valueOf(0));
+
+                    skuMerchantRequestModelArrayList.add(skuMerchantRequestModel);
+
+                    checkSelectionExist++;
+
+                }
+
+            }
+
+            if (checkSelectionExist > 0) {
+                for (int j = 0; j < skuMerchantRequestModelArrayList.size(); j++) {
+                    if (networkUtils.isNetworkConnected()) {
+                        skuMerchantRequestModel = skuMerchantRequestModelArrayList.get(j);
+                        networkUtils.storeSKUPrice(skuMerchantRequestModel, new BaseCallbackInterface() {
+                            @Override
+                            public void success(Response response) {
+                            }
+
+                            @Override
+                            public void failure(String error) {
+                            }
+                        });
+                    }
+                }
+            }
+        }
+    }
+
+    int getCount(String key) {
+            SharedPreferences prefs = getSharedPreferences(Constants.BEEM_PREFERENCE_COUNT, MODE_PRIVATE);
+            int coutn = prefs.getInt(key, 0);
+            return coutn;
+        }
 }

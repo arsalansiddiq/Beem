@@ -5,16 +5,17 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.arsalansiddiq.beem.R;
+import com.example.arsalansiddiq.beem.activities.PriceUpdateActivity;
 import com.example.arsalansiddiq.beem.models.responsemodels.merchant.competitionsku.DatumMerchant;
 import com.squareup.picasso.Picasso;
 
@@ -37,6 +38,32 @@ public class CustomListAdapterSKUs extends ArrayAdapter<DatumMerchant> {
             this.tag = tag;
             this.datumMerchantList =  objects;
         }
+
+    @Override
+    public int getCount() {
+        return datumMerchantList.size();
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return position;
+    }
+
+    @Override
+    public int getViewTypeCount() {
+        return getCount();
+    }
+
+    @Nullable
+    @Override
+    public DatumMerchant getItem(int position) {
+        return datumMerchantList.get(position);
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return position;
+    }
 
     @NonNull
     @Override
@@ -75,7 +102,14 @@ public class CustomListAdapterSKUs extends ArrayAdapter<DatumMerchant> {
         listViewHolderMerchant.edtText_priceMerchant.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
+                for (int j = 0; j < PriceUpdateActivity.listViewModelCheckMerchantArrayList.size(); j++) {
+                    int localId = PriceUpdateActivity.listViewModelCheckMerchantArrayList.get(j).getId();
+                    int serverId = datum.getId();
+                    if (localId == serverId) {
+                        Log.i("Id Comparison: ", PriceUpdateActivity.listViewModelCheckMerchantArrayList.get(j).getId() + " " +datum.getId());
+                        PriceUpdateActivity.listViewModelCheckMerchantArrayList.get(j).setedtText_priceMerchant(listViewHolderMerchant.edtText_priceMerchant.getText().toString());
+                    }
+                }
             }
 
             @Override

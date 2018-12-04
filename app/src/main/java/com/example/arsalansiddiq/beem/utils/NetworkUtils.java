@@ -18,6 +18,7 @@ import com.example.arsalansiddiq.beem.interfaces.merchantcallback.BaseCallbackIn
 import com.example.arsalansiddiq.beem.models.requestmodels.AddShopRequest;
 import com.example.arsalansiddiq.beem.models.requestmodels.LoginRequest;
 import com.example.arsalansiddiq.beem.models.requestmodels.StartMeetingRequest;
+import com.example.arsalansiddiq.beem.models.requestmodels.merchant.MeetingRequestMerchant;
 import com.example.arsalansiddiq.beem.models.requestmodels.merchant.SKUMerchantRequestModel;
 import com.example.arsalansiddiq.beem.models.responsemodels.AttandanceResponse;
 import com.example.arsalansiddiq.beem.models.responsemodels.LoginResponse;
@@ -480,37 +481,6 @@ public class NetworkUtils {
         });
     }
 
-//    public void storeMerchantTaskResponse(int user_id, int task_id, int shop_id, int brand_id,
-//                                          File take_store_picture_1, File take_store_picture_2,
-//                                          File before_chillers_pic_front_2, String feedback) {
-    public void storeMerchantTaskResponse(BaseCallbackInterface baseCallbackInterface) {
-        MultipartBody.Part filePart1 = null;
-//                = MultipartBody.Part.createFormData("Take_Store_Picture_1",
-//                take_store_picture_1.getName(), RequestBody.create(MediaType.parse("image/*"), take_store_picture_1));
-        MultipartBody.Part filePart2 = null;
-//                = MultipartBody.Part.createFormData("Take_Store_Picture_2",
-//                take_store_picture_1.getName(), RequestBody.create(MediaType.parse("image/*"), take_store_picture_2));
-        MultipartBody.Part filePart3 = null;
-//        = MultipartBody.Part.createFormData("Before_Chillers_Pic_Front_2",
-//                before_chillers_pic_front_2.getName(), RequestBody.create(MediaType.parse("image/*"), before_chillers_pic_front_2));
-
-        networkRequestInterfaces.storeMerchantTaskResponse(10, 7, 7, 7,
-                filePart1, filePart2, filePart3, "test")
-                .enqueue(new Callback<MerchantTaskResponse>() {
-                    @Override
-                    public void onResponse(Call<MerchantTaskResponse> call, Response<MerchantTaskResponse> response) {
-                        baseCallbackInterface.success(response);
-                        Log.i("storeMerchantTa", String.valueOf(response.body().getStatus()));
-                    }
-
-                    @Override
-                    public void onFailure(Call<MerchantTaskResponse> call, Throwable t) {
-                        baseCallbackInterface.failure(t.getLocalizedMessage());
-                        Log.e("storeMerchantTa", "error");
-                    }
-                });
-    }
-
     public void dynamicKeyValue(int user_id, int task_id, int shop_id, int brand_id, String key, String value, UpdateCallback updateCallback) {
 
         Map<String, String> mapParams = new HashMap<>();
@@ -553,6 +523,22 @@ public class NetworkUtils {
         networkRequestInterfaces.getMerchantTasks(emp_id).enqueue(new UpdateRH<MerchantTaskResponse>(updateCallback));
     }
 
+    public void updateShopLatLong(MeetingRequestMerchant meetingRequestMerchant, final BaseCallbackInterface baseCallbackInterface) {
+        networkRequestInterfaces.updateShopLatLong(meetingRequestMerchant).enqueue(new Callback<ResponseSUP>() {
+            @Override
+            public void onResponse(Call<ResponseSUP> call, Response<ResponseSUP> response) {
+                if (response.body().getStatus() == 1) {
+                   baseCallbackInterface.success(response);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseSUP> call, Throwable t) {
+                baseCallbackInterface.failure(t.getLocalizedMessage());
+            }
+        });
+    }
+
     public void getCompetitionSKU (int brand_id, UpdateCallback updateCallback) {
         networkRequestInterfaces.getCompetitionSKU(brand_id).enqueue(new UpdateRH<MerchantSKU>(updateCallback));
     }
@@ -561,7 +547,19 @@ public class NetworkUtils {
         networkRequestInterfaces.getMerchantSKU(brand_id).enqueue(new UpdateRH<MerchantSKU>(updateCallback));
     }
 
-    public void storeSKUPrice(SKUMerchantRequestModel skuMerchantRequestModel, UpdateCallback updateCallback) {
-        networkRequestInterfaces.storeSKUPrice(skuMerchantRequestModel).enqueue(new UpdateRH<MerchantTaskResponse>(updateCallback));
+    public void storeSKUPrice(SKUMerchantRequestModel skuMerchantRequestModel, BaseCallbackInterface baseCallbackInterface) {
+        networkRequestInterfaces.storeSKUPrice(skuMerchantRequestModel).enqueue(new Callback<MerchantTaskResponse>() {
+            @Override
+            public void onResponse(Call<MerchantTaskResponse> call, Response<MerchantTaskResponse> response) {
+                if (response.body().getStatus() == 1) {
+                    baseCallbackInterface.success(response);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<MerchantTaskResponse> call, Throwable t) {
+                baseCallbackInterface.failure(t.getLocalizedMessage());
+            }
+        });
     }
 }

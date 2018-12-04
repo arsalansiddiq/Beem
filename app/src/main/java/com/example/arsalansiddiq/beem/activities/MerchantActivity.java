@@ -43,6 +43,7 @@ public class MerchantActivity extends BaseActivity implements View.OnClickListen
     private static  final String END_PIC_COUNT = "End_Pic";
     private static  final String SUBMIT_FEEDBACK = "Feedback";
     private static  final String VIEW_INSTRUCTIONS = "View_Instruction";
+    private static  final String RADIUS = "radius";
 
     static final int REQUEST_IMAGE_CAPTURE = 1;
     private Button btn_takeStorePicture, btn_submitFeedback, btn_takeFrontChillersPicture,
@@ -85,6 +86,7 @@ public class MerchantActivity extends BaseActivity implements View.OnClickListen
 
         networkUtils = new NetworkUtils(this);
 
+        setRadius();
         getCompulsorySteps();
         btn_takeStorePicture = (Button) findViewById(R.id.btn_takeStorePicture);
         btn_submitFeedback = (Button) findViewById(R.id.btn_submitFeedback);
@@ -117,16 +119,25 @@ public class MerchantActivity extends BaseActivity implements View.OnClickListen
                 CURRENT_KEY = SUBMIT_FEEDBACK;
 
                 progressShow();
-                networkUtils.dynamicKeyValue(8, 8,
-                        8,
-                        8,
+                networkUtils.dynamicKeyValue(loginResponseRealm.getUserId(),
+                        getCount(Constants.TASK_ID), getCount(Constants.SHOP_ID),
+                        Integer.parseInt(loginResponseRealm.getBrand()),
                         CURRENT_KEY, String.valueOf(rating), MerchantActivity.this);
             }
         });
     }
 
+    private void setRadius() {
+        if (networkUtils.isNetworkConnected()) {
+            CURRENT_KEY = RADIUS;
+            networkUtils.dynamicKeyValue(loginResponseRealm.getUserId(), getCount(Constants.TASK_ID),
+                    getCount(Constants.SHOP_ID), Integer.parseInt(loginResponseRealm.getBrand()),
+                    CURRENT_KEY, String.valueOf(getCount(Constants.RADIUS)), this);
+        }
+    }
+
     private void getCompulsorySteps() {
-        networkUtils.getComplusorySteps(38, new BaseCallbackInterface() {
+        networkUtils.getComplusorySteps(Integer.parseInt(loginResponseRealm.getBrand()), new BaseCallbackInterface() {
             @Override
             public void success(Response response) {
                 CompulsoryStepsResponseModel compulsoryStepsResponseModel = (CompulsoryStepsResponseModel) response.body();
@@ -243,9 +254,9 @@ public class MerchantActivity extends BaseActivity implements View.OnClickListen
 
             progressShow();
 
-            networkUtils.dynamicKeyFiles(8, 8,
-                    8,
-                    8,
+            networkUtils.dynamicKeyFiles(loginResponseRealm.getUserId(),
+                    getCount(Constants.TASK_ID), getCount(Constants.SHOP_ID),
+                    Integer.parseInt(loginResponseRealm.getBrand()),
                     CURRENT_KEY, userImageFile, this);
         }
     }
@@ -258,6 +269,8 @@ public class MerchantActivity extends BaseActivity implements View.OnClickListen
             ratingBar_submitFeedback.setVisibility(View.GONE);
         } else if (CURRENT_KEY == VIEW_INSTRUCTIONS) {
             Toast.makeText(this, "done", Toast.LENGTH_SHORT).show();
+        } else if (CURRENT_KEY == RADIUS) {
+            Toast.makeText(this, "Radius Updated!", Toast.LENGTH_SHORT).show();
         } else {
 
             String currentKey = CURRENT_KEY.substring(0, CURRENT_KEY.length() - 1);

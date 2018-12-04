@@ -1,6 +1,7 @@
 package com.example.arsalansiddiq.beem.utils;
 
 import com.example.arsalansiddiq.beem.models.requestmodels.LoginRequest;
+import com.example.arsalansiddiq.beem.models.requestmodels.merchant.MeetingRequestMerchant;
 import com.example.arsalansiddiq.beem.models.requestmodels.merchant.SKUMerchantRequestModel;
 import com.example.arsalansiddiq.beem.models.responsemodels.AttandanceResponse;
 import com.example.arsalansiddiq.beem.models.responsemodels.LoginResponse;
@@ -22,7 +23,6 @@ import java.util.Map;
 
 import io.reactivex.Observable;
 import okhttp3.MultipartBody;
-import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
@@ -240,6 +240,10 @@ public interface NetworkRequestInterfaces {
     @Multipart
     @POST("merchant/tasks")
     Call<MerchantTaskResponse> getMerchantTasks(@Part("emp_id") int emp_id);
+
+
+    @POST("updateshoplatlong")
+    Call<ResponseSUP> updateShopLatLong(@Body MeetingRequestMerchant meetingRequestMerchant);
 
     @POST("getskucompetition")
     Call<MerchantSKU> getCompetitionSKU (@Query("brand_id") int brand_id);

@@ -41,23 +41,25 @@ import com.example.arsalansiddiq.beem.adapters.MerchantTaskAdapter;
 import com.example.arsalansiddiq.beem.base.BaseActivity;
 import com.example.arsalansiddiq.beem.databases.BeemDatabase;
 import com.example.arsalansiddiq.beem.databases.BeemPreferences;
+import com.example.arsalansiddiq.beem.databases.BeemPreferencesCount;
 import com.example.arsalansiddiq.beem.databases.RealmCRUD;
 import com.example.arsalansiddiq.beem.interfaces.AttandanceInterface;
 import com.example.arsalansiddiq.beem.interfaces.EndAttendanceInterface;
 import com.example.arsalansiddiq.beem.interfaces.MeetingCallBack;
+import com.example.arsalansiddiq.beem.interfaces.merchantcallback.BaseCallbackInterface;
 import com.example.arsalansiddiq.beem.models.databasemodels.MarkAttendance;
 import com.example.arsalansiddiq.beem.models.databasemodels.SalesAndNoSales;
 import com.example.arsalansiddiq.beem.models.databasemodels.meetingsup.MeetingSUPEndTable;
 import com.example.arsalansiddiq.beem.models.databasemodels.meetingsup.MeetingSUPStartTable;
 import com.example.arsalansiddiq.beem.models.databasemodels.meetingsup.MeetingSUPUpdatesTable;
 import com.example.arsalansiddiq.beem.models.requestmodels.StartMeetingRequest;
+import com.example.arsalansiddiq.beem.models.requestmodels.merchant.MeetingRequestMerchant;
 import com.example.arsalansiddiq.beem.models.responsemodels.AttandanceResponse;
 import com.example.arsalansiddiq.beem.models.responsemodels.LoginResponse;
 import com.example.arsalansiddiq.beem.models.responsemodels.MeetingResponseModel;
 import com.example.arsalansiddiq.beem.models.responsemodels.ResponseSUP;
 import com.example.arsalansiddiq.beem.models.responsemodels.babreak.BreakTypeResponseModel;
 import com.example.arsalansiddiq.beem.models.responsemodels.babreak.Status;
-import com.example.arsalansiddiq.beem.models.responsemodels.merchant.competitionsku.DatumMerchant;
 import com.example.arsalansiddiq.beem.models.responsemodels.merchant.merchanttask.Datum;
 import com.example.arsalansiddiq.beem.models.responsemodels.merchant.merchanttask.MerchantTaskResponse;
 import com.example.arsalansiddiq.beem.models.responsemodels.tasksresponsemodels.Task;
@@ -1636,12 +1638,54 @@ public class NavigationDrawerActivity extends BaseActivity
 
     void meetingMerhcant () {
 
+        MeetingRequestMerchant meetingRequestMerchant = new MeetingRequestMerchant();
+        meetingRequestMerchant.setShop_id(datum.getShopId());
         Intent intent = new Intent(NavigationDrawerActivity.this, MerchantActivity.class);
-        startActivity(intent);
-//        if (datum.getLatitude() == 0 || datum.getLongitude() == 0) {
-//
-//        } else {
-//
-//        }
+        if (datum.getLatitude() == 0 || datum.getLongitude() == 0) {
+                meetingRequestMerchant.setLatitude(latitude);
+                meetingRequestMerchant.setLongitude(longitude);
+        } else {
+
+            meetingRequestMerchant.setLatitude(datum.getLatitude());
+            meetingRequestMerchant.setLongitude(datum.getLongitude());
+
+
+        }
+
+        if (networkUtils.isNetworkConnected()) {
+            networkUtils.updateShopLatLong(meetingRequestMerchant, new BaseCallbackInterface() {
+                @Override
+                public void success(Response response) {
+                    BeemPreferencesCount beemPreferencesCount = new BeemPreferencesCount(NavigationDrawerActivity.this);
+                    beemPreferencesCount.putInt(Constants.TASK_ID, datum.getTaskId());
+                    beemPreferencesCount.putInt(Constants.SHOP_ID, datum.getShopId());
+
+                    Location locationFromListener = new Location("");
+                    locationFromListener.setLatitude(latitude);
+                    locationFromListener.setLongitude(longitude);
+
+                    getlocationFromTaskAPI.setLatitude(datum.getLatitude());
+                    getlocationFromTaskAPI.setLongitude(datum.getLongitude());
+
+                    float distanceInMeters = locationFromListener.distanceTo(getlocationFromTaskAPI);
+                    boolean isWithinRadius = distanceInMeters < 150;
+
+                    if (isWithinRadius) {
+                        beemPreferencesCount.putInt(Constants.RADIUS, 1);
+                    } else {
+                        beemPreferencesCount.putInt(Constants.RADIUS, 0);
+                    }
+                    startActivity(intent);
+
+                }
+
+                @Override
+                public void failure(String error) {
+
+                }
+            });
+        } else {
+            alterDialog(true);
+        }
     }
 }
