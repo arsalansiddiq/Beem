@@ -5,10 +5,12 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.arsalansiddiq.beem.R;
 import com.example.arsalansiddiq.beem.adapters.merchant.CustomListAdapterSKUs;
@@ -59,6 +61,9 @@ public class PriceUpdateActivity extends AppCompatActivity implements UpdateCall
         ButterKnife.bind(this);
         ButterKnife.setDebug(true);
 
+        listView_merchant.setDescendantFocusability(ViewGroup.FOCUS_AFTER_DESCENDANTS);
+        listView_merchant.setItemsCanFocus(true);
+
         if (getIntent().getExtras() != null) intent = getIntent();
         tag = intent.getStringExtra("tag");
 
@@ -77,18 +82,28 @@ public class PriceUpdateActivity extends AppCompatActivity implements UpdateCall
         btn_submitMerchant.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                storeRecordsOnServer();
+                getSelectedItemAndPriceToServer();
             }
         });
     }
 
-    private void storeRecordsOnServer() {
-
-
-
-        SKUMerchantRequestModel skuMerchantRequestModel = null;
-        networkUtils.storeSKUPrice(skuMerchantRequestModel, PriceUpdateActivity.this);
-    }
+//    private void storeRecordsOnServer() {
+//
+//
+//
+//        SKUMerchantRequestModel skuMerchantRequestModel = null;
+//        networkUtils.storeSKUPrice(skuMerchantRequestModel, new BaseCallbackInterface() {
+//            @Override
+//            public void success(Response response) {
+//
+//            }
+//
+//            @Override
+//            public void failure(String error) {
+//
+//            }
+//        });
+//    }
 
     @Override
     public void UpdateSuccess(Response response) {
@@ -99,11 +114,15 @@ public class PriceUpdateActivity extends AppCompatActivity implements UpdateCall
                 CustomListAdapterSKUs(PriceUpdateActivity.this, 0,
                 merchantSKUS.getData(), tag);
 
-
         for (int i = 0; i < merchantSKUS.getData().size(); i++) {
             ListViewModelCheckMerchant listViewModelCheckMerchant = new ListViewModelCheckMerchant();
             listViewModelCheckMerchant.setId(merchantSKUS.getData().get(i).getId());
-            listViewModelCheckMerchant.setedtText_priceMerchant("");
+
+            if  (tag.equals("price") || tag.equals("priceCompetition")) {
+                listViewModelCheckMerchant.setedtText_priceMerchant("");
+            } else if (tag.equals("stock")) {
+                listViewModelCheckMerchant.setedtText_stockMerchant("");
+            }
 
             listViewModelCheckMerchantArrayList.add(listViewModelCheckMerchant);
 
@@ -116,7 +135,7 @@ public class PriceUpdateActivity extends AppCompatActivity implements UpdateCall
 
     }
 
-    void getSelectedItemAndPrice() {
+    void getSelectedItemAndPriceToServer() {
 
         int listLength = 0;
 
@@ -138,20 +157,36 @@ public class PriceUpdateActivity extends AppCompatActivity implements UpdateCall
 
                 priceMerchant = null;
 
-                String priceEdtText = listViewModelCheckMerchantArrayList.get(i).getedtText_priceMerchant().toString();
+                String priceStockEdtText = null;
+                if  (tag.equals("price") || tag.equals("priceCompetition")) {
+                    priceStockEdtText = listViewModelCheckMerchantArrayList.get(i).getedtText_priceMerchant().toString();
+                } else if (tag.equals("stock")) {
+                    priceStockEdtText = listViewModelCheckMerchantArrayList.get(i).getedtText_stockMerchant().toString();
+                }
 
-                if (priceEdtText.equals("")) {
+                if (priceStockEdtText.equals("")) {
 
-                } else if (priceEdtText.length() > 0) {
+                } else if (priceStockEdtText.length() > 0) {
 
-                    priceMerchant = Long.valueOf(priceEdtText);
                     skuMerchantRequestModel.setUserId(Long.valueOf(loginResponse.getUserId()));
                     skuMerchantRequestModel.setBrandId(Long.valueOf(loginResponse.getBrand()));
                     skuMerchantRequestModel.setTaskId(Long.valueOf(getCount(Constants.TASK_ID)));
                     skuMerchantRequestModel.setShopId(Long.valueOf(getCount(Constants.SHOP_ID)));
                     skuMerchantRequestModel.setSkuId(Long.valueOf(listViewModelCheckMerchantArrayList.get(i).getId()));
-                    skuMerchantRequestModel.setPrice(priceMerchant);
-                    skuMerchantRequestModel.setCompetition(Long.valueOf(0));
+
+                    if  (tag.equals("price") || tag.equals("priceCompetition")) {
+                        priceMerchant = Long.valueOf(priceStockEdtText);
+                        skuMerchantRequestModel.setPrice(priceMerchant);
+                    } else if (tag.equals("stock")) {
+                        priceMerchant = Long.valueOf(priceStockEdtText);
+                        skuMerchantRequestModel.setStock(priceMerchant);
+                    }
+
+                    if  (tag.equals("priceCompetition")) {
+                        skuMerchantRequestModel.setCompetition(Long.valueOf(1));
+                    } else {
+                        skuMerchantRequestModel.setCompetition(Long.valueOf(0));
+                    }
 
                     skuMerchantRequestModelArrayList.add(skuMerchantRequestModel);
 
@@ -175,7 +210,14 @@ public class PriceUpdateActivity extends AppCompatActivity implements UpdateCall
                             }
                         });
                     }
+
+                    int k = j + 1;
+                    if (k == skuMerchantRequestModelArrayList.size()) {
+                        finish();
+                    }
                 }
+            } else {
+                Toast.makeText(this, "please enter some quantity!", Toast.LENGTH_SHORT).show();
             }
         }
     }

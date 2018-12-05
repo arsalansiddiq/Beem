@@ -252,6 +252,6 @@ public interface NetworkRequestInterfaces {
     Call<MerchantSKU> getMerchantSKU (@Query("brand_id") int brand_id);
 
     @POST("storeskuresponse")
-    Call<MerchantTaskResponse> storeSKUPrice (@Body SKUMerchantRequestModel skuMerchantRequestModel);
+    Call<ResponseSUP> storeSKUPrice (@Body SKUMerchantRequestModel skuMerchantRequestModel);
 
 }

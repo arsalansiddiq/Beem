@@ -527,9 +527,9 @@ public class NetworkUtils {
         networkRequestInterfaces.updateShopLatLong(meetingRequestMerchant).enqueue(new Callback<ResponseSUP>() {
             @Override
             public void onResponse(Call<ResponseSUP> call, Response<ResponseSUP> response) {
-                if (response.body().getStatus() == 1) {
+//                if (response.body().getStatus() == 1) {
                    baseCallbackInterface.success(response);
-                }
+//                }
             }
 
             @Override
@@ -548,16 +548,16 @@ public class NetworkUtils {
     }
 
     public void storeSKUPrice(SKUMerchantRequestModel skuMerchantRequestModel, BaseCallbackInterface baseCallbackInterface) {
-        networkRequestInterfaces.storeSKUPrice(skuMerchantRequestModel).enqueue(new Callback<MerchantTaskResponse>() {
+        networkRequestInterfaces.storeSKUPrice(skuMerchantRequestModel).enqueue(new Callback<ResponseSUP>() {
             @Override
-            public void onResponse(Call<MerchantTaskResponse> call, Response<MerchantTaskResponse> response) {
+            public void onResponse(Call<ResponseSUP> call, Response<ResponseSUP> response) {
                 if (response.body().getStatus() == 1) {
                     baseCallbackInterface.success(response);
                 }
             }
 
             @Override
-            public void onFailure(Call<MerchantTaskResponse> call, Throwable t) {
+            public void onFailure(Call<ResponseSUP> call, Throwable t) {
                 baseCallbackInterface.failure(t.getLocalizedMessage());
             }
         });

@@ -334,6 +334,8 @@ public class NavigationDrawerActivity extends BaseActivity
 
             startService(new Intent(NavigationDrawerActivity.this, BreakService.class));
         } else if (loginResponseRealm.getuT().equals("MCD")) {
+            fab_menu_supervisor.setVisibility(View.GONE);
+            fab_menu_ba.setVisibility(View.GONE);
             listView_taskNav.setVisibility(View.VISIBLE);
             constraintLayout_NavigationBeemLogo.setBackground(null);
             navigationDrawerPresenter.getMerchantTasks("GetMerchantTasks", loginResponseRealm.getUserId());
@@ -350,6 +352,8 @@ public class NavigationDrawerActivity extends BaseActivity
             txtView_minutes.setVisibility(View.VISIBLE);
             txtView_seconds.setVisibility(View.VISIBLE);
         }
+
+        getlocationFromTaskAPI = new Location("");
 
     }
 
@@ -381,7 +385,6 @@ public class NavigationDrawerActivity extends BaseActivity
                         if (taskList != null) {
 
                             for (int i = 0; i < taskList.size(); i++) {
-                                getlocationFromTaskAPI = new Location("");
                                 getlocationFromTaskAPI.setLatitude(taskList.get(i).getShopLat());
                                 getlocationFromTaskAPI.setLongitude(taskList.get(i).getShopLng());
 
@@ -1632,7 +1635,7 @@ public class NavigationDrawerActivity extends BaseActivity
 
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-        datum = (Datum) adapterView.getItemAtPosition(position);
+        datum = datumMerchantList.get(position);
             getLocation(null);
     }
 

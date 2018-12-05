@@ -92,7 +92,8 @@
             android:theme="@style/AppTheme.NoActionBar1" />
         <activity android:name=".activities.StockUpdateActivity" />
         <activity android:name=".activities.PriceUpdateActivity"
-            android:theme="@style/AppTheme.NoActionBar1"></activity>
+            android:theme="@style/AppTheme.NoActionBar1"
+            android:windowSoftInputMode="adjustPan" ></activity>
     </application>
 
 </manifest>

@@ -64,6 +64,11 @@ public class MerchantActivity extends BaseActivity implements View.OnClickListen
     @BindView(R.id.ratingBar_submitFeedback)
     RatingBar ratingBar_submitFeedback;
 
+    @BindView(R.id.btn_updateCompetitiopnPrices)
+    Button btn_updateCompetitiopnPrices;
+
+    Intent startActivityPriceStock;
+
     int i = 0;
 
     @Override
@@ -78,6 +83,7 @@ public class MerchantActivity extends BaseActivity implements View.OnClickListen
         appUtils = new AppUtils(this);
         realmCRUD = new RealmCRUD(this);
         loginResponseRealm = realmCRUD.getLoginInformationDetails();
+        startActivityPriceStock = new Intent(MerchantActivity.this, PriceUpdateActivity.class);
 
         beemPreferences = new BeemPreferences(this);
         beemPreferencesCount = new BeemPreferencesCount(this);
@@ -111,6 +117,7 @@ public class MerchantActivity extends BaseActivity implements View.OnClickListen
         btn_updateStockPrices.setOnClickListener(this);
         btn_surveyFormQuestions.setOnClickListener(this);
         btn_endPicture.setOnClickListener(this);
+        btn_updateCompetitiopnPrices.setOnClickListener(this);
 
         ratingBar_submitFeedback.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
             @Override
@@ -202,6 +209,7 @@ public class MerchantActivity extends BaseActivity implements View.OnClickListen
                 i = getCount(Constants.TAKE_END_PICTURE);
                 if (i >= 3) {
                     Toast.makeText(this, "Limit Exceeded", Toast.LENGTH_SHORT).show();
+                    finish();
                 } else {
                     i = i + 1;
                     CURRENT_KEY = END_PIC_COUNT + "1";
@@ -228,9 +236,18 @@ public class MerchantActivity extends BaseActivity implements View.OnClickListen
                 break;
 
             case R.id.btn_updateStockPrices:
-                Intent intent2 = new Intent(MerchantActivity.this, PriceUpdateActivity.class);
-                intent2.putExtra("tag", "price");
-                startActivity(intent2);
+                startActivityPriceStock.putExtra("tag", "price");
+                startActivity(startActivityPriceStock);
+                break;
+
+            case R.id.btn_updateStocks:
+                startActivityPriceStock.putExtra("tag", "stock");
+                startActivity(startActivityPriceStock);
+                break;
+
+            case R.id.btn_updateCompetitiopnPrices:
+                startActivityPriceStock.putExtra("tag", "priceCompetition");
+                startActivity(startActivityPriceStock);
                 break;
 
         }

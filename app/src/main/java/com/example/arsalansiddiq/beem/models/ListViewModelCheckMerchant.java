@@ -26,7 +26,7 @@ public class ListViewModelCheckMerchant {
         return edtText_stockMerchant;
     }
 
-    public void setEditTextView_carton(String edtText_stockMerchant) {
+    public void setedtText_stockMerchant(String edtText_stockMerchant) {
         this.edtText_stockMerchant = edtText_stockMerchant;
     }
 

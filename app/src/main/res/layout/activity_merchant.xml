@@ -10,7 +10,8 @@
     <ScrollView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="10dp">
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp">
     <LinearLayout
         android:layout_height="wrap_content"
         android:layout_width="350dp"
@@ -113,6 +114,17 @@
             android:layout_margin="8dp"
             android:textStyle="bold|italic"
             android:text="Update Stock Prices" />
+
+        <Button
+            android:id="@+id/btn_updateCompetitiopnPrices"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorBlue"
+            android:textColor="@color/white_color"
+            android:textSize="20sp"
+            android:layout_margin="8dp"
+            android:textStyle="bold|italic"
+            android:text="Update Competition Price" />
 
         <Button
             android:id="@+id/btn_surveyFormQuestions"

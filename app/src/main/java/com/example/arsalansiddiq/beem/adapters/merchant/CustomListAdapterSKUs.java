@@ -74,11 +74,11 @@ public class CustomListAdapterSKUs extends ArrayAdapter<DatumMerchant> {
 
         if (convertView == null) {
             LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
             listViewHolderMerchant = new ListViewHolderMerchant();
 
             convertView = layoutInflater.from(getContext()).inflate(R.layout.list_child_merchant_skus, parent, false);
             listViewHolderMerchant.imgView_brandImageMerchant = convertView.findViewById(R.id.imgView_brandImageMerchant);
+            listViewHolderMerchant.txtView_nameMerchant = convertView.findViewById(R.id.txtView_nameMerchant);
 
             listViewHolderMerchant.txtView_priceMerchant = convertView.findViewById(R.id.txtView_priceMerchant);
             listViewHolderMerchant.edtText_priceMerchant = convertView.findViewById(R.id.edtText_priceMerchant);
@@ -86,34 +86,37 @@ public class CustomListAdapterSKUs extends ArrayAdapter<DatumMerchant> {
             listViewHolderMerchant.txtView_stockMerchant = convertView.findViewById(R.id.txtView_stockMerchant);
             listViewHolderMerchant.edtText_stockMerchant = convertView.findViewById(R.id.edtText_stockMerchant);
 
-            if (tag.equals("price")) {
+            if (tag.equals("price") || tag.equals("priceCompetition")) {
                 listViewHolderMerchant.txtView_stockMerchant.setVisibility(View.GONE);
                 listViewHolderMerchant.edtText_stockMerchant.setVisibility(View.GONE);
-            } else {
+            } else if (tag.equals("stock")){
                 listViewHolderMerchant.txtView_priceMerchant.setVisibility(View.GONE);
                 listViewHolderMerchant.edtText_priceMerchant.setVisibility(View.GONE);
             }
 
             convertView.setTag(listViewHolderMerchant);
         } else {
-            listViewHolderMerchant = (CustomListAdapterSKUs.ListViewHolderMerchant) convertView.getTag();
+            listViewHolderMerchant = (ListViewHolderMerchant) convertView.getTag();
         }
 
         listViewHolderMerchant.edtText_priceMerchant.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                for (int j = 0; j < PriceUpdateActivity.listViewModelCheckMerchantArrayList.size(); j++) {
-                    int localId = PriceUpdateActivity.listViewModelCheckMerchantArrayList.get(j).getId();
-                    int serverId = datum.getId();
-                    if (localId == serverId) {
-                        Log.i("Id Comparison: ", PriceUpdateActivity.listViewModelCheckMerchantArrayList.get(j).getId() + " " +datum.getId());
-                        PriceUpdateActivity.listViewModelCheckMerchantArrayList.get(j).setedtText_priceMerchant(listViewHolderMerchant.edtText_priceMerchant.getText().toString());
-                    }
-                }
+
             }
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                Log.i("dataEdit", listViewHolderMerchant.edtText_priceMerchant.getText().toString());
+
+                for (int j = 0; j < PriceUpdateActivity.listViewModelCheckMerchantArrayList.size(); j++) {
+                    int localId = PriceUpdateActivity.listViewModelCheckMerchantArrayList.get(j).getId();
+                    int serverId = datum.getId();
+                    if (localId == serverId) {
+                        Log.i("Id Comparison: ", listViewHolderMerchant.edtText_priceMerchant.getText() + " " +PriceUpdateActivity.listViewModelCheckMerchantArrayList.get(j).getId() + " " +datum.getId());
+                        PriceUpdateActivity.listViewModelCheckMerchantArrayList.get(j).setedtText_priceMerchant(listViewHolderMerchant.edtText_priceMerchant.getText().toString());
+                    }
+                }
             }
 
             @Override
@@ -130,7 +133,17 @@ public class CustomListAdapterSKUs extends ArrayAdapter<DatumMerchant> {
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                Log.i("dataEditStock", listViewHolderMerchant.edtText_priceMerchant.getText().toString());
 
+                for (int j = 0; j < PriceUpdateActivity.listViewModelCheckMerchantArrayList.size(); j++) {
+                    int localId = PriceUpdateActivity.listViewModelCheckMerchantArrayList.get(j).getId();
+                    int serverId = datum.getId();
+                    if (localId == serverId) {
+                        Log.i("Id Comparison: ", listViewHolderMerchant.edtText_priceMerchant.getText() + " " +PriceUpdateActivity.listViewModelCheckMerchantArrayList.get(j).getId() + " " +datum.getId());
+                        PriceUpdateActivity.listViewModelCheckMerchantArrayList.get(j).setedtText_stockMerchant(listViewHolderMerchant.edtText_stockMerchant.getText().toString());
+
+                    }
+                }
             }
 
             @Override
@@ -140,12 +153,13 @@ public class CustomListAdapterSKUs extends ArrayAdapter<DatumMerchant> {
         });
 
         Picasso.get().load(datum.getSKUImage()).into(listViewHolderMerchant.imgView_brandImageMerchant);
+        listViewHolderMerchant.txtView_nameMerchant.setText(datum.getName().toString());
 
         return convertView;
     }
 
     static class ListViewHolderMerchant {
-        TextView txtView_priceMerchant, txtView_stockMerchant;
+        TextView txtView_nameMerchant, txtView_priceMerchant, txtView_stockMerchant;
         ImageView imgView_brandImageMerchant;
         EditText edtText_priceMerchant, edtText_stockMerchant;
     }
