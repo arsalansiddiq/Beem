@@ -282,21 +282,20 @@ public class NavigationDrawerActivity extends BaseActivity
         SharedPreferences preferences = this.getSharedPreferences(Constants.ATTENDANCE_STATUS, MODE_PRIVATE);
         int id = preferences.getInt(Constants.KEY_ATTENDANCE_STATUS, 0);
 
-        if (loginResponseRealm.getuT().toLowerCase().equals("sup")) {
+        SharedPreferences preferencesMeetingSupervisor = this.getSharedPreferences(Constants.SUPERVISOR_MEETING_STATUS, MODE_PRIVATE);
+        boolean meetingStatusSupervisor = preferencesMeetingSupervisor.getBoolean(Constants.KEY_SUPERVISOR_MEETING_STATUS, false);
 
-            SharedPreferences preferencesMeeting = this.getSharedPreferences(Constants.SUPERVISOR_MEETING_STATUS, MODE_PRIVATE);
-            boolean meetingStatus = preferencesMeeting.getBoolean(Constants.KEY_SUPERVISOR_MEETING_STATUS, false);
+        if (loginResponseRealm.getuT().toLowerCase().equals("sup")) {
 
             fab_menu_supervisor.setVisibility(View.VISIBLE);
 
-
-            if (id == 1 && meetingStatus) {
+            if (id == 1 && meetingStatusSupervisor) {
                 fabViewVisibility.fabMarkAttendance(false);
                 fabViewVisibility.fabEndAttendance(false);
                 fabViewVisibility.fabStartMeeting(false);
                 fabViewVisibility.fabEndMeeting(true);
                 fabViewVisibility.fabsAfterStartMeeting(true);
-            } else if (id == 1 && !meetingStatus) {
+            } else if (id == 1 && !meetingStatusSupervisor) {
                 fabViewVisibility.fabMarkAttendance(false);
                 fabViewVisibility.fabEndAttendance(true);
                 fabViewVisibility.fabStartMeeting(true);
@@ -334,13 +333,22 @@ public class NavigationDrawerActivity extends BaseActivity
 
             startService(new Intent(NavigationDrawerActivity.this, BreakService.class));
         } else if (loginResponseRealm.getuT().equals("MCD")) {
-            fab_menu_supervisor.setVisibility(View.GONE);
+
+            fab_menu_supervisor.setVisibility(View.VISIBLE);
             fab_menu_ba.setVisibility(View.GONE);
+            fabViewVisibility.fabMerchant();
+
+            if (id == 1) {
+                fabViewVisibility.fabMerchantAttendance(true);
+            } else if (id == 0) {
+                fabViewVisibility.fabMerchantAttendance(false);
+            }
+
             listView_taskNav.setVisibility(View.VISIBLE);
             constraintLayout_NavigationBeemLogo.setBackground(null);
             navigationDrawerPresenter.getMerchantTasks("GetMerchantTasks", loginResponseRealm.getUserId());
-        }
 
+        }
 
         SharedPreferences preferencesMeeting = this.getSharedPreferences(Constants.BREAK_STATUS, MODE_PRIVATE);
         int breakStatus = preferencesMeeting.getInt(Constants.KEY_BREAK_STATUS, 0);
@@ -942,8 +950,12 @@ public class NavigationDrawerActivity extends BaseActivity
 
             case R.id.fab_menu_startMeeting_supervisor:
 
-                meetingTag = "StartMeeting";
-                meetingConfirmationDialog(true);
+                if (loginResponseRealm.getuT().equals("MCD")) {
+                    getLocation(null);
+                } else {
+                    meetingTag = "StartMeeting";
+                    meetingConfirmationDialog(true);
+                }
 
                 break;
             case R.id.fab_menu_endMeeting_supervisor:
@@ -1096,7 +1108,6 @@ public class NavigationDrawerActivity extends BaseActivity
     }
 
     void attendanceSupervisor() {
-
 
         if (latitude == 0 && longitude == 0) {
             Toast.makeText(this, "Unable to get location, is your location on?", Toast.LENGTH_SHORT).show();
@@ -1639,10 +1650,13 @@ public class NavigationDrawerActivity extends BaseActivity
             getLocation(null);
     }
 
-    void meetingMerhcant () {
+    void  meetingMerhcant () {
 
         MeetingRequestMerchant meetingRequestMerchant = new MeetingRequestMerchant();
-        meetingRequestMerchant.setShop_id(datum.getShopId());
+        if (datum == null) {
+        } else {
+            meetingRequestMerchant.setShop_id(datum.getShopId());
+        }
         Intent intent = new Intent(NavigationDrawerActivity.this, MerchantActivity.class);
         if (datum.getLatitude() == 0 || datum.getLongitude() == 0) {
                 meetingRequestMerchant.setLatitude(latitude);
@@ -1651,7 +1665,6 @@ public class NavigationDrawerActivity extends BaseActivity
 
             meetingRequestMerchant.setLatitude(datum.getLatitude());
             meetingRequestMerchant.setLongitude(datum.getLongitude());
-
 
         }
 

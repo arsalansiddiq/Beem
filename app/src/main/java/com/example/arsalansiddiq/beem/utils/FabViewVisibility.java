@@ -73,4 +73,24 @@ public class FabViewVisibility {
     public void fabAfterEndMeeting(boolean status) {
     }
 
+    public void fabMerchant() {
+
+        fab_menu_addShop_supervisor.setVisibility(View.GONE);
+        fab_menu_endMeeting_supervisor.setVisibility(View.GONE);
+        fab_menu_takePictures_supervisor.setVisibility(View.GONE);
+        fab_menu_addNotes_supervisor.setVisibility(View.GONE);
+
+    }
+
+    public void fabMerchantAttendance(boolean status) {
+        if (status) {
+            fab_menu_markAttendance_supervisor.setVisibility(View.GONE);
+            fab_menu_endAttendance_supervisor.setVisibility(View.VISIBLE);
+            fab_menu_startMeeting_supervisor.setVisibility(View.VISIBLE);
+        } else {
+            fab_menu_markAttendance_supervisor.setVisibility(View.VISIBLE);
+            fab_menu_endAttendance_supervisor.setVisibility(View.GONE);
+            fab_menu_startMeeting_supervisor.setVisibility(View.GONE);
+        }
+    }
 }
