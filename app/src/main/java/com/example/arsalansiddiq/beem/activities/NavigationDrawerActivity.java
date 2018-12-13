@@ -1653,20 +1653,26 @@ public class NavigationDrawerActivity extends BaseActivity
     void  meetingMerhcant () {
 
         MeetingRequestMerchant meetingRequestMerchant = new MeetingRequestMerchant();
-        if (datum == null) {
-        } else {
+        if (datum != null) {
             meetingRequestMerchant.setShop_id(datum.getShopId());
-        }
-        Intent intent = new Intent(NavigationDrawerActivity.this, MerchantActivity.class);
-        if (datum.getLatitude() == 0 || datum.getLongitude() == 0) {
+
+            if (datum.getLatitude() == 0 || datum.getLongitude() == 0) {
                 meetingRequestMerchant.setLatitude(latitude);
                 meetingRequestMerchant.setLongitude(longitude);
+            } else {
+
+                meetingRequestMerchant.setLatitude(datum.getLatitude());
+                meetingRequestMerchant.setLongitude(datum.getLongitude());
+
+            }
+
         } else {
-
-            meetingRequestMerchant.setLatitude(datum.getLatitude());
-            meetingRequestMerchant.setLongitude(datum.getLongitude());
-
+            meetingRequestMerchant.setLatitude(latitude);
+            meetingRequestMerchant.setLongitude(longitude);
         }
+
+        Intent intent = new Intent(NavigationDrawerActivity.this, MerchantActivity.class);
+
 
         if (networkUtils.isNetworkConnected()) {
             networkUtils.updateShopLatLong(meetingRequestMerchant, new BaseCallbackInterface() {

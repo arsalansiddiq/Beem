@@ -82,7 +82,7 @@ public class LocationProvider extends LocationCallback {
             task.addOnSuccessListener(new OnSuccessListener<LocationSettingsResponse>() {
                 @Override
                 public void onSuccess(LocationSettingsResponse locationSettingsResponse) {
-                    Log.i(LOG_TAG, "SettingsSatisfied!");
+                    Log.i(LOG_TAG, "SettingsSatisfied!" + locationSettingsResponse.getLocationSettingsStates());
                     startLocationUpdates();
                 }
             });
