@@ -123,6 +123,7 @@ public class NavigationDrawerActivity extends BaseActivity
     private int meetingStatus = 0;
     private String callTag;
     private BeemPreferences beemPreferences;
+    BeemPreferencesCount beemPreferencesCount;
 
     //MVP
     private NavigationDrawerContractorSUP.NavigationDrawerPresenter navigationDrawerPresenter;
@@ -200,6 +201,8 @@ public class NavigationDrawerActivity extends BaseActivity
         };
 
         initProgressBar();
+
+        beemPreferencesCount = new BeemPreferencesCount(NavigationDrawerActivity.this);
 
         pictureNotesCount = getSharedPreferences(Constants.PICTURE_COUNT, MODE_PRIVATE);
         count = pictureNotesCount.getInt(Constants.KEY_PICTURE_COUNT, 0);
@@ -952,6 +955,7 @@ public class NavigationDrawerActivity extends BaseActivity
 
                 if (loginResponseRealm.getuT().equals("MCD")) {
                     getLocation(null);
+                    beemPreferencesCount.putBoolean(Constants.RANDOM_TASK, true);
                 } else {
                     meetingTag = "StartMeeting";
                     meetingConfirmationDialog(true);
@@ -1673,30 +1677,35 @@ public class NavigationDrawerActivity extends BaseActivity
 
         Intent intent = new Intent(NavigationDrawerActivity.this, MerchantActivity.class);
 
-
         if (networkUtils.isNetworkConnected()) {
             networkUtils.updateShopLatLong(meetingRequestMerchant, new BaseCallbackInterface() {
                 @Override
                 public void success(Response response) {
-                    BeemPreferencesCount beemPreferencesCount = new BeemPreferencesCount(NavigationDrawerActivity.this);
-                    beemPreferencesCount.putInt(Constants.TASK_ID, datum.getTaskId());
-                    beemPreferencesCount.putInt(Constants.SHOP_ID, datum.getShopId());
 
-                    Location locationFromListener = new Location("");
-                    locationFromListener.setLatitude(latitude);
-                    locationFromListener.setLongitude(longitude);
+                    SharedPreferences prefs = getSharedPreferences(Constants.BEEM_PREFERENCE_COUNT, MODE_PRIVATE);
+                    boolean isStatus = prefs.getBoolean(Constants.RANDOM_TASK, false);
 
-                    getlocationFromTaskAPI.setLatitude(datum.getLatitude());
-                    getlocationFromTaskAPI.setLongitude(datum.getLongitude());
+                    if (!isStatus) {
+                        beemPreferencesCount.putInt(Constants.TASK_ID, datum.getTaskId());
+                        beemPreferencesCount.putInt(Constants.SHOP_ID, datum.getShopId());
 
-                    float distanceInMeters = locationFromListener.distanceTo(getlocationFromTaskAPI);
-                    boolean isWithinRadius = distanceInMeters < 150;
+                        Location locationFromListener = new Location("");
+                        locationFromListener.setLatitude(latitude);
+                        locationFromListener.setLongitude(longitude);
 
-                    if (isWithinRadius) {
-                        beemPreferencesCount.putInt(Constants.RADIUS, 1);
-                    } else {
-                        beemPreferencesCount.putInt(Constants.RADIUS, 0);
+                        getlocationFromTaskAPI.setLatitude(datum.getLatitude());
+                        getlocationFromTaskAPI.setLongitude(datum.getLongitude());
+
+                        float distanceInMeters = locationFromListener.distanceTo(getlocationFromTaskAPI);
+                        boolean isWithinRadius = distanceInMeters < 150;
+
+                        if (isWithinRadius) {
+                            beemPreferencesCount.putInt(Constants.RADIUS, 1);
+                        } else {
+                            beemPreferencesCount.putInt(Constants.RADIUS, 0);
+                        }
                     }
+
                     startActivity(intent);
 
                 }

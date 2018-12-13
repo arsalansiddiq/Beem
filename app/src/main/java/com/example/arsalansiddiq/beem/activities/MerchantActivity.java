@@ -137,9 +137,15 @@ public class MerchantActivity extends BaseActivity implements View.OnClickListen
     private void setRadius() {
         if (networkUtils.isNetworkConnected()) {
             CURRENT_KEY = RADIUS;
-            networkUtils.dynamicKeyValue(loginResponseRealm.getUserId(), getCount(Constants.TASK_ID),
-                    getCount(Constants.SHOP_ID), Integer.parseInt(loginResponseRealm.getBrand()),
-                    CURRENT_KEY, String.valueOf(getCount(Constants.RADIUS)), this);
+            if (getRandomTaskStatus()) {
+                networkUtils.dynamicKeyValue(loginResponseRealm.getUserId(), Integer.parseInt(""),
+                        getCount(Constants.SHOP_ID), Integer.parseInt(loginResponseRealm.getBrand()),
+                        CURRENT_KEY, String.valueOf(getCount(Constants.RADIUS)), this);
+            } else {
+                networkUtils.dynamicKeyValue(loginResponseRealm.getUserId(), getCount(Constants.TASK_ID),
+                        getCount(Constants.SHOP_ID), Integer.parseInt(loginResponseRealm.getBrand()),
+                        CURRENT_KEY, String.valueOf(getCount(Constants.RADIUS)), this);
+            }
         }
     }
 
@@ -380,6 +386,12 @@ public class MerchantActivity extends BaseActivity implements View.OnClickListen
         SharedPreferences prefs = getSharedPreferences(Constants.BEEM_PREFERENCE_COUNT, MODE_PRIVATE);
         int coutn = prefs.getInt(key, 0);
         return coutn;
+    }
+
+    boolean getRandomTaskStatus () {
+        SharedPreferences prefs = getSharedPreferences(Constants.BEEM_PREFERENCE_COUNT, MODE_PRIVATE);
+        boolean isStatus = prefs.getBoolean(Constants.RANDOM_TASK, false);
+        return isStatus;
     }
 
     @Override

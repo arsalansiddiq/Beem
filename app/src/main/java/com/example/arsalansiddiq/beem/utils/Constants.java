@@ -77,6 +77,7 @@ public class Constants {
     public static final String TASK_ID = "taskId";
     public static final String SHOP_ID = "shopId";
     public static final String RADIUS = "radius";
+    public static final String RANDOM_TASK = "randomTask";
 
 
 }
