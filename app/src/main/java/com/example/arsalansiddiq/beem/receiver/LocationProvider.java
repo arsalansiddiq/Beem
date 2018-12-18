@@ -97,6 +97,8 @@ public class LocationProvider extends LocationCallback {
                     } else if (context.getClass().getSimpleName().equals("LoginActivity")) {
                         ((LoginActivity)context).alertLocation();
                     }
+
+                    Toast.makeText(context, "Please check your location permission!", Toast.LENGTH_SHORT).show();
                 }
             });
         }

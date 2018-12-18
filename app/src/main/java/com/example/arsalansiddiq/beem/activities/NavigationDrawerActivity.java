@@ -1657,9 +1657,31 @@ public class NavigationDrawerActivity extends BaseActivity
     void  meetingMerhcant () {
 
         MeetingRequestMerchant meetingRequestMerchant = new MeetingRequestMerchant();
-        if (datum != null) {
-            meetingRequestMerchant.setShop_id(datum.getShopId());
 
+        SharedPreferences prefs = getSharedPreferences(Constants.BEEM_PREFERENCE_COUNT, MODE_PRIVATE);
+        boolean isStatus = prefs.getBoolean(Constants.RANDOM_TASK, false);
+
+        if (isStatus){
+            meetingRequestMerchant.setUser_id(loginResponseRealm.getUserId());
+            meetingRequestMerchant.setBrand_id(Integer.valueOf(loginResponseRealm.getBrand()));
+            meetingRequestMerchant.setLatitude(latitude);
+            meetingRequestMerchant.setLongitude(longitude);
+
+            networkUtils.storeMerchantTaskResponse(meetingRequestMerchant, new BaseCallbackInterface() {
+                @Override
+                public void success(Response response) {
+                    startActivity(new Intent(NavigationDrawerActivity.this, MerchantActivity.class));
+                }
+
+                @Override
+                public void failure(String error) {
+                    Toast.makeText(NavigationDrawerActivity.this, error, Toast.LENGTH_SHORT).show();
+                }
+            });
+
+        } else {
+            meetingRequestMerchant.setShop_id(datum.getShopId());
+            Intent intent = new Intent(NavigationDrawerActivity.this, MerchantActivity.class);
             if (datum.getLatitude() == 0 || datum.getLongitude() == 0) {
                 meetingRequestMerchant.setLatitude(latitude);
                 meetingRequestMerchant.setLongitude(longitude);
@@ -1668,24 +1690,14 @@ public class NavigationDrawerActivity extends BaseActivity
                 meetingRequestMerchant.setLatitude(datum.getLatitude());
                 meetingRequestMerchant.setLongitude(datum.getLongitude());
 
+
             }
 
-        } else {
-            meetingRequestMerchant.setLatitude(latitude);
-            meetingRequestMerchant.setLongitude(longitude);
-        }
-
-        Intent intent = new Intent(NavigationDrawerActivity.this, MerchantActivity.class);
-
-        if (networkUtils.isNetworkConnected()) {
-            networkUtils.updateShopLatLong(meetingRequestMerchant, new BaseCallbackInterface() {
-                @Override
-                public void success(Response response) {
-
-                    SharedPreferences prefs = getSharedPreferences(Constants.BEEM_PREFERENCE_COUNT, MODE_PRIVATE);
-                    boolean isStatus = prefs.getBoolean(Constants.RANDOM_TASK, false);
-
-                    if (!isStatus) {
+            if (networkUtils.isNetworkConnected()) {
+                networkUtils.updateShopLatLong(meetingRequestMerchant, new BaseCallbackInterface() {
+                    @Override
+                    public void success(Response response) {
+                        BeemPreferencesCount beemPreferencesCount = new BeemPreferencesCount(NavigationDrawerActivity.this);
                         beemPreferencesCount.putInt(Constants.TASK_ID, datum.getTaskId());
                         beemPreferencesCount.putInt(Constants.SHOP_ID, datum.getShopId());
 
@@ -1704,19 +1716,18 @@ public class NavigationDrawerActivity extends BaseActivity
                         } else {
                             beemPreferencesCount.putInt(Constants.RADIUS, 0);
                         }
+                        startActivity(intent);
+
                     }
 
-                    startActivity(intent);
+                    @Override
+                    public void failure(String error) {
 
-                }
-
-                @Override
-                public void failure(String error) {
-
-                }
-            });
-        } else {
-            alterDialog(true);
+                    }
+                });
+            } else {
+                alterDialog(true);
+            }
         }
     }
 }

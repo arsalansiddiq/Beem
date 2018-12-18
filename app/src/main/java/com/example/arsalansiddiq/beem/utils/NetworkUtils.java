@@ -481,7 +481,8 @@ public class NetworkUtils {
         });
     }
 
-    public void dynamicKeyValue(int user_id, int task_id, int shop_id, int brand_id, String key, String value, UpdateCallback updateCallback) {
+    public void dynamicKeyValue(int user_id, int task_id, int shop_id, int brand_id,
+                                String key, String value, UpdateCallback updateCallback) {
 
         Map<String, String> mapParams = new HashMap<>();
         mapParams.put(key, value);
@@ -561,5 +562,27 @@ public class NetworkUtils {
                 baseCallbackInterface.failure(t.getLocalizedMessage());
             }
         });
+    }
+
+    public void storeMerchantTaskResponse(MeetingRequestMerchant meetingRequestMerchant,
+                                          final BaseCallbackInterface baseCallbackInterface) {
+        networkRequestInterfaces.storeMerchantTaskResponse(meetingRequestMerchant)
+                .enqueue(new Callback<MerchantTaskResponse>() {
+                    @Override
+                    public void onResponse(Call<MerchantTaskResponse> call, Response<MerchantTaskResponse> response) {
+                        if (response.isSuccessful()) {
+                            if (response.body().getStatus() == 1) {
+                                baseCallbackInterface.success(response);
+                            } else {
+                                baseCallbackInterface.failure("Something Went Worng!");
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<MerchantTaskResponse> call, Throwable t) {
+                        baseCallbackInterface.failure(t.getLocalizedMessage());
+                    }
+                });
     }
 }

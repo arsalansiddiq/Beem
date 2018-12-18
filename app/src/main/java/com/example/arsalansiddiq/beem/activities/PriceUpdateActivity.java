@@ -170,8 +170,14 @@ public class PriceUpdateActivity extends AppCompatActivity implements UpdateCall
 
                     skuMerchantRequestModel.setUserId(Long.valueOf(loginResponse.getUserId()));
                     skuMerchantRequestModel.setBrandId(Long.valueOf(loginResponse.getBrand()));
-                    skuMerchantRequestModel.setTaskId(Long.valueOf(getCount(Constants.TASK_ID)));
-                    skuMerchantRequestModel.setShopId(Long.valueOf(getCount(Constants.SHOP_ID)));
+
+                    if (getRandomTaskStatus()) {
+                        skuMerchantRequestModel.setTaskId(Long.valueOf(getCount(Constants.TASK_ID)));
+                        skuMerchantRequestModel.setShopId(Long.valueOf(getCount(Constants.SHOP_ID)));
+                    } else {
+                        skuMerchantRequestModel.setTaskId(Long.valueOf(0));
+                        skuMerchantRequestModel.setShopId(Long.valueOf(0));
+                    }
                     skuMerchantRequestModel.setSkuId(Long.valueOf(listViewModelCheckMerchantArrayList.get(i).getId()));
 
                     if  (tag.equals("price") || tag.equals("priceCompetition")) {
@@ -227,4 +233,10 @@ public class PriceUpdateActivity extends AppCompatActivity implements UpdateCall
             int coutn = prefs.getInt(key, 0);
             return coutn;
         }
+
+    boolean getRandomTaskStatus () {
+        SharedPreferences prefs = getSharedPreferences(Constants.BEEM_PREFERENCE_COUNT, MODE_PRIVATE);
+        boolean isStatus = prefs.getBoolean(Constants.RANDOM_TASK, false);
+        return isStatus;
+    }
 }

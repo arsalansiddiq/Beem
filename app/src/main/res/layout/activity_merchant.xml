@@ -1,59 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:padding="15dp"
-    android:orientation="vertical"
+    android:layout_height="wrap_content"
+    android:fillViewport="true"
+    android:padding="10dp"
     tools:context="com.example.arsalansiddiq.beem.activities.MerchantActivity">
-
-    <ScrollView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:paddingTop="10dp"
-        android:paddingBottom="10dp">
 
     <LinearLayout
         android:layout_height="wrap_content"
-        android:layout_width="350dp"
-        android:layout_gravity="center"
-        android:scrollbars="horizontal"
+        android:layout_width="match_parent"
+        android:gravity="center"
         android:orientation="vertical">
 
-        <TextView
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:layout_margin="8dp"
-            android:text="Follow these steps to complete your task"/>
+    <TextView
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_margin="5dp"
+        android:layout_gravity="left"
+        android:text="Follow these steps to complete your task"/>
 
-        <TextView
-            android:id="@+id/txtView_shopNameMerchand"
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:layout_margin="5dp"
-            android:text="Shop Name: "/>
+    <TextView
+        android:id="@+id/txtView_shopNameMerchand"
+        android:layout_gravity="left"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_margin="5dp"
+        android:text="Shop Name:   "/>
 
-        <TextView
-            android:id="@+id/txtView_shopArea"
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:layout_margin="5dp"
-            android:text="Shop Area: "/>
+    <TextView
+        android:layout_gravity="left"
+        android:id="@+id/txtView_shopArea"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_margin="5dp"
+        android:text="Shop Area:   "/>
 
-        <TextView
-            android:id="@+id/txtView_shopCSFNumb"
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:layout_margin="5dp"
-            android:text="Shop CSF#: "/>
+    <TextView
+        android:layout_gravity="left"
+        android:id="@+id/txtView_shopCSFNumb"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_margin="5dp"
+        android:text="Shop CSF#:   "/>
 
-        <TextView
-            android:id="@+id/txtView_CSFName"
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:layout_margin="5dp"
-            android:text="Shop CSF Name: "/>
+    <TextView
+        android:layout_gravity="left"
+        android:id="@+id/txtView_CSFName"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_margin="5dp"
+        android:text="Shop CSF Name:   "/>
+
 
     <Button
         android:id="@+id/btn_takeStorePicture"
@@ -185,4 +184,4 @@
         android:text="End Picture" />
     </LinearLayout>
     </ScrollView>
-</LinearLayout>
+<!--</LinearLayout>-->

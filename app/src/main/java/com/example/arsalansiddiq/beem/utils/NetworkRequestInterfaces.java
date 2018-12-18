@@ -232,6 +232,9 @@ public interface NetworkRequestInterfaces {
                                                                          @Part("brand_id") int brand_id,
                                                                         @Part MultipartBody.Part file);
 
+    @POST("merchant/task/response")
+    Call<MerchantTaskResponse> storeMerchantTaskResponse(@Body MeetingRequestMerchant meetingRequestMerchant);
+
     @Multipart
     @POST("viewinstruction")
     Call<ViewInstructionResponseModel> getViewInstruction(@Part("brand_id") int brand_id,

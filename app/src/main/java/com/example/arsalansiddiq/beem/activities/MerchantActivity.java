@@ -44,6 +44,7 @@ public class MerchantActivity extends BaseActivity implements View.OnClickListen
     private static  final String SUBMIT_FEEDBACK = "Feedback";
     private static  final String VIEW_INSTRUCTIONS = "View_Instruction";
     private static  final String RADIUS = "radius";
+    private static  final String RANDOM_TASK = "randomTask";
 
     static final int REQUEST_IMAGE_CAPTURE = 1;
     private Button btn_takeStorePicture, btn_submitFeedback, btn_takeFrontChillersPicture,
@@ -92,7 +93,14 @@ public class MerchantActivity extends BaseActivity implements View.OnClickListen
 
         networkUtils = new NetworkUtils(this);
 
-        setRadius();
+            if (networkUtils.isNetworkConnected()) {
+                if (!getRandomTaskStatus()) {
+                    setRadius();
+                }
+            } else {
+                noInternet();
+            }
+
         getCompulsorySteps();
         btn_takeStorePicture = (Button) findViewById(R.id.btn_takeStorePicture);
         btn_submitFeedback = (Button) findViewById(R.id.btn_submitFeedback);
@@ -126,10 +134,22 @@ public class MerchantActivity extends BaseActivity implements View.OnClickListen
                 CURRENT_KEY = SUBMIT_FEEDBACK;
 
                 progressShow();
-                networkUtils.dynamicKeyValue(loginResponseRealm.getUserId(),
-                        getCount(Constants.TASK_ID), getCount(Constants.SHOP_ID),
-                        Integer.parseInt(loginResponseRealm.getBrand()),
-                        CURRENT_KEY, String.valueOf(rating), MerchantActivity.this);
+
+                if (networkUtils.isNetworkConnected()) {
+                    if (getRandomTaskStatus()) {
+                        networkUtils.dynamicKeyValue(loginResponseRealm.getUserId(),
+                                0, 0,
+                                Integer.parseInt(loginResponseRealm.getBrand()),
+                                CURRENT_KEY, String.valueOf(rating), MerchantActivity.this);
+                    } else {
+                        networkUtils.dynamicKeyValue(loginResponseRealm.getUserId(),
+                                getCount(Constants.TASK_ID), getCount(Constants.SHOP_ID),
+                                Integer.parseInt(loginResponseRealm.getBrand()),
+                                CURRENT_KEY, String.valueOf(rating), MerchantActivity.this);
+                    }
+                } else {
+                    noInternet();
+                }
             }
         });
     }
@@ -138,8 +158,8 @@ public class MerchantActivity extends BaseActivity implements View.OnClickListen
         if (networkUtils.isNetworkConnected()) {
             CURRENT_KEY = RADIUS;
             if (getRandomTaskStatus()) {
-                networkUtils.dynamicKeyValue(loginResponseRealm.getUserId(), Integer.parseInt(""),
-                        getCount(Constants.SHOP_ID), Integer.parseInt(loginResponseRealm.getBrand()),
+                networkUtils.dynamicKeyValue(loginResponseRealm.getUserId(), 0,
+                        0, Integer.parseInt(loginResponseRealm.getBrand()),
                         CURRENT_KEY, String.valueOf(getCount(Constants.RADIUS)), this);
             } else {
                 networkUtils.dynamicKeyValue(loginResponseRealm.getUserId(), getCount(Constants.TASK_ID),
@@ -277,10 +297,21 @@ public class MerchantActivity extends BaseActivity implements View.OnClickListen
 
             progressShow();
 
-            networkUtils.dynamicKeyFiles(loginResponseRealm.getUserId(),
-                    getCount(Constants.TASK_ID), getCount(Constants.SHOP_ID),
-                    Integer.parseInt(loginResponseRealm.getBrand()),
-                    CURRENT_KEY, userImageFile, this);
+            if (networkUtils.isNetworkConnected()) {
+                if (getRandomTaskStatus()) {
+                    networkUtils.dynamicKeyFiles(loginResponseRealm.getUserId(),
+                            0, 0,
+                            Integer.parseInt(loginResponseRealm.getBrand()),
+                            CURRENT_KEY, userImageFile, this);
+                } else {
+                    networkUtils.dynamicKeyFiles(loginResponseRealm.getUserId(),
+                            getCount(Constants.TASK_ID), getCount(Constants.SHOP_ID),
+                            Integer.parseInt(loginResponseRealm.getBrand()),
+                            CURRENT_KEY, userImageFile, this);
+                }
+            } else {
+                noInternet();
+            }
         }
     }
 
@@ -401,5 +432,9 @@ public class MerchantActivity extends BaseActivity implements View.OnClickListen
                 return true;
         }
         return false;
+    }
+
+    private void noInternet() {
+        Toast.makeText(this, "please check your internet connection", Toast.LENGTH_SHORT).show();
     }
 }

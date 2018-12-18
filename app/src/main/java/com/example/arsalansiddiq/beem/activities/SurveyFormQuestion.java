@@ -1,10 +1,9 @@
 package com.example.arsalansiddiq.beem.activities;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -20,6 +19,7 @@ import com.example.arsalansiddiq.beem.interfaces.merchantcallback.BaseCallbackIn
 import com.example.arsalansiddiq.beem.models.responsemodels.LoginResponse;
 import com.example.arsalansiddiq.beem.models.responsemodels.merchant.merchanttask.MerchantTaskResponse;
 import com.example.arsalansiddiq.beem.models.responsemodels.merchant.surveyquestions.SurveyQuestionsResponseModel;
+import com.example.arsalansiddiq.beem.utils.Constants;
 import com.example.arsalansiddiq.beem.utils.NetworkUtils;
 import com.example.arsalansiddiq.beem.utils.data.BaseResponse;
 import com.example.arsalansiddiq.beem.utils.data.UpdateCallback;
@@ -113,7 +113,7 @@ public class SurveyFormQuestion extends BaseActivity implements
                 }
             });
         } else {
-            Toast.makeText(this, "please connect with internet", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "please connect your internet", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -195,9 +195,17 @@ public class SurveyFormQuestion extends BaseActivity implements
         progressShow();
 
         if (networkUtils.isNetworkConnected()) {
-            networkUtils.dynamicKeyValueQA(8, 8, 8,
-                    38, "Questions", questionListUser,
-                    "Answers", answersListUser, this);
+            if (getRandomTaskStatus()) {
+                networkUtils.dynamicKeyValueQA(loginResponseRealm.getUserId(), 0,
+                        0, Integer.parseInt(loginResponseRealm.getBrand()),
+                        "Questions", questionListUser, "Answers", answersListUser,
+                        this);
+            } else {
+                networkUtils.dynamicKeyValueQA(loginResponseRealm.getUserId(), getCount(Constants.TASK_ID),
+                        getCount(Constants.SHOP_ID), Integer.parseInt(loginResponseRealm.getBrand()),
+                        "Questions", questionListUser, "Answers", answersListUser,
+                        this);
+            }
         } else {
             Toast.makeText(this, "please connect with internet", Toast.LENGTH_SHORT).show();
         }
@@ -219,5 +227,17 @@ public class SurveyFormQuestion extends BaseActivity implements
     @Override
     public void UpdateFailure(BaseResponse baseResponse) {
         progressHide();
+    }
+
+    int getCount(String key) {
+        SharedPreferences prefs = getSharedPreferences(Constants.BEEM_PREFERENCE_COUNT, MODE_PRIVATE);
+        int coutn = prefs.getInt(key, 0);
+        return coutn;
+    }
+
+    boolean getRandomTaskStatus () {
+        SharedPreferences prefs = getSharedPreferences(Constants.BEEM_PREFERENCE_COUNT, MODE_PRIVATE);
+        boolean isStatus = prefs.getBoolean(Constants.RANDOM_TASK, false);
+        return isStatus;
     }
 }
