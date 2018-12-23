@@ -118,8 +118,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_weight="1"
-            android:layout_marginTop="20dp">
+            android:layout_weight="1">
 
             <TextView
                 android:id="@+id/txtView_gender"
@@ -145,8 +144,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_weight="1"
-        android:layout_marginTop="10dp">
+        android:layout_weight="1">
 
         <TextView
             android:id="@+id/txtView_age"
@@ -165,14 +163,38 @@
         </Spinner>
     </LinearLayout>
 
+        <LinearLayout
+            android:layout_below="@id/linearLayout_age"
+            android:id="@+id/linearLayout_subBrands"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_weight="1">
+            <TextView
+                android:id="@+id/txtView_subBrands"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:textSize="15sp"
+                android:text="Sub Brand"
+                android:layout_below="@+id/txtView_recordsSent"
+                android:layout_margin="5dp"
+                android:layout_weight="1"/>
+            <Spinner
+                android:id="@+id/spinner_subBrands"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp">
+            </Spinner>
+        </LinearLayout>
+
     <LinearLayout
-        android:layout_below="@id/linearLayout_age"
+        android:layout_below="@id/linearLayout_subBrands"
         android:id="@+id/linearLayout_pBrands"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_weight="1"
-        android:layout_marginTop="10dp">
+        android:visibility="gone"
+        android:layout_weight="1">
         <TextView
             android:id="@+id/txtView_pBrands"
             android:layout_height="wrap_content"
@@ -195,8 +217,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_weight="1"
-        android:layout_marginTop="10dp">
+        android:visibility="gone"
+        android:layout_weight="1">
         <TextView
             android:id="@+id/txtView_cBrands"
             android:layout_height="wrap_content"
@@ -221,7 +243,7 @@
         android:layout_height="wrap_content"
         android:layout_width="wrap_content"
         android:layout_centerInParent="true"
-        android:layout_marginTop="25dp"
+        android:layout_marginTop="20dp"
         android:id="@+id/btn_next"
         android:onClick="onNext"
         android:textSize="18dp"

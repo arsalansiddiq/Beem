@@ -110,7 +110,7 @@ public class NavigationDrawerActivity extends BaseActivity
             fab_menu_takePictures_supervisor, fab_menu_addNotes_supervisor;
 
     private com.github.clans.fab.FloatingActionButton fab_menu_startBreak, fab_menu_endDay, fab_menu_sale, fab_menu_attandance,
-            fab_menu_target, fab_menu_map, fab_menu_endBreak;
+            fab_menu_target, fab_menu_map, fab_menu_endBreak, fab_menu_addFeedbackBA;
 
     private TextView txtView_minutes, txtView_seconds;
 
@@ -243,6 +243,7 @@ public class NavigationDrawerActivity extends BaseActivity
         fab_menu_attandance = (com.github.clans.fab.FloatingActionButton) findViewById(R.id.fab_menu_attandance);
         fab_menu_target = (com.github.clans.fab.FloatingActionButton) findViewById(R.id.fab_menu_target);
         fab_menu_map = (com.github.clans.fab.FloatingActionButton) findViewById(R.id.fab_menu_map);
+        fab_menu_addFeedbackBA = (com.github.clans.fab.FloatingActionButton) findViewById(R.id.fab_menu_addFeedbackBA);
 
         fab_menu_startBreak.setOnClickListener(this);
         fab_menu_endBreak.setOnClickListener(this);
@@ -251,6 +252,7 @@ public class NavigationDrawerActivity extends BaseActivity
         fab_menu_attandance.setOnClickListener(this);
         fab_menu_target.setOnClickListener(this);
         fab_menu_map.setOnClickListener(this);
+        fab_menu_addFeedbackBA.setOnClickListener(this);
         //End
 
         //Fabs Supervisor
@@ -809,7 +811,12 @@ public class NavigationDrawerActivity extends BaseActivity
             // Handle the camera action
         } else if (id == R.id.nav_sync) {
 
-            SyncDataToServerClass syncDataToServerClass = new SyncDataToServerClass(NavigationDrawerActivity.this);
+            SyncDataToServerClass syncDataToServerClass = new SyncDataToServerClass(NavigationDrawerActivity.this, NavigationDrawerActivity.this);
+
+            Log.i("nav_sync", "Clicked");
+            Menu menuNavigation = navigationView.getMenu();
+            MenuItem menuItemNavigation = menuNavigation.findItem(R.id.nav_sync);
+            menuItemNavigation.setEnabled(false);
 
             if (loginResponseRealm.getuT().toLowerCase().equals("ba")) {
                 if (salesAndNoSales != null) {
@@ -894,7 +901,6 @@ public class NavigationDrawerActivity extends BaseActivity
                     realmCRUD.clearRecordsAtEndDay();
                     meetingStatus = 0;
                     getLocation(false);
-
                 }
 
                 break;
@@ -962,6 +968,11 @@ public class NavigationDrawerActivity extends BaseActivity
                 }
 
                 break;
+
+            case R.id.fab_menu_addFeedbackBA:
+                startActivity(new Intent(NavigationDrawerActivity.this, FeedbackBAActivity.class));
+                break;
+
             case R.id.fab_menu_endMeeting_supervisor:
 
                 meetingTag = "EndMeeting";

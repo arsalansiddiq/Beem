@@ -41,11 +41,12 @@
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
                 android:layout_weight="1"
-                android:text="is loose out of stock"
+                android:text="Out of stock"
                 android:layout_gravity="left"
                 android:textSize="12sp" />
 
             <CheckBox
+                android:visibility="gone"
                 android:layout_marginLeft="10dp"
                 android:id="@+id/checkbox_carton"
                 android:layout_width="wrap_content"
@@ -76,13 +77,14 @@
             <TextView
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
-                android:text="Loose"
+                android:text="Packs"
                 android:layout_weight="1"
                 android:gravity="center"
                 android:layout_gravity="left"
                 android:textSize="20sp" />
 
             <TextView
+                android:visibility="gone"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="right"
@@ -112,6 +114,7 @@
                 android:textSize="20sp" />
 
             <EditText
+                android:visibility="gone"
                 android:id="@+id/edtText_carton"
                 android:layout_width="wrap_content"
                 android:layout_height="35dp"

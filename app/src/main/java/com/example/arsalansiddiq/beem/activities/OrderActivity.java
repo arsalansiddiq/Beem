@@ -465,21 +465,22 @@ public class OrderActivity extends BaseActivity implements LocationListener, Rad
 
         final LoginResponse loginResponse = beemDatabase.getUserDetail();
 
+
+        String currentString = age;
+        String[] separated = currentString.split("-");
+
+        try {
+
+            calculatedAge = Integer.parseInt(separated[0]);
+            calculatedAge += Integer.parseInt(separated[1]);
+
+            calculatedAge = calculatedAge / 2;
+
+        }catch (NumberFormatException e) {
+            Log.e(LOG_TAG, "Age Format  " + e.getLocalizedMessage().toString());
+        }
+
         if (networkUtils.isNetworkConnected()) {
-
-            String currentString = age;
-            String[] separated = currentString.split("-");
-
-            try {
-
-                 calculatedAge = Integer.parseInt(separated[0]);
-                 calculatedAge += Integer.parseInt(separated[1]);
-
-                calculatedAge = calculatedAge / 2;
-
-            }catch (NumberFormatException e) {
-                Log.e(LOG_TAG, "Age Format  " + e.getLocalizedMessage().toString());
-            }
 
 //            int parsedContact = Integer.parseInt(contact);
 

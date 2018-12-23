@@ -7,13 +7,13 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -23,8 +23,10 @@ import com.example.arsalansiddiq.beem.R;
 import com.example.arsalansiddiq.beem.base.BaseActivity;
 import com.example.arsalansiddiq.beem.databases.RealmCRUD;
 import com.example.arsalansiddiq.beem.interfaces.SKUCategoryInterface;
+import com.example.arsalansiddiq.beem.interfaces.merchantcallback.BaseCallbackInterface;
 import com.example.arsalansiddiq.beem.models.databasemodels.SalesAndNoSales;
 import com.example.arsalansiddiq.beem.models.responsemodels.LoginResponse;
+import com.example.arsalansiddiq.beem.models.responsemodels.bamodels.SubBrandsBAResponseModel;
 import com.example.arsalansiddiq.beem.models.responsemodels.salesresponsemodels.SalesObjectResponse;
 import com.example.arsalansiddiq.beem.models.responsemodels.salesresponsemodels.SalesSKUArrayResponse;
 import com.example.arsalansiddiq.beem.utils.Constants;
@@ -37,6 +39,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import retrofit2.Response;
 
 public class SalesActivity extends BaseActivity implements AdapterView.OnItemSelectedListener {
@@ -48,17 +52,18 @@ public class SalesActivity extends BaseActivity implements AdapterView.OnItemSel
     private TextView txtView_recordsPending_count = null;
 
     private String[] brandList = null;
+    private String[] subBrandList = null;
 
-    private Spinner spinner_gender, spinner_age, spinner_pBrand, spinner_cBrand = null;
+    private Spinner spinner_gender, spinner_age, spinner_pBrand, spinner_cBrand, spinner_subBrands = null;
 
     String name, email, gender, age;
 
     String contact = null;
-    private Integer cBrand, pBrand;
+    private Integer cBrand, pBrand, subBrand;
 
     private EditText edtText_name, edtText_contact, edtText_email;
 
-    private ArrayAdapter<CharSequence> adapterGender, adapterAge, adapterBrand;
+    private ArrayAdapter<CharSequence> adapterGender, adapterAge, adapterBrand, adapterSubBrands;
     private Button btn_next;
 
     private Response<SalesObjectResponse> salesObjectResponse = null;
@@ -67,6 +72,7 @@ public class SalesActivity extends BaseActivity implements AdapterView.OnItemSel
 
     private RealmCRUD realmCRUD;
 
+    private List<com.example.arsalansiddiq.beem.models.responsemodels.bamodels.Data> data;
     private List<SalesSKUArrayResponse> salesSKUArrayResponseList;
 
     private List<SalesSKUArrayResponse> salesSKUArrayResponseListDuplicateComparator;
@@ -74,17 +80,26 @@ public class SalesActivity extends BaseActivity implements AdapterView.OnItemSel
     private String valueBrandId;
     private String valuePreviousBrandId;
 
+    LoginResponse loginResponse;
 
+    @BindView(R.id.linearLayout_cBrands)
+    LinearLayout linearLayout_cBrands;
+
+    @BindView(R.id.linearLayout_pBrands)
+    LinearLayout linearLayout_pBrands;
     //    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sales);
+        ButterKnife.bind(this);
+        ButterKnife.setDebug(true);
 
         txtView_recordsSent_count = findViewById(R.id.txtView_recordsSent_count);
         txtView_recordsPending_count = findViewById(R.id.txtView_recordsPending_count);
 
         realmCRUD = new RealmCRUD(this);
+        loginResponse = realmCRUD.getLoginInformationDetails();
 
         SharedPreferences preferences = this.getSharedPreferences(Constants.SALE_STATUS, MODE_PRIVATE);
         int id = preferences.getInt(Constants.KEY_SALE_STATUS, 0);
@@ -93,6 +108,7 @@ public class SalesActivity extends BaseActivity implements AdapterView.OnItemSel
 
         spinner_gender = findViewById(R.id.spinner_gender);
         spinner_age = findViewById(R.id.spinner_age);
+        spinner_subBrands = findViewById(R.id.spinner_subBrands);
         spinner_pBrand = findViewById(R.id.spinner_pBrand);
         spinner_cBrand = findViewById(R.id.spinner_cBrand);
         btn_next = findViewById(R.id.btn_next);
@@ -104,6 +120,7 @@ public class SalesActivity extends BaseActivity implements AdapterView.OnItemSel
 
         spinner_gender.setOnItemSelectedListener(this);
         spinner_age.setOnItemSelectedListener(this);
+        spinner_subBrands.setOnItemSelectedListener(this);
         spinner_pBrand.setOnItemSelectedListener(this);
         spinner_cBrand.setOnItemSelectedListener(this);
 
@@ -133,54 +150,43 @@ public class SalesActivity extends BaseActivity implements AdapterView.OnItemSel
 
         if (!TextUtils.isEmpty(brand)) {
 
-            LoginResponse loginResponse = realmCRUD.getLoginInformationDetails();
+            boolean checSubBrandsExists = realmCRUD.checkCurrentUserHasSavedSubBrandsBA(loginResponse.getUserId());
 
             boolean checkBrandsExists = realmCRUD.checkCurrentUserHasSavedBrands(loginResponse.getUserId());
 
-            if (checkBrandsExists) {
-                callRelmFetcherForBrands(loginResponse.getUserId());
+            if (checSubBrandsExists) {
+                callRelmFetcherForBrandsSub(loginResponse.getUserId());
             } else {
-
                 NetworkUtils networkUtils = new NetworkUtils(SalesActivity.this);
 
                 if (networkUtils.isNetworkConnected()) {
                     progressShow();
-                    networkUtils.getBrandsofUser(loginResponse.getBrand(), new SKUCategoryInterface() {
+                    networkUtils.getSubBrandsBA(Integer.parseInt(loginResponse.getBrand()), new BaseCallbackInterface() {
 
                         @Override
-                        public void success(Response<SalesObjectResponse> response) {
-                            if (response.body().getStatus() == 1) {
+                        public void success(Response response) {
+                            SubBrandsBAResponseModel subBrandsBAResponseModelResponse = (SubBrandsBAResponseModel) response.body();
+
+                            if (subBrandsBAResponseModelResponse.getStatus() == 1) {
 
                                 progressHide();
 
-                                salesObjectResponse = response;
-                                List<SalesSKUArrayResponse> salesSKUArrayResponseList = response.body().getSku();
+                                for (int i = 0; i < subBrandsBAResponseModelResponse.getData().size(); i++) {
 
-                                for (int i = 0; i < response.body().getSku().size(); i++) {
-
-                                    realmCRUD.insertBrandsCategoryDetails(salesSKUArrayResponseList.get(i), loginResponse.getUserId());
-
-//                                //Offline Checking
-//                                skuCategory = response.body().getSku().get(i);
-////                            skuCategoryList.add(skuCategory.getSKUCaategory());
-//                                brandList[i + 1] = skuCategory.getSKUCaategory();
-
+                                    realmCRUD.insertBrandsCategoryDetailsSubBrands(subBrandsBAResponseModelResponse.getData().get(i),
+                                            loginResponse.getUserId());
                                 }
 
-                                callRelmFetcherForBrands(loginResponse.getUserId());
-
-//                            setAdatpers(brandList);
-
-                                Log.i("SKU", String.valueOf(response.body().getStatus()));
-                                Log.i("SKUCat", String.valueOf(brandList));
+                                callRelmFetcherForBrandsSub(loginResponse.getUserId());
                             }
                         }
 
                         @Override
-                        public void failed(String error) {
+                        public void failure(String error) {
                             progressHide();
-                            Log.i("SKU", error);
+                            Toast.makeText(SalesActivity.this, error, Toast.LENGTH_SHORT).show();
                         }
+
                     });
                 } else {
 
@@ -199,15 +205,83 @@ public class SalesActivity extends BaseActivity implements AdapterView.OnItemSel
                     alertBuilder.show();
                 }
             }
+
+            if (!checkBrandsExists) {
+
+                NetworkUtils networkUtils = new NetworkUtils(SalesActivity.this);
+
+                if (networkUtils.isNetworkConnected()) {
+                    progressShow();
+                    networkUtils.getBrandsofUser(loginResponse.getBrand(), new SKUCategoryInterface() {
+
+                        @Override
+                        public void success(Response<SalesObjectResponse> response) {
+                            if (response.body().getStatus() == 1) {
+
+                                progressHide();
+
+                                salesObjectResponse = response;
+                                List<SalesSKUArrayResponse> salesSKUArrayResponseList = response.body().getSku();
+
+                                for (int i = 0; i < response.body().getSku().size(); i++) {
+                                    realmCRUD.insertBrandsCategoryDetails(salesSKUArrayResponseList.get(i), loginResponse.getUserId());
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void failed(String error) {
+                            progressHide();
+                            Toast.makeText(SalesActivity.this, error, Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                } else {
+
+                    AlertDialog.Builder alertBuilder = new AlertDialog.Builder(SalesActivity.this);
+                    alertBuilder.setTitle("Network")
+                            .setMessage("Please connect with internet to get brands")
+                            .setCancelable(false)
+                            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    getBrandDetails();
+                                }
+                            });
+
+                    alertBuilder.show();
+                }
+            }
         }
     }
 
     //    @RequiresApi(api = Build.VERSION_CODES.N)
-    private void callRelmFetcherForBrands(Integer userId) {
+    private void callRelmFetcherForBrandsSub(Integer userId) {
+
+        data = realmCRUD.getUserBrandsSKUCategorySub(userId);
+
+        subBrandList = new String[data.size() + 1];
+        subBrandList[0] = "Select Brand";
+
+
+        for (int i = 0; i < data.size(); i++) {
+
+            subBrandList[i + 1] = data.get(i).getBrandName();
+        }
+        setAdapterSubBrands(subBrandList);
+    }
+
+    void setAdapterSubBrands(String[] subBrandList){
+        adapterSubBrands = new ArrayAdapter<CharSequence>(SalesActivity.this, android.R.layout.simple_spinner_item, subBrandList);
+        adapterSubBrands.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner_subBrands.setAdapter(adapterSubBrands);
+    }
+
+    //    @RequiresApi(api = Build.VERSION_CODES.N)
+    private void callRelmFetcherForBrands(Integer userId, int subBrandID) {
 
         salesSKUArrayResponseListDuplicateComparator = new ArrayList<>();
 
-        salesSKUArrayResponseList = realmCRUD.getUserBrandsSKUCategory(userId);
+        salesSKUArrayResponseList = realmCRUD.getUserBrandsSKUCategory(userId, subBrandID);
 
         Map<Integer, SalesSKUArrayResponse> map = new LinkedHashMap<>();
 
@@ -217,26 +291,13 @@ public class SalesActivity extends BaseActivity implements AdapterView.OnItemSel
 
         salesSKUArrayResponseListDuplicateComparator.addAll(map.values());
 
-//        List<SalesSKUArrayResponse> salesSKUArrayResponseList = realmCRUD.getUserBrandsSKUCategory(userId);
-
-//        salesSKUArrayResponseListDuplicateComparator =
-//                salesSKUArrayResponseList.stream().collect(collectingAndThen(toCollection(() -> new TreeSet<>(
-//                        comparingInt(SalesSKUArrayResponse::getCateId))), ArrayList::new));
-
         brandList = new String[salesSKUArrayResponseListDuplicateComparator.size() + 1];
-        brandList[0] = "Select Brand";
+        brandList[0] = "Select Sub Brand";
 
 
         for (int i = 0; i < salesSKUArrayResponseListDuplicateComparator.size(); i++) {
 
-            //Offline Checking
-//            skuCategory = salesSKUArrayResponseList.get(i);
-//            skuCategoryList.add(skuCategory.getSKUCaategory());
-//             brandList[i + 1] = skuCategory.getSKUCaategory();
-
             brandList[i + 1] = salesSKUArrayResponseListDuplicateComparator.get(i).getSKUCaategory();
-//             brandList[i + 1] = salesSKUArrayResponseList.get(i).getSKUCaategory();
-
         }
 
         setAdatpers(brandList);
@@ -265,103 +326,106 @@ public class SalesActivity extends BaseActivity implements AdapterView.OnItemSel
         edtText_email.setTextColor(Color.parseColor("#000000"));
         edtText_contact.setTextColor(Color.parseColor("#000000"));
 
-        if (TextUtils.isEmpty(name) || spinner_gender.getSelectedItemPosition() == 0
-                || spinner_age.getSelectedItemPosition() == 0 ||spinner_pBrand.getSelectedItemPosition() == 0
-                || spinner_cBrand.getSelectedItemPosition() == 0) {
+        if (subBrand != 0) {
+            if (TextUtils.isEmpty(name) || spinner_gender.getSelectedItemPosition() == 0
+                    || spinner_age.getSelectedItemPosition() == 0 || spinner_pBrand.getSelectedItemPosition() == 0
+                    || spinner_cBrand.getSelectedItemPosition() == 0) {
+                Toast.makeText(SalesActivity.this, "please complete information", Toast.LENGTH_SHORT).show();
 
-            Toast.makeText(SalesActivity.this, "please complete information", Toast.LENGTH_SHORT).show();
+            } else {
 
-        } else {
+                valueBrandId = String.valueOf(salesSKUArrayResponseListDuplicateComparator.get(cBrand - 1).getCateId());
+                valuePreviousBrandId = String.valueOf(salesSKUArrayResponseListDuplicateComparator.get(pBrand - 1).getCateId());
 
-            valueBrandId = String.valueOf(salesSKUArrayResponseListDuplicateComparator.get(cBrand - 1).getCateId());
-            valuePreviousBrandId = String.valueOf(salesSKUArrayResponseListDuplicateComparator.get(pBrand - 1).getCateId());
-
-            if (!TextUtils.isEmpty(edtText_name.getText().toString()) &&
-                    (TextUtils.isEmpty(edtText_email.getText().toString()) && TextUtils.isEmpty(edtText_contact.getText().toString()))) {
-                Intent intent = new Intent(SalesActivity.this, OrderActivity.class);
-                intent.putExtra("name", name);
-                intent.putExtra("contact", "0");
-                intent.putExtra("email", "");
-                intent.putExtra("gender", gender);
-                intent.putExtra("age", age);
-//                intent.putExtra("pBrand", pBrand);
-                intent.putExtra("pBrand", valuePreviousBrandId);
-                intent.putExtra("cBrand", valueBrandId);
-//                intent.putExtra("cBrand", cBrand);
-                startActivity(intent);
-            } else if ((!TextUtils.isEmpty(edtText_name.getText().toString())) &&
-                    (!TextUtils.isEmpty(edtText_email.getText().toString()) && TextUtils.isEmpty(edtText_contact.getText().toString()))) {
-//                    || (TextUtils.isEmpty(edtText_email.getText().toString()) && TextUtils.isEmpty(edtText_contact.getText().toString()))) {
-
-                if (isEmailValid(edtText_email.getText().toString())) {
-                    email = edtText_email.getText().toString();
+                if (!TextUtils.isEmpty(edtText_name.getText().toString()) &&
+                        (TextUtils.isEmpty(edtText_email.getText().toString()) && TextUtils.isEmpty(edtText_contact.getText().toString()))) {
                     Intent intent = new Intent(SalesActivity.this, OrderActivity.class);
                     intent.putExtra("name", name);
                     intent.putExtra("contact", "0");
-                    intent.putExtra("email", email);
-                    intent.putExtra("gender", gender);
-                    intent.putExtra("age", age);
-//                    intent.putExtra("pBrand", pBrand);
-                    intent.putExtra("pBrand", valuePreviousBrandId);
-                    intent.putExtra("cBrand", valueBrandId);
-//                    intent.putExtra("cBrand", cBrand);
-                    startActivity(intent);
-                } else {
-                    edtText_email.setTextColor(Color.parseColor("#ff0000"));
-                    Toast.makeText(this, " please enter valid email", Toast.LENGTH_SHORT).show();
-                }
-
-            } else if ((!TextUtils.isEmpty(edtText_name.getText().toString())) &&
-                    (TextUtils.isEmpty(edtText_email.getText().toString()) && !TextUtils.isEmpty(edtText_contact.getText().toString()))) {
-                if (edtText_contact.getText().length() != 13) {
-                    edtText_contact.setTextColor(Color.parseColor("#ff0000"));
-                } else {
-                    contact = edtText_contact.getText().toString();
-                    contact = contact.replace(" ", "");
-
-                    Intent intent = new Intent(SalesActivity.this, OrderActivity.class);
-                    intent.putExtra("name", name);
-                    intent.putExtra("contact", contact);
                     intent.putExtra("email", "");
                     intent.putExtra("gender", gender);
                     intent.putExtra("age", age);
-//                    intent.putExtra("pBrand", pBrand);
+//                intent.putExtra("pBrand", pBrand);
                     intent.putExtra("pBrand", valuePreviousBrandId);
                     intent.putExtra("cBrand", valueBrandId);
-//                    intent.putExtra("cBrand", cBrand);
+//                intent.putExtra("cBrand", cBrand);
                     startActivity(intent);
-                }
-            } else if ((!TextUtils.isEmpty(edtText_name.getText().toString())) &&
-                    (!TextUtils.isEmpty(edtText_email.getText().toString()) && !TextUtils.isEmpty(edtText_contact.getText().toString()))) {
-                if (edtText_contact.getText().length() != 13 && !isEmailValid(edtText_email.getText().toString())) {
-                    edtText_email.setTextColor(Color.parseColor("#ff0000"));
-                    edtText_contact.setTextColor(Color.parseColor("#ff0000"));
-                } else if (edtText_contact.getText().length() == 13 && !isEmailValid(edtText_email.getText().toString())) {
+                } else if ((!TextUtils.isEmpty(edtText_name.getText().toString())) &&
+                        (!TextUtils.isEmpty(edtText_email.getText().toString()) && TextUtils.isEmpty(edtText_contact.getText().toString()))) {
+//                    || (TextUtils.isEmpty(edtText_email.getText().toString()) && TextUtils.isEmpty(edtText_contact.getText().toString()))) {
 
-                    edtText_email.setTextColor(Color.parseColor("#ff0000"));
-                } else if (edtText_contact.getText().length() != 13 && isEmailValid(edtText_email.getText().toString())) {
-                    edtText_contact.setTextColor(Color.parseColor("#ff0000"));
+                    if (isEmailValid(edtText_email.getText().toString())) {
+                        email = edtText_email.getText().toString();
+                        Intent intent = new Intent(SalesActivity.this, OrderActivity.class);
+                        intent.putExtra("name", name);
+                        intent.putExtra("contact", "0");
+                        intent.putExtra("email", email);
+                        intent.putExtra("gender", gender);
+                        intent.putExtra("age", age);
+//                    intent.putExtra("pBrand", pBrand);
+                        intent.putExtra("pBrand", valuePreviousBrandId);
+                        intent.putExtra("cBrand", valueBrandId);
+//                    intent.putExtra("cBrand", cBrand);
+                        startActivity(intent);
+                    } else {
+                        edtText_email.setTextColor(Color.parseColor("#ff0000"));
+                        Toast.makeText(this, " please enter valid email", Toast.LENGTH_SHORT).show();
+                    }
+
+                } else if ((!TextUtils.isEmpty(edtText_name.getText().toString())) &&
+                        (TextUtils.isEmpty(edtText_email.getText().toString()) && !TextUtils.isEmpty(edtText_contact.getText().toString()))) {
+                    if (edtText_contact.getText().length() != 13) {
+                        edtText_contact.setTextColor(Color.parseColor("#ff0000"));
+                    } else {
+                        contact = edtText_contact.getText().toString();
+                        contact = contact.replace(" ", "");
+
+                        Intent intent = new Intent(SalesActivity.this, OrderActivity.class);
+                        intent.putExtra("name", name);
+                        intent.putExtra("contact", contact);
+                        intent.putExtra("email", "");
+                        intent.putExtra("gender", gender);
+                        intent.putExtra("age", age);
+//                    intent.putExtra("pBrand", pBrand);
+                        intent.putExtra("pBrand", valuePreviousBrandId);
+                        intent.putExtra("cBrand", valueBrandId);
+//                    intent.putExtra("cBrand", cBrand);
+                        startActivity(intent);
+                    }
+                } else if ((!TextUtils.isEmpty(edtText_name.getText().toString())) &&
+                        (!TextUtils.isEmpty(edtText_email.getText().toString()) && !TextUtils.isEmpty(edtText_contact.getText().toString()))) {
+                    if (edtText_contact.getText().length() != 13 && !isEmailValid(edtText_email.getText().toString())) {
+                        edtText_email.setTextColor(Color.parseColor("#ff0000"));
+                        edtText_contact.setTextColor(Color.parseColor("#ff0000"));
+                    } else if (edtText_contact.getText().length() == 13 && !isEmailValid(edtText_email.getText().toString())) {
+
+                        edtText_email.setTextColor(Color.parseColor("#ff0000"));
+                    } else if (edtText_contact.getText().length() != 13 && isEmailValid(edtText_email.getText().toString())) {
+                        edtText_contact.setTextColor(Color.parseColor("#ff0000"));
+                    } else {
+                        email = edtText_email.getText().toString();
+                        contact = edtText_contact.getText().toString();
+                        contact = contact.replace(" ", "");
+
+                        Intent intent = new Intent(SalesActivity.this, OrderActivity.class);
+                        intent.putExtra("name", name);
+                        intent.putExtra("contact", contact);
+                        intent.putExtra("email", "");
+                        intent.putExtra("gender", gender);
+                        intent.putExtra("age", age);
+//                    intent.putExtra("pBrand", pBrand);
+                        intent.putExtra("pBrand", valuePreviousBrandId);
+                        intent.putExtra("cBrand", valueBrandId);
+//                    intent.putExtra("cBrand", cBrand);
+
+                        startActivity(intent);
+                    }
                 } else {
-                    email = edtText_email.getText().toString();
-                    contact = edtText_contact.getText().toString();
-                    contact = contact.replace(" ", "");
-
-                    Intent intent = new Intent(SalesActivity.this, OrderActivity.class);
-                    intent.putExtra("name", name);
-                    intent.putExtra("contact", contact);
-                    intent.putExtra("email", "");
-                    intent.putExtra("gender", gender);
-                    intent.putExtra("age", age);
-//                    intent.putExtra("pBrand", pBrand);
-                    intent.putExtra("pBrand", valuePreviousBrandId);
-                    intent.putExtra("cBrand", valueBrandId);
-//                    intent.putExtra("cBrand", cBrand);
-
-                    startActivity(intent);
+                    Toast.makeText(this, "please insert valid credentials", Toast.LENGTH_SHORT).show();
                 }
-            } else {
-                Toast.makeText(this, "please insert valid credentials", Toast.LENGTH_SHORT).show();
             }
+        } else {
+            Toast.makeText(this, "please select Sub Brand", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -387,6 +451,18 @@ public class SalesActivity extends BaseActivity implements AdapterView.OnItemSel
             case R.id.spinner_cBrand:
 
                 cBrand = spinner_cBrand.getSelectedItemPosition();
+
+                break;
+
+            case R.id.spinner_subBrands:
+
+                subBrand = spinner_subBrands.getSelectedItemPosition();
+
+                if (subBrand != 0) {
+                    linearLayout_pBrands.setVisibility(View.VISIBLE);
+                    linearLayout_cBrands.setVisibility(View.VISIBLE);
+                    callRelmFetcherForBrands(loginResponse.getUserId(), data.get(subBrand - 1).getBrandId());
+                }
 
                 break;
         }

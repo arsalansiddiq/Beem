@@ -97,6 +97,14 @@
             fab:fab_label="Map"
             app:fab_colorNormal="@color/colorBlue" />
 
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/fab_menu_addFeedbackBA"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_menu_share"
+            app:fab_size="mini"
+            fab:fab_label="Feedback"
+            app:fab_colorNormal="@color/colorBlue" />
     </com.github.clans.fab.FloatingActionMenu>
 
 

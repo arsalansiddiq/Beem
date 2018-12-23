@@ -18,6 +18,7 @@ import com.example.arsalansiddiq.beem.interfaces.merchantcallback.BaseCallbackIn
 import com.example.arsalansiddiq.beem.models.requestmodels.AddShopRequest;
 import com.example.arsalansiddiq.beem.models.requestmodels.LoginRequest;
 import com.example.arsalansiddiq.beem.models.requestmodels.StartMeetingRequest;
+import com.example.arsalansiddiq.beem.models.requestmodels.ba.BAAddFeedbackRequestModel;
 import com.example.arsalansiddiq.beem.models.requestmodels.merchant.MeetingRequestMerchant;
 import com.example.arsalansiddiq.beem.models.requestmodels.merchant.SKUMerchantRequestModel;
 import com.example.arsalansiddiq.beem.models.responsemodels.AttandanceResponse;
@@ -25,6 +26,7 @@ import com.example.arsalansiddiq.beem.models.responsemodels.LoginResponse;
 import com.example.arsalansiddiq.beem.models.responsemodels.MeetingResponseModel;
 import com.example.arsalansiddiq.beem.models.responsemodels.ResponseSUP;
 import com.example.arsalansiddiq.beem.models.responsemodels.babreak.BreakTypeResponseModel;
+import com.example.arsalansiddiq.beem.models.responsemodels.bamodels.SubBrandsBAResponseModel;
 import com.example.arsalansiddiq.beem.models.responsemodels.merchant.competitionsku.MerchantSKU;
 import com.example.arsalansiddiq.beem.models.responsemodels.merchant.compulsory.CompulsoryStepsResponseModel;
 import com.example.arsalansiddiq.beem.models.responsemodels.merchant.merchanttask.MerchantTaskResponse;
@@ -584,5 +586,49 @@ public class NetworkUtils {
                         baseCallbackInterface.failure(t.getLocalizedMessage());
                     }
                 });
+    }
+
+    public void getSubBrandsBA(int brand_id, final BaseCallbackInterface baseCallbackInterface) {
+        networkRequestInterfaces.getSubBrandsBA(brand_id).enqueue(new Callback<SubBrandsBAResponseModel>() {
+            @Override
+            public void onResponse(Call<SubBrandsBAResponseModel> call, Response<SubBrandsBAResponseModel> response) {
+                if (response.isSuccessful()) {
+                    if (response.body().getStatus() == 1) {
+                     baseCallbackInterface.success(response);
+                    } else {
+                        baseCallbackInterface.failure("Something Went Wrong!");
+                    }
+                } else {
+                    baseCallbackInterface.failure("Something Went Wrong!");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<SubBrandsBAResponseModel> call, Throwable t) {
+                baseCallbackInterface.failure(t.getLocalizedMessage());
+            }
+        });
+    }
+
+    public void addFeedbackBA(BAAddFeedbackRequestModel baAddFeedbackRequestModel, final BaseCallbackInterface baseCallbackInterface){
+        networkRequestInterfaces.addFeedbackBA(baAddFeedbackRequestModel).enqueue(new Callback<ResponseSUP>() {
+            @Override
+            public void onResponse(Call<ResponseSUP> call, Response<ResponseSUP> response) {
+                if (response.isSuccessful()) {
+                    if (response.body().getStatus() == 1) {
+                        baseCallbackInterface.success(response);
+                    } else {
+                        baseCallbackInterface.failure("Something Went Wrong!");
+                    }
+                } else {
+                    baseCallbackInterface.failure("Something Went Wrong!");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseSUP> call, Throwable t) {
+                baseCallbackInterface.failure(t.getLocalizedMessage());
+            }
+        });
     }
 }

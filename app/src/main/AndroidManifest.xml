@@ -92,9 +92,12 @@
             android:name=".activities.ViewInstructions"
             android:theme="@style/AppTheme.NoActionBar1" />
         <activity android:name=".activities.StockUpdateActivity" />
-        <activity android:name=".activities.PriceUpdateActivity"
+        <activity
+            android:name=".activities.PriceUpdateActivity"
             android:theme="@style/AppTheme.NoActionBar1"
-            android:windowSoftInputMode="adjustPan" ></activity>
+            android:windowSoftInputMode="adjustPan" />
+        <activity android:name=".activities.FeedbackBAActivity"
+            android:theme="@style/AppTheme.NoActionBar1"></activity>
     </application>
 
 </manifest>

@@ -1,26 +1,28 @@
 package com.example.arsalansiddiq.beem.utils;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.support.design.widget.NavigationView;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.example.arsalansiddiq.beem.R;
 import com.example.arsalansiddiq.beem.activities.NavigationDrawerActivity;
 import com.example.arsalansiddiq.beem.databases.RealmCRUD;
-import com.example.arsalansiddiq.beem.interfaces.AttandanceInterface;
 import com.example.arsalansiddiq.beem.interfaces.LoginInterface;
 import com.example.arsalansiddiq.beem.interfaces.MeetingCallBack;
 import com.example.arsalansiddiq.beem.interfaces.SampleInterface;
 import com.example.arsalansiddiq.beem.models.HolderListModel;
-import com.example.arsalansiddiq.beem.models.databasemodels.MarkAttendance;
 import com.example.arsalansiddiq.beem.models.databasemodels.SaleApiResponseTableRealm;
 import com.example.arsalansiddiq.beem.models.databasemodels.meetingsup.MeetingSUPEndTable;
 import com.example.arsalansiddiq.beem.models.databasemodels.meetingsup.MeetingSUPStartTable;
 import com.example.arsalansiddiq.beem.models.databasemodels.meetingsup.MeetingSUPUpdatesTable;
 import com.example.arsalansiddiq.beem.models.requestmodels.StartMeetingRequest;
-import com.example.arsalansiddiq.beem.models.responsemodels.AttandanceResponse;
 import com.example.arsalansiddiq.beem.models.responsemodels.LoginResponse;
 import com.example.arsalansiddiq.beem.models.responsemodels.MeetingResponseModel;
 
@@ -41,6 +43,7 @@ public class SyncDataToServerClass {
     private NavigationDrawerActivity navigationDrawerActivity;
     ProgressBar progressBar;
     private Context context;
+    private Activity activity;
     private NetworkUtils networkUtils;
     private Toast toast;
     //    private Realm realm;
@@ -54,9 +57,10 @@ public class SyncDataToServerClass {
             salesRecordsExecuted = 0, orderRecordsExecuted = 0, salesRecordsTotal = 0, orderRecordsTotal = 0;
     int count;
 
-    public SyncDataToServerClass(Context context) {
+    public SyncDataToServerClass(Context context, Activity activity) {
         navigationDrawerActivity = new NavigationDrawerActivity();
         this.context = context;
+        this.activity = activity;
         networkUtils = new NetworkUtils(context);
 //        realm = Realm.getDefaultInstance();
         realmCRUD = new RealmCRUD(context);
@@ -196,6 +200,8 @@ public class SyncDataToServerClass {
                 });
 
         alertBuilder.show();
+
+        enableNav_Sync();
     }
 
     public void updateSalesData() {
@@ -260,6 +266,7 @@ public class SyncDataToServerClass {
 //                Toast.makeText(context, saleApiResponseTableRealmList.size() + " Pending records sync successfully", Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(context, "please check you internet connection", Toast.LENGTH_SHORT).show();
+                enableNav_Sync();
             }
         }
 
@@ -341,14 +348,12 @@ public class SyncDataToServerClass {
 
                             if (responseModelResponse.isSuccessful()) {
                                 if (responseModelResponse.isSuccessful()) {
-
                                     realmCRUD.saveUpdateTablesUpdates(meetingSUPUpdatesTable.getPrimaryKey(), startMeetingId, 1);
                                 }
 
                             } else {
                                 Toast.makeText(context, "Something Went Wrong", Toast.LENGTH_SHORT).show();
                             }
-
                         }
 
                         @Override
@@ -359,7 +364,6 @@ public class SyncDataToServerClass {
                 } else {
                     Toast.makeText(context, "please check you internet connection", Toast.LENGTH_SHORT).show();
                 }
-
             }
         }
     }
@@ -389,7 +393,6 @@ public class SyncDataToServerClass {
                         } else {
                             Toast.makeText(context, "Something Went Wrong", Toast.LENGTH_SHORT).show();
                         }
-
                     }
 
                     @Override
@@ -403,83 +406,17 @@ public class SyncDataToServerClass {
         }
     }
 
-
-    public void updateMarkAttendanceOnServer() {
-        if (networkUtils.isNetworkConnected()) {
-
-            List<MarkAttendance> markAttendanceList = realmCRUD.getUnsavedMarkAttendanceData();
-
-            if (markAttendanceList.size() > 0) {
-                for (int i = 0; i < markAttendanceList.size(); i++) {
-
-                    final MarkAttendance markAttendance = markAttendanceList.get(i);
-                    File userImageFile = appUtils.imageByteToFileConversion(markAttendance.getStartImage());
-
-//                if (isConnected) {
-                    networkUtils.attandanceBA(markAttendance.getDate(), markAttendance.getId(), markAttendance.getName(), userImageFile,
-                            markAttendance.getStartTime(), markAttendance.getLatitude(), markAttendance.getLongitude(), 1, new AttandanceInterface() {
-                                @Override
-                                public void success(Response<AttandanceResponse> attandanceResponseResponse) {
-                                    if (attandanceResponseResponse.body().getStatus() == 1) {
-//                                        markAttendanceList.get(i) =
-                                        Log.i(LOG_TAG, String.valueOf(attandanceResponseResponse.body().getStatus()));
-                                    } else {
-
-                                    }
-                                }
-
-                                @Override
-                                public void failed(String error) {
-
-                                }
-                            });
-                }
-            }
-
-        } else {
-            alerts(true);
-        }
-    }
-
-    public void updateEndMarkAttendanceOnServer() {
-        if (networkUtils.isNetworkConnected()) {
-
-            List<MarkAttendance> markAttendanceList = realmCRUD.getUnsavedMarkAttendanceData();
-
-            if (markAttendanceList.size() > 0) {
-                for (int i = 0; i < markAttendanceList.size(); i++) {
-
-                    final MarkAttendance markAttendance = markAttendanceList.get(i);
-                    File userImageFile = appUtils.imageByteToFileConversion(markAttendance.getStartImage());
-
-//                if (isConnected) {
-                    networkUtils.attandanceBA(markAttendance.getDate(), markAttendance.getId(), markAttendance.getName(), userImageFile,
-                            markAttendance.getStartTime(), markAttendance.getLatitude(), markAttendance.getLongitude(), 1, new AttandanceInterface() {
-                                @Override
-                                public void success(Response<AttandanceResponse> attandanceResponseResponse) {
-                                    if (attandanceResponseResponse.body().getStatus() == 1) {
-                                        Log.i(LOG_TAG, String.valueOf(attandanceResponseResponse.body().getStatus()));
-                                    } else {
-
-                                    }
-                                }
-
-                                @Override
-                                public void failed(String error) {
-
-                                }
-                            });
-                }
-            }
-
-        } else {
-            alerts(true);
-        }
-    }
-
     void showToastWithCount(int status) {
         toast.setText("Total Sales Executed: " + salesRecordsExecuted + ", Status: " +status+ "\n" +
                 "Total Orders Executed with respect to Sales: " + orderRecordsExecuted + ", Status: " + status);
         toast.show();
+    }
+
+    void enableNav_Sync() {
+        Log.i("nav_sync", "ClickedEnables");
+        NavigationView navigationView = (NavigationView) this.activity.findViewById(R.id.nav_view);
+        Menu menuNavigation = navigationView.getMenu();
+        MenuItem menuItemNavigation = menuNavigation.findItem(R.id.nav_sync);
+        menuItemNavigation.setEnabled(true);
     }
 }

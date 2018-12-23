@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="5dp"
+    tools:context="com.example.arsalansiddiq.beem.activities.FeedbackBAActivity">
+
+    <TextView
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:textSize="25dp"
+        android:textColor="@color/colorBlue"
+        android:gravity="center"
+        android:hint="Feedback"/>
+
+    <EditText
+        android:id="@+id/edtText_customerName"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_margin="5dp"
+        android:inputType="textPersonName"
+        android:textCursorDrawable="@null"
+        android:hint="Customer Name"/>
+
+    <EditText
+        android:id="@+id/edtText_contactNumb"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_margin="5dp"
+        android:inputType="phone"
+        android:textCursorDrawable="@null"
+        android:textSize="20sp"
+        android:cursorVisible="false"
+        android:maxLength="13"
+        android:hint="Contact Number"/>
+
+    <RatingBar
+        android:id="@+id/ratingBar_submitFeedbackBA"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_margin="5dp"
+        android:numStars="5"
+        android:stepSize="1.0" />
+
+    <EditText
+        android:id="@+id/edtText_productName"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_margin="5dp"
+        android:inputType="textPersonName"
+        android:textCursorDrawable="@null"
+        android:hint="Product Name"/>
+
+    <EditText
+        android:id="@+id/edtText_comments"
+        android:layout_height="60dp"
+        android:layout_width="match_parent"
+        android:layout_margin="5dp"
+        android:textSize="20sp"
+        android:lines="4"
+        android:textCursorDrawable="@null"
+        android:inputType="textMultiLine"
+        android:hint="Comments"/>
+
+    <Button
+        android:id="@+id/btn_submitBAFeedback"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_margin="10dp"
+        android:background="@color/colorBlue"
+        android:textSize="18sp"
+        android:textColor="@color/white_color"
+        android:text="Submit"/>
+
+</LinearLayout>

@@ -1,6 +1,7 @@
 package com.example.arsalansiddiq.beem.utils;
 
 import com.example.arsalansiddiq.beem.models.requestmodels.LoginRequest;
+import com.example.arsalansiddiq.beem.models.requestmodels.ba.BAAddFeedbackRequestModel;
 import com.example.arsalansiddiq.beem.models.requestmodels.merchant.MeetingRequestMerchant;
 import com.example.arsalansiddiq.beem.models.requestmodels.merchant.SKUMerchantRequestModel;
 import com.example.arsalansiddiq.beem.models.responsemodels.AttandanceResponse;
@@ -8,6 +9,7 @@ import com.example.arsalansiddiq.beem.models.responsemodels.LoginResponse;
 import com.example.arsalansiddiq.beem.models.responsemodels.MeetingResponseModel;
 import com.example.arsalansiddiq.beem.models.responsemodels.ResponseSUP;
 import com.example.arsalansiddiq.beem.models.responsemodels.babreak.BreakTypeResponseModel;
+import com.example.arsalansiddiq.beem.models.responsemodels.bamodels.SubBrandsBAResponseModel;
 import com.example.arsalansiddiq.beem.models.responsemodels.merchant.competitionsku.MerchantSKU;
 import com.example.arsalansiddiq.beem.models.responsemodels.merchant.compulsory.CompulsoryStepsResponseModel;
 import com.example.arsalansiddiq.beem.models.responsemodels.merchant.merchanttask.MerchantTaskResponse;
@@ -257,4 +259,9 @@ public interface NetworkRequestInterfaces {
     @POST("storeskuresponse")
     Call<ResponseSUP> storeSKUPrice (@Body SKUMerchantRequestModel skuMerchantRequestModel);
 
+    @POST("brand/subbrands")
+    Call<SubBrandsBAResponseModel> getSubBrandsBA(@Query("brand_id") int brand_id);
+
+    @POST("addfeedback")
+    Call<ResponseSUP> addFeedbackBA(@Body BAAddFeedbackRequestModel baAddFeedbackRequestModel);
 }

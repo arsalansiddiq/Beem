@@ -480,7 +480,6 @@ public class RealmCRUD {
     }
 
     public boolean checkCurrentUserHasSavedBrands(int userId) {
-
         RealmResults<SalesSKUArrayResponse> salesSKUArrayResponses = realm.where(SalesSKUArrayResponse.class).equalTo("loginUserRelationIdWithBrands",
                 userId).findAll();
 
@@ -489,12 +488,54 @@ public class RealmCRUD {
         } else {
             return false;
         }
-
     }
 
-    public List<SalesSKUArrayResponse> getUserBrandsSKUCategory(int loginUserRelationIdWithBrands) {
+    public void insertBrandsCategoryDetailsSubBrands(com.example.arsalansiddiq.beem.models.responsemodels.bamodels.Data
+                                                             data, int loginUserRelationIdWithBrands) {
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                com.example.arsalansiddiq.beem.models.responsemodels.bamodels.Data salesSKUArrayResponse1 =
+                        realm.createObject(com.example.arsalansiddiq.beem.models.responsemodels.bamodels.Data.class);
+                salesSKUArrayResponse1.setLoginUserRelationIdWithBrands(loginUserRelationIdWithBrands);
+                salesSKUArrayResponse1.setId(data.getId());
+                salesSKUArrayResponse1.setBrandName(data.getBrandName());
+                salesSKUArrayResponse1.setBrandId(data.getBrandId());
+                salesSKUArrayResponse1.setDescription(data.getDescription());
+                salesSKUArrayResponse1.setCreatedAt(data.getCreatedAt());
+                salesSKUArrayResponse1.setUpdatedAt(data.getUpdatedAt());
+                salesSKUArrayResponse1.setDeletedAt(data.getDeletedAt());
+            }
+        });
+    }
 
-        RealmResults<SalesSKUArrayResponse> salesSKUArrayResponses = realm.where(SalesSKUArrayResponse.class).equalTo("loginUserRelationIdWithBrands",
+    public boolean checkCurrentUserHasSavedSubBrandsBA(int userId) {
+        RealmResults<com.example.arsalansiddiq.beem.models.responsemodels.bamodels.Data> subBrandsBAResponseModels = realm.where(com.example.arsalansiddiq.beem.models.responsemodels.bamodels.Data.class).equalTo("loginUserRelationIdWithBrands",
+                userId).findAll();
+
+        if (subBrandsBAResponseModels.size() > 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public List<SalesSKUArrayResponse> getUserBrandsSKUCategory(int loginUserRelationIdWithBrands,
+                                                                int subBrandsID) {
+
+        RealmResults<SalesSKUArrayResponse> salesSKUArrayResponses = realm.where(SalesSKUArrayResponse.class).equalTo("brandId", subBrandsID).findAll();
+
+        if (salesSKUArrayResponses.size() > 0) {
+            return salesSKUArrayResponses;
+        } else {
+            return salesSKUArrayResponses = null;
+        }
+    }
+
+    public List<com.example.arsalansiddiq.beem.models.responsemodels.bamodels.Data> getUserBrandsSKUCategorySub(int loginUserRelationIdWithBrands) {
+
+        RealmResults<com.example.arsalansiddiq.beem.models.responsemodels.bamodels.Data> salesSKUArrayResponses =
+                realm.where(com.example.arsalansiddiq.beem.models.responsemodels.bamodels.Data.class).equalTo("loginUserRelationIdWithBrands",
                 loginUserRelationIdWithBrands).findAll();
 
         if (salesSKUArrayResponses.size() > 0) {

@@ -29,15 +29,14 @@
 
     <string-array name="age_array">
         <item>Select Age</item>
-        <item>10-15</item>
-        <item>15-20</item>
         <item>20-25</item>
-        <item>25-30</item>
-        <item>30-35</item>
-        <item>35-40</item>
-        <item>40-45</item>
-        <item>45-50</item>
+        <item>26-30</item>
+        <item>31-35</item>
+        <item>36-40</item>
+        <item>41-45</item>
+        <item>46-50</item>
     </string-array>
+
     <string name="title_activity_basic_actibity">BasicActibity</string>
     <string name="title_activity_targets_and_achievements">TargetsAndAchievementsActivity</string>
     <string name="tab_text_1">SKU TARGETS</string>
