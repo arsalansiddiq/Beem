@@ -145,6 +145,8 @@ public class SalesActivity extends BaseActivity implements AdapterView.OnItemSel
     //    @RequiresApi(api = Build.VERSION_CODES.N)
     private void getBrandDetails() {
 
+        NetworkUtils networkUtils = new NetworkUtils(SalesActivity.this);
+
         SharedPreferences preferences = this.getSharedPreferences(Constants.USER_BRAND, MODE_PRIVATE);
         String brand = preferences.getString(Constants.KEY_USER_BRAND, null);
 
@@ -157,7 +159,6 @@ public class SalesActivity extends BaseActivity implements AdapterView.OnItemSel
             if (checSubBrandsExists) {
                 callRelmFetcherForBrandsSub(loginResponse.getUserId());
             } else {
-                NetworkUtils networkUtils = new NetworkUtils(SalesActivity.this);
 
                 if (networkUtils.isNetworkConnected()) {
                     progressShow();
@@ -207,8 +208,6 @@ public class SalesActivity extends BaseActivity implements AdapterView.OnItemSel
             }
 
             if (!checkBrandsExists) {
-
-                NetworkUtils networkUtils = new NetworkUtils(SalesActivity.this);
 
                 if (networkUtils.isNetworkConnected()) {
                     progressShow();
@@ -461,7 +460,7 @@ public class SalesActivity extends BaseActivity implements AdapterView.OnItemSel
                 if (subBrand != 0) {
                     linearLayout_pBrands.setVisibility(View.VISIBLE);
                     linearLayout_cBrands.setVisibility(View.VISIBLE);
-                    callRelmFetcherForBrands(loginResponse.getUserId(), data.get(subBrand - 1).getBrandId());
+                    callRelmFetcherForBrands(loginResponse.getUserId(), data.get(subBrand - 1).getId());
                 }
 
                 break;

@@ -523,7 +523,8 @@ public class RealmCRUD {
     public List<SalesSKUArrayResponse> getUserBrandsSKUCategory(int loginUserRelationIdWithBrands,
                                                                 int subBrandsID) {
 
-        RealmResults<SalesSKUArrayResponse> salesSKUArrayResponses = realm.where(SalesSKUArrayResponse.class).equalTo("brandId", subBrandsID).findAll();
+        RealmResults<SalesSKUArrayResponse> salesSKUArrayResponses = realm.where(SalesSKUArrayResponse.class)
+                .equalTo("loginUserRelationIdWithBrands", loginUserRelationIdWithBrands).and().equalTo("brandId", subBrandsID).findAll();
 
         if (salesSKUArrayResponses.size() > 0) {
             return salesSKUArrayResponses;

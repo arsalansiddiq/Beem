@@ -175,7 +175,7 @@
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
                 android:textSize="15sp"
-                android:text="Sub Brand"
+                android:text="Product Category"
                 android:layout_below="@+id/txtView_recordsSent"
                 android:layout_margin="5dp"
                 android:layout_weight="1"/>

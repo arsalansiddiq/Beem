@@ -25,6 +25,7 @@ import com.example.arsalansiddiq.beem.adapters.RecyclerViewAdapter;
 import com.example.arsalansiddiq.beem.interfaces.TargetsAndAchievementResponseInterface;
 import com.example.arsalansiddiq.beem.models.responsemodels.targetsandachievementsmodel.Target;
 import com.example.arsalansiddiq.beem.models.responsemodels.targetsandachievementsmodel.TargetsandAchievementsModel;
+import com.example.arsalansiddiq.beem.rnd.GenericAdapter;
 import com.example.arsalansiddiq.beem.utils.NetworkUtils;
 
 import java.util.ArrayList;
@@ -176,6 +177,18 @@ public class TargetAndAchievFragment extends Fragment {
 
                         // Create adapter passing in the sample user data
                         RecyclerViewAdapter adapter = new RecyclerViewAdapter(targetsandAchievementsModelResponse.body().getTarget());
+
+                        RecyclerView.Adapter recyclerAdapter = new GenericAdapter(getContext(), targetsandAchievementsModelResponse.body().getTarget()) {
+                            @Override
+                            public RecyclerView.ViewHolder setViewHolder(ViewGroup parent) {
+                                return null;
+                            }
+
+                            @Override
+                            public void onBindData(RecyclerView.ViewHolder holder, Object val) {
+
+                            }
+                        };
                         // Attach the adapter to the recyclerview to populate items
                         recyclerView.setAdapter(adapter);
                         // Set layout manager to position the items
