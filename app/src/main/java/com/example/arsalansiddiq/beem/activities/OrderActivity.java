@@ -63,6 +63,7 @@ public class OrderActivity extends BaseActivity implements LocationListener, Rad
     private Spinner spinner_saleStatus = null;
     private NetworkUtils networkUtils = null;
     private String cusName, contact; String email; String gender; String age; String cBrand = null;
+    private String cBrandName;
     private String pBrand = null;
     private Integer sale_id = 0, saleStatus = null;
     private LocationManager locationManager = null;
@@ -98,8 +99,8 @@ public class OrderActivity extends BaseActivity implements LocationListener, Rad
     public static ArrayList<ListViewModelCheck> listViewModelCheckArrayList;
 
 
-    @BindView(R.id.txtView_salesStatus)
-    TextView txtView_salesStatus;
+    @BindView(R.id.txtView_cBrandSelected)
+    TextView txtView_cBrandSelected;
 
 
     @Override
@@ -142,8 +143,9 @@ public class OrderActivity extends BaseActivity implements LocationListener, Rad
         age = intent.getStringExtra("age");
         pBrand = intent.getStringExtra("pBrand");
         cBrand = intent.getStringExtra("cBrand");
+        cBrandName = intent.getStringExtra("cBrandName");
 
-        txtView_salesStatus.setText(cBrand);
+        txtView_cBrandSelected.setText(cBrandName);
 
         ArrayAdapter adapterGender = ArrayAdapter.createFromResource(this, R.array.saleStatus_array, android.R.layout.simple_spinner_item);
         adapterGender.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);

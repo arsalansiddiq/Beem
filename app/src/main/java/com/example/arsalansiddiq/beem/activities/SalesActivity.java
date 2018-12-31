@@ -56,7 +56,7 @@ public class SalesActivity extends BaseActivity implements AdapterView.OnItemSel
 
     private Spinner spinner_gender, spinner_age, spinner_pBrand, spinner_cBrand, spinner_subBrands = null;
 
-    String name, email, gender, age;
+    String name, email, gender, age, cBrandName;
 
     String contact = null;
     private Integer cBrand, pBrand, subBrand;
@@ -87,6 +87,7 @@ public class SalesActivity extends BaseActivity implements AdapterView.OnItemSel
 
     @BindView(R.id.linearLayout_pBrands)
     LinearLayout linearLayout_pBrands;
+
     //    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -117,17 +118,15 @@ public class SalesActivity extends BaseActivity implements AdapterView.OnItemSel
         edtText_contact = findViewById(R.id.edtText_contact);
         edtText_email = findViewById(R.id.edtText_email);
 
-
         spinner_gender.setOnItemSelectedListener(this);
         spinner_age.setOnItemSelectedListener(this);
         spinner_subBrands.setOnItemSelectedListener(this);
         spinner_pBrand.setOnItemSelectedListener(this);
         spinner_cBrand.setOnItemSelectedListener(this);
 
-        setupEditTextWithDashes(R.id.edtText_contact, Constants.NUMBERS_DASHED_MASK);
+        setStaticAdapters();
 
-//        genderList = new  {"Male", "Female"};
-//        skuCategory = new ArrayList<SalesSKUArrayResponse>();
+        setupEditTextWithDashes(R.id.edtText_contact, Constants.NUMBERS_DASHED_MASK);
 
         getBrandDetails();
 
@@ -269,7 +268,7 @@ public class SalesActivity extends BaseActivity implements AdapterView.OnItemSel
         setAdapterSubBrands(subBrandList);
     }
 
-    void setAdapterSubBrands(String[] subBrandList){
+    void setAdapterSubBrands(String[] subBrandList) {
         adapterSubBrands = new ArrayAdapter<CharSequence>(SalesActivity.this, android.R.layout.simple_spinner_item, subBrandList);
         adapterSubBrands.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner_subBrands.setAdapter(adapterSubBrands);
@@ -283,7 +282,6 @@ public class SalesActivity extends BaseActivity implements AdapterView.OnItemSel
         salesSKUArrayResponseList = realmCRUD.getUserBrandsSKUCategory(userId, subBrandID);
 
         Map<Integer, SalesSKUArrayResponse> map = new LinkedHashMap<>();
-
         for (SalesSKUArrayResponse saleArray : salesSKUArrayResponseList) {
             map.put(saleArray.getCateId(), saleArray);
         }
@@ -305,6 +303,13 @@ public class SalesActivity extends BaseActivity implements AdapterView.OnItemSel
 
     private void setAdatpers(String[] brandList) {
 
+        adapterBrand = new ArrayAdapter<CharSequence>(SalesActivity.this, android.R.layout.simple_spinner_item, brandList);
+        adapterBrand.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner_cBrand.setAdapter(adapterBrand);
+        spinner_pBrand.setAdapter(adapterBrand);
+    }
+
+    private void setStaticAdapters() {
         adapterGender = ArrayAdapter.createFromResource(SalesActivity.this, R.array.gender_array, android.R.layout.simple_spinner_item);
         adapterGender.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner_gender.setAdapter(adapterGender);
@@ -312,11 +317,6 @@ public class SalesActivity extends BaseActivity implements AdapterView.OnItemSel
         adapterAge = ArrayAdapter.createFromResource(SalesActivity.this, R.array.age_array, android.R.layout.simple_spinner_item);
         adapterAge.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner_age.setAdapter(adapterAge);
-
-        adapterBrand = new ArrayAdapter<CharSequence>(SalesActivity.this, android.R.layout.simple_spinner_item, brandList);
-        adapterBrand.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner_cBrand.setAdapter(adapterBrand);
-        spinner_pBrand.setAdapter(adapterBrand);
     }
 
     public void onNext(View v) {
@@ -334,6 +334,7 @@ public class SalesActivity extends BaseActivity implements AdapterView.OnItemSel
             } else {
 
                 valueBrandId = String.valueOf(salesSKUArrayResponseListDuplicateComparator.get(cBrand - 1).getCateId());
+                cBrandName = salesSKUArrayResponseListDuplicateComparator.get(cBrand - 1).getBrand();
                 valuePreviousBrandId = String.valueOf(salesSKUArrayResponseListDuplicateComparator.get(pBrand - 1).getCateId());
 
                 if (!TextUtils.isEmpty(edtText_name.getText().toString()) &&
@@ -347,6 +348,7 @@ public class SalesActivity extends BaseActivity implements AdapterView.OnItemSel
 //                intent.putExtra("pBrand", pBrand);
                     intent.putExtra("pBrand", valuePreviousBrandId);
                     intent.putExtra("cBrand", valueBrandId);
+                    intent.putExtra("cBrandName", cBrandName);
 //                intent.putExtra("cBrand", cBrand);
                     startActivity(intent);
                 } else if ((!TextUtils.isEmpty(edtText_name.getText().toString())) &&
@@ -364,6 +366,7 @@ public class SalesActivity extends BaseActivity implements AdapterView.OnItemSel
 //                    intent.putExtra("pBrand", pBrand);
                         intent.putExtra("pBrand", valuePreviousBrandId);
                         intent.putExtra("cBrand", valueBrandId);
+                        intent.putExtra("cBrandName", cBrandName);
 //                    intent.putExtra("cBrand", cBrand);
                         startActivity(intent);
                     } else {
@@ -388,6 +391,7 @@ public class SalesActivity extends BaseActivity implements AdapterView.OnItemSel
 //                    intent.putExtra("pBrand", pBrand);
                         intent.putExtra("pBrand", valuePreviousBrandId);
                         intent.putExtra("cBrand", valueBrandId);
+                        intent.putExtra("cBrandName", cBrandName);
 //                    intent.putExtra("cBrand", cBrand);
                         startActivity(intent);
                     }
@@ -415,6 +419,7 @@ public class SalesActivity extends BaseActivity implements AdapterView.OnItemSel
 //                    intent.putExtra("pBrand", pBrand);
                         intent.putExtra("pBrand", valuePreviousBrandId);
                         intent.putExtra("cBrand", valueBrandId);
+                        intent.putExtra("cBrandName", cBrandName);
 //                    intent.putExtra("cBrand", cBrand);
 
                         startActivity(intent);
@@ -474,8 +479,7 @@ public class SalesActivity extends BaseActivity implements AdapterView.OnItemSel
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        switch(keyCode)
-        {
+        switch (keyCode) {
             case KeyEvent.KEYCODE_BACK:
 
                 Intent intent = new Intent(SalesActivity.this, NavigationDrawerActivity.class);
@@ -488,22 +492,21 @@ public class SalesActivity extends BaseActivity implements AdapterView.OnItemSel
     }
 
 
-    public boolean isEmailValid(String email)
-    {
+    public boolean isEmailValid(String email) {
         String regExpn =
                 "^(([\\w-]+\\.)+[\\w-]+|([a-zA-Z]{1}|[\\w-]{2,}))@"
-                        +"((([0-1]?[0-9]{1,2}|25[0-5]|2[0-4][0-9])\\.([0-1]?"
-                        +"[0-9]{1,2}|25[0-5]|2[0-4][0-9])\\."
-                        +"([0-1]?[0-9]{1,2}|25[0-5]|2[0-4][0-9])\\.([0-1]?"
-                        +"[0-9]{1,2}|25[0-5]|2[0-4][0-9])){1}|"
-                        +"([a-zA-Z]+[\\w-]+\\.)+[a-zA-Z]{2,4})$";
+                        + "((([0-1]?[0-9]{1,2}|25[0-5]|2[0-4][0-9])\\.([0-1]?"
+                        + "[0-9]{1,2}|25[0-5]|2[0-4][0-9])\\."
+                        + "([0-1]?[0-9]{1,2}|25[0-5]|2[0-4][0-9])\\.([0-1]?"
+                        + "[0-9]{1,2}|25[0-5]|2[0-4][0-9])){1}|"
+                        + "([a-zA-Z]+[\\w-]+\\.)+[a-zA-Z]{2,4})$";
 
         CharSequence inputStr = email;
 
-        Pattern pattern = Pattern.compile(regExpn,Pattern.CASE_INSENSITIVE);
+        Pattern pattern = Pattern.compile(regExpn, Pattern.CASE_INSENSITIVE);
         Matcher matcher = pattern.matcher(inputStr);
 
-        if(matcher.matches())
+        if (matcher.matches())
             return true;
         else
             return false;
