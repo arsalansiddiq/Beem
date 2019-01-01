@@ -289,7 +289,7 @@ public class SalesActivity extends BaseActivity implements AdapterView.OnItemSel
         salesSKUArrayResponseListDuplicateComparator.addAll(map.values());
 
         brandList = new String[salesSKUArrayResponseListDuplicateComparator.size() + 1];
-        brandList[0] = "Select Sub Brand";
+        brandList[0] = "Product category";
 
 
         for (int i = 0; i < salesSKUArrayResponseListDuplicateComparator.size(); i++) {
@@ -334,7 +334,7 @@ public class SalesActivity extends BaseActivity implements AdapterView.OnItemSel
             } else {
 
                 valueBrandId = String.valueOf(salesSKUArrayResponseListDuplicateComparator.get(cBrand - 1).getCateId());
-                cBrandName = salesSKUArrayResponseListDuplicateComparator.get(cBrand - 1).getBrand();
+//                cBrandName = salesSKUArrayResponseListDuplicateComparator.get(cBrand - 1).getBrand();
                 valuePreviousBrandId = String.valueOf(salesSKUArrayResponseListDuplicateComparator.get(pBrand - 1).getCateId());
 
                 if (!TextUtils.isEmpty(edtText_name.getText().toString()) &&
@@ -455,6 +455,7 @@ public class SalesActivity extends BaseActivity implements AdapterView.OnItemSel
             case R.id.spinner_cBrand:
 
                 cBrand = spinner_cBrand.getSelectedItemPosition();
+                cBrandName = spinner_cBrand.getSelectedItem().toString();
 
                 break;
 
