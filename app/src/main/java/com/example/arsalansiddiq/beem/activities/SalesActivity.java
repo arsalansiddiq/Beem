@@ -258,7 +258,7 @@ public class SalesActivity extends BaseActivity implements AdapterView.OnItemSel
         data = realmCRUD.getUserBrandsSKUCategorySub(userId);
 
         subBrandList = new String[data.size() + 1];
-        subBrandList[0] = "Select Brand";
+        subBrandList[0] = "Select Product Category";
 
 
         for (int i = 0; i < data.size(); i++) {
@@ -289,7 +289,7 @@ public class SalesActivity extends BaseActivity implements AdapterView.OnItemSel
         salesSKUArrayResponseListDuplicateComparator.addAll(map.values());
 
         brandList = new String[salesSKUArrayResponseListDuplicateComparator.size() + 1];
-        brandList[0] = "Product category";
+        brandList[0] = "Select Brand";
 
 
         for (int i = 0; i < salesSKUArrayResponseListDuplicateComparator.size(); i++) {

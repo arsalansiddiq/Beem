@@ -18,7 +18,6 @@ public class RealmApplicationInstance extends Application {
         RealmConfiguration realmConfiguration = new RealmConfiguration.Builder()
                 .name("mybeemdatabase.realm")
                 .build();
-
         Realm.setDefaultConfiguration(realmConfiguration);
     }
 }
