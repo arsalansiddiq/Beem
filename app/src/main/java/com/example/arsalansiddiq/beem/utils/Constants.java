@@ -6,8 +6,8 @@ package com.example.arsalansiddiq.beem.utils;
 
 public class Constants {
 
-//    public static final String BASE_URL = "http://dayfresh.brandedgesolutions.com/api/";
-    public static final String BASE_URL = "http://test.brandedgesolutions.com/api/";
+    public static final String BASE_URL = "http://dayfresh.brandedgesolutions.com/api/";
+//    public static final String BASE_URL = "http://test.brandedgesolutions.com/api/";
 
     public static final String BA_ATTENDANCE_ID = "id";
     public static final String KEY_BA_ATTENDANCE_ID = "baAttendanceID";

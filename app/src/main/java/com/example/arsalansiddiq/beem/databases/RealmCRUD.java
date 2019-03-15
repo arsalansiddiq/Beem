@@ -520,10 +520,11 @@ public class RealmCRUD {
         }
     }
 
-    public List<SalesSKUArrayResponse> getUserBrandsSKUCategory(int loginUserRelationIdWithBrands,
-                                                                int subBrandsID) {
+    //Code Before 1.2 APK
+    public List<SalesSKUArrayResponse> getUserBrandsSKUCategory(int loginUserRelationIdWithBrands) {
 
-        RealmResults<SalesSKUArrayResponse> salesSKUArrayResponses = realm.where(SalesSKUArrayResponse.class).equalTo("brandId", subBrandsID).findAll();
+        RealmResults<SalesSKUArrayResponse> salesSKUArrayResponses = realm.where(SalesSKUArrayResponse.class).equalTo("loginUserRelationIdWithBrands",
+                loginUserRelationIdWithBrands).findAll();
 
         if (salesSKUArrayResponses.size() > 0) {
             return salesSKUArrayResponses;
@@ -531,6 +532,19 @@ public class RealmCRUD {
             return salesSKUArrayResponses = null;
         }
     }
+
+    //March 15 Changes reverted to APK 1.1 from 1.2
+//    public List<SalesSKUArrayResponse> getUserBrandsSKUCategory(int loginUserRelationIdWithBrands,
+//                                                                int subBrandsID) {
+//
+//        RealmResults<SalesSKUArrayResponse> salesSKUArrayResponses = realm.where(SalesSKUArrayResponse.class).equalTo("brandId", subBrandsID).findAll();
+//
+//        if (salesSKUArrayResponses.size() > 0) {
+//            return salesSKUArrayResponses;
+//        } else {
+//            return salesSKUArrayResponses = null;
+//        }
+//    }
 
     public List<com.example.arsalansiddiq.beem.models.responsemodels.bamodels.Data> getUserBrandsSKUCategorySub(int loginUserRelationIdWithBrands) {
 
