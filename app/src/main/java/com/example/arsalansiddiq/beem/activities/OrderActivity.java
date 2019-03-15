@@ -26,6 +26,7 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.arsalansiddiq.beem.R;
@@ -49,6 +50,8 @@ import com.example.arsalansiddiq.beem.utils.NetworkUtils;
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import retrofit2.Response;
 
 public class OrderActivity extends BaseActivity implements LocationListener, RadioGroup.OnCheckedChangeListener{
@@ -60,6 +63,7 @@ public class OrderActivity extends BaseActivity implements LocationListener, Rad
     private Spinner spinner_saleStatus = null;
     private NetworkUtils networkUtils = null;
     private String cusName, contact; String email; String gender; String age; String cBrand = null;
+    private String cBrandName;
     private String pBrand = null;
     private Integer sale_id = 0, saleStatus = null;
     private LocationManager locationManager = null;
@@ -95,10 +99,16 @@ public class OrderActivity extends BaseActivity implements LocationListener, Rad
     public static ArrayList<ListViewModelCheck> listViewModelCheckArrayList;
 
 
+    @BindView(R.id.txtView_cBrandSelected)
+    TextView txtView_cBrandSelected;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_order);
+        ButterKnife.bind(this);
+        ButterKnife.setDebug(true);
 
         listViewModelCheckArrayList = new ArrayList<>();
 
@@ -133,6 +143,9 @@ public class OrderActivity extends BaseActivity implements LocationListener, Rad
         age = intent.getStringExtra("age");
         pBrand = intent.getStringExtra("pBrand");
         cBrand = intent.getStringExtra("cBrand");
+        cBrandName = intent.getStringExtra("cBrandName");
+
+        txtView_cBrandSelected.setText(cBrandName);
 
         ArrayAdapter adapterGender = ArrayAdapter.createFromResource(this, R.array.saleStatus_array, android.R.layout.simple_spinner_item);
         adapterGender.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
