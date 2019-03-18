@@ -171,7 +171,7 @@ public class SyncDataToServerClass {
         } else {
 
 //            ((NavigationDrawerActivity) context).hideProgress();
-            alertTitle = "DatumMerchant Sync Status!";
+            alertTitle = "Sync Status!";
 
             String syncRecordsSuccess = "Dear user " + syncSalesSuccess + " sales and " + syncOrderSuccess + " orders synced successfully";
 
